@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f7f1e8">
 <title>失衡・公寓觀察</title>
-<meta name="imb-build" content="2026-11-10 20:27 (台北)">
+<meta name="imb-build" content="2026-11-10 20:36 (台北)">
 <style>
 :root{
   --bg:#f7f1e8; --card:#fffaf3; --line:#e8dccb; --ink:#4a3f35; --muted:#9a8b7b; --accent:#c9876b; --accent2:#e7b9a3;
@@ -566,6 +566,17 @@ span.av,div.av{display:inline-block;border-radius:50%}
 .ckmark label{display:flex;flex-direction:column;gap:4px;color:var(--muted)}
 .ckmark select,.ckmark input[type=number]{font:inherit;font-size:16px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:#fff;color:inherit}
 @media (min-width:480px){.ckmark{grid-template-columns:1fr 1fr}.ckmark .ckcd,.ckmark .small{grid-column:1/-1}}
+
+.cheatmenu{display:flex;flex-direction:column;gap:10px;padding:8px 0 12px}
+.ckmenubtn{min-height:52px;font-size:16px;font-weight:600}
+.ckback{margin:0 0 8px}
+.ckpick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:8px 0 12px}
+.ckav{display:flex;flex-direction:column;align-items:center;gap:4px;border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:8px 4px 6px;cursor:pointer;font:inherit;color:inherit;min-width:0}
+.ckav .av{width:44px;height:44px}
+.ckav small{font-size:11px;line-height:1.2;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ckav.on{border-color:var(--accent);background:#fff4ee;box-shadow:0 0 0 2px rgba(196,106,74,.35)}
+.ckallav{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--soft);font-size:16px;font-weight:700;color:var(--accent)}
+@media (min-width:560px){.ckpick{grid-template-columns:repeat(8,1fr)}}
 
 </style>
 </head>
@@ -5310,49 +5321,131 @@ function setCheat(on){
   save(); toast(on ? '🛠️ 作弊模式：可以修改數值' : '作弊模式關閉：數值不能修改');
   if (ui.view === 'save' || ui.view === 'ach') renderView(ui.view);
 }
-// 可以改的數值：[標籤, 取值, 設值, 最小, 最大]
-function cheatFields(){
+// 可以改的數值：[標籤, 取值, 設值, 最小, 最大, 步進, 分段]
+// 不傳 who 時回傳全部（給測試／匯出用）；傳 'h'／室友 id／'all' 時只回那一頁要用的
+const ckUi = {page:'menu', who:'h'};
+function cheatFields(who){
   const f = [];
-  for (const id of S.residents){
-    f.push([id, `${nm(id)} 對你的好感`, () => S.aff[id].h, v => { S.aff[id].h = v; }, -100, 100]);
-    f.push([id, `${nm(id)} 對你的情慾`, () => S.des[id].h, v => { S.des[id].h = v; }, 0, 100]);
-    f.push([id, `你對 ${nm(id)} 的好感`, () => S.aff.h[id], v => { S.aff.h[id] = v; }, -100, 100]);
-    f.push([id, `${nm(id)} 的醋意`, () => S.jeal[id] || 0, v => { S.jeal[id] = v; }, 0, 100]);
-    f.push([id, `${nm(id)} 的獨佔欲`, () => possOf(id), v => setPoss(id, v), 0, 100]);
+  const add = (id, label, get, set, lo, hi, st, sec) => f.push([id, label, get, set, lo, hi, st == null ? 1 : st, sec || '']);
+  const needs = (id, sec) => {
+    const e = () => S.ents[id];
+    if (id === 'h') add(id, '你的心情', () => hMood(), v => { S.hero.mood = v; }, 0, 100, 1, sec);
+    else add(id, '心情加成', () => Math.round((e() && e().buff) || 0), v => { if (e()) e().buff = v; }, -30, 30, 1, sec);
+    for (const k of Object.keys(NEED_LBL)) add(id, `${id === 'h' ? '你的' : ''}${NEED_LBL[k]}`, () => (e() && e().needs[k]) || 0, v => { if (e()) e().needs[k] = v; }, 0, 100, 1, sec);
+  };
+  const rel = (id) => {
+    add(id, `${nm(id)} 對你的好感`, () => S.aff[id].h, v => { S.aff[id].h = v; }, -100, 100, 1, '和你的關係');
+    add(id, `${nm(id)} 對你的情慾`, () => S.des[id].h, v => { S.des[id].h = v; }, 0, 100, 1, '和你的關係');
+    add(id, `你對 ${nm(id)} 的好感`, () => S.aff.h[id], v => { S.aff.h[id] = v; }, -100, 100, 1, '和你的關係');
+    add(id, `你對 ${nm(id)} 的情慾`, () => S.des.h[id], v => { S.des.h[id] = v; }, 0, 100, 1, '和你的關係');
+    add(id, `${nm(id)} 的醋意`, () => S.jeal[id] || 0, v => { S.jeal[id] = v; }, 0, 100, 1, '和你的關係');
+  };
+  const coef = (id) => {
+    for (const [k, n] of COEF_LBL) add('coef', `${nm(id)}・${n}`, () => CHAR[id][k], v => { (S.coef[id] = S.coef[id] || {})[k] = v; CHAR[id][k] = v; }, 0, 1.5, 0.05, '個性');
+    add(id, `${nm(id)} 的獨佔欲`, () => possOf(id), v => setPoss(id, v), 0, 100, 1, '個性');
+  };
+  const pairs = (id) => {
+    for (const o of S.residents){ if (o === id) continue; const k = pkey(id, o);
+      add('pair', `${nm(id)} ⇄ ${nm(o)} 交情`, () => pairV(id, o), v => { S.aff[id][o] = v; S.aff[o][id] = v; }, -100, 100, 1, '和其他室友');
+      add('pair', `${nm(id)} ⇄ ${nm(o)} 競爭`, () => S.rival[k] || 0, v => { S.rival[k] = v; }, 0, 100, 1, '和其他室友'); }
+  };
+  if (!who){
+    for (const id of S.residents){ rel(id); coef(id); }
+    needs('h', '狀態');
+    const R = S.residents;
+    for (let i = 0; i < R.length; i++) for (let j = i + 1; j < R.length; j++){ const a = R[i], b = R[j], k = pkey(a, b);
+      add('pair', `${nm(a)} ⇄ ${nm(b)} 交情`, () => pairV(a, b), v => { S.aff[a][b] = v; S.aff[b][a] = v; }, -100, 100, 1, '室友之間');
+      add('pair', `${nm(a)} ⇄ ${nm(b)} 競爭`, () => S.rival[k] || 0, v => { S.rival[k] = v; }, 0, 100, 1, '室友之間'); }
+    return f;
   }
-  f.push(['h', '你的心情', () => hMood(), v => { S.hero.mood = v; }, 0, 100]);
-  for (const k of Object.keys(NEED_LBL)) f.push(['h', `你的${NEED_LBL[k]}`, () => S.ents.h.needs[k], v => { S.ents.h.needs[k] = v; }, 0, 100]);
-  // 室友之間：交情（雙向一起改）與競爭
-  const R = S.residents;
-  for (let i = 0; i < R.length; i++) for (let j = i + 1; j < R.length; j++){ const a = R[i], b = R[j], k = pkey(a, b);
-    f.push(['pair', `${nm(a)} ⇄ ${nm(b)} 交情`, () => pairV(a, b), v => { S.aff[a][b] = v; S.aff[b][a] = v; }, -100, 100]);
-    f.push(['pair', `${nm(a)} ⇄ ${nm(b)} 競爭`, () => S.rival[k] || 0, v => { S.rival[k] = v; }, 0, 100]); }
-  // 個性係數（影響吃醋、被逗笑、被稱讚、被撩的反應）
-  for (const id of R) for (const [k, n] of COEF_LBL) f.push(['coef', `${nm(id)}・${n}`, () => CHAR[id][k], v => { (S.coef[id] = S.coef[id] || {})[k] = v; CHAR[id][k] = v; }, 0, 1.5, 0.05]);
+  if (who === 'h'){ needs('h', '狀態'); return f; }
+  if (who === 'all') return f;
+  if (CHAR[who] && S.residents.includes(who)){ needs(who, '狀態'); rel(who); coef(who); pairs(who); }
   return f;
 }
-function openCheat(){
+function cheatSet(lab, val){
   if (!S || !S.cheat) return false;
+  const find = F => F.findIndex(x => x[1] === lab);
+  const fill = i => { const n = document.querySelector(`#sheet input[type=number][data-ck="${i}"]`); if (!n) return false; n.value = String(val); n.dispatchEvent(new Event('input')); n.dispatchEvent(new Event('change')); return true; };
+  if (ckUi.page === 'vals'){ const i = find(cheatFields(ckUi.who)); if (i >= 0 && fill(i)) return true; }
+  const all = cheatFields(), j = find(all); if (j < 0) return false;
+  const row = all[j]; let who = row[0];
+  if (who === 'pair') who = S.residents.find(id => lab.includes(nm(id))) || 'all';
+  else if (who === 'coef') who = S.residents.find(id => lab.startsWith(nm(id) + '・')) || 'all';
+  if (!cheatGoto(who)) return false;
+  const i2 = find(cheatFields(ckUi.who)); return i2 >= 0 && fill(i2);
+}
+function renderCheatMenu(){
+  $('#sheet').innerHTML = `<div class="grab"></div><h3>🛠️ 作弊模式</h3>
+    <div class="small muted">先選要做的事。關掉左上角的「作弊」開關就不能再改。</div>
+    <div class="cheatmenu">
+      <button type="button" class="btn wide ckmenubtn" id="ckVals">📊 修改數值</button>
+      <button type="button" class="btn wide ckmenubtn" id="ckNpc">🧩 自訂室友行為</button>
+      <button type="button" class="btn wide ckmenubtn" id="ckText">📝 修改遊戲裡的文字</button>
+      <button type="button" class="btn wide" id="ckClose">完成</button>
+    </div>`;
+  $('#ckVals').onclick = () => { ckUi.page = 'vals'; ckUi.who = ckUi.who || 'h'; ui.sheet.render(); };
+  $('#ckNpc').onclick = () => openNpcMods();
+  $('#ckText').onclick = () => { if (typeof txUi !== 'undefined') txUi.item = null; openTextEditor(); };
+  $('#ckClose').onclick = closeSheet;
+}
+function ckPickers(){
+  const who = ckUi.who || 'h';
+  const items = [['h', S.hero.name], ...S.residents.map(id => [id, nm(id)]), ['all', '全體']];
+  return `<div class="ckpick" role="tablist">${items.map(([id, n]) => `<button type="button" class="ckav${who === id ? ' on' : ''}" data-ckwho="${id}" aria-pressed="${who === id}"><span class="av">${id === 'all' ? '<span class="ckallav">全</span>' : avOf(id)}</span><small>${esc(n)}</small></button>`).join('')}</div>`;
+}
+function renderCheatVals(){
+  const who = (ckUi.who === 'all' || ckUi.who === 'h' || (CHAR[ckUi.who] && S.residents.includes(ckUi.who))) ? ckUi.who : 'h';
+  ckUi.who = who;
+  const F = cheatFields(who);
+  const title = who === 'h' ? esc(S.hero.name) : who === 'all' ? '全體' : esc(nm(who));
+  let last = null, body = '';
+  for (let i = 0; i < F.length; i++){
+    const x = F[i], sec = x[7] || '';
+    if (sec && sec !== last){ body += `<div class="cksec" id="cks-${sec === '和其他室友' ? 'pair' : sec === '個性' ? 'coef' : who}">${esc(sec)}</div>`; last = sec; }
+    const st = x[6] || 1, v = Math.round(x[2]() / st) * st, vs = st < 1 ? v.toFixed(2) : v;
+    body += `<label class="ckrow"><span>${esc(x[1])}</span><input type="range" min="${x[4]}" max="${x[5]}" step="${st}" value="${vs}" data-ck="${i}"><input type="number" min="${x[4]}" max="${x[5]}" step="${st}" value="${vs}" data-ck="${i}" inputmode="decimal"></label>`;
+  }
+  let extra = '';
+  if (who === 'h' && typeof markCheatHTML === 'function') extra += markCheatHTML();
+  if (who !== 'h' && who !== 'all'){
+    extra += `<div class="cksec">邀約／拒絕的冷卻</div><div class="ckcd"><button type="button" class="btn sm" data-ckcd="${who}">重置 ${esc(nm(who))} 的冷卻</button></div>
+      <button type="button" class="btn wide" data-ckcoef="${who}">還原 ${esc(nm(who))} 的個性係數</button>`; }
+  if (who === 'all'){
+    extra += `<div class="small muted" style="margin:8px 0">各人的好感、情慾、獨佔欲和室友交情，請點上面的頭像。這裡是會一次影響所有人的操作。</div>
+      <div class="cksec" id="cks-all">全體操作</div>
+      <div class="ckcd"><button type="button" class="btn sm" data-ckcd="all">重置所有人的冷卻</button></div>
+      <button type="button" class="btn wide" id="ckCoef0">個性係數還原成預設</button>`; }
+  $('#sheet').innerHTML = `<div class="grab"></div><button type="button" class="btn sm ckback" id="ckBack">← 回到選單</button>
+    <h3>🛠️ 修改數值 <span class="pill">作弊模式</span> <span class="muted small">${title}</span></h3>
+    <div class="small muted">先選一個人，再改他的數值。拖動或輸入會馬上生效。</div>
+    ${ckPickers()}
+    <div class="cheatpanel">${body}${extra}</div>`;
+  const apply = (i, raw) => { if (!S.cheat) return; const x = F[i]; if (!x) return; const st = x[6] || 1, v = clamp(Math.round(Number(raw) / st) * st, x[4], x[5]); if (!Number.isFinite(v)) return; x[3](st < 1 ? Math.round(v * 100) / 100 : v);
+    $('#sheet').querySelectorAll(`[data-ck="${i}"]`).forEach(n => { if (Math.abs(+n.value - v) > 1e-9) n.value = st < 1 ? v.toFixed(2) : v; });
+    if (CHAR[x[0]]){ S.tiers[x[0]] = S.tiers[x[0]] ?? tierIdx(x[0]); checkTier(x[0]); } achThink(); save(); };
+  $('#sheet').querySelectorAll('[data-ck]').forEach(n => { n.oninput = () => apply(+n.dataset.ck, n.value); n.onchange = () => { apply(+n.dataset.ck, n.value); renderAll(true); }; });
+  $('#ckBack').onclick = () => { ckUi.page = 'menu'; ui.sheet.render(); };
+  $('#sheet').querySelectorAll('[data-ckwho]').forEach(b => b.onclick = () => { ckUi.who = b.dataset.ckwho; ui.sheet.render(); });
+  $('#sheet').querySelectorAll('[data-ckcd]').forEach(b => b.onclick = () => { resetCooldowns(b.dataset.ckcd); toast(b.dataset.ckcd === 'all' ? '已重置所有人的冷卻' : `已重置 ${nm(b.dataset.ckcd)} 的冷卻`); });
+  const c0 = $('#ckCoef0'); if (c0) c0.onclick = () => { resetCoef(); toast('個性係數已還原成預設'); ui.sheet.render(); };
+  $('#sheet').querySelectorAll('[data-ckcoef]').forEach(b => b.onclick = () => { resetCoef(b.dataset.ckcoef); toast(`已還原 ${nm(b.dataset.ckcoef)} 的個性係數`); ui.sheet.render(); });
+  if (who === 'h' && typeof markCheatBind === 'function') markCheatBind();
+}
+function cheatGoto(who){
+  if (!S || !S.cheat) return false;
+  ckUi.page = 'vals'; ckUi.who = who || 'h';
+  if (ui.sheet && ui.sheet.cheat && typeof ui.sheet.render === 'function') ui.sheet.render();
+  else openCheat('vals', who);
+  return true;
+}
+function openCheat(page, who){
+  if (!S || !S.cheat) return false;
+  if (page) ckUi.page = page; else ckUi.page = 'menu';
+  if (who) ckUi.who = who;
   openSheet(() => {
-    const F = cheatFields(); let last = null;
-    $('#sheet').innerHTML = `<div class="grab"></div><h3>🛠️ 修改數值 <span class="pill">作弊模式</span></h3>
-      <div class="small muted">拖動或輸入數字，馬上生效。關掉左上角的「作弊」開關就不能再改。</div>
-      <div class="cheatpanel">${F.map((x, i) => { const head = x[0] !== last ? `<div class="cksec" id="cks-${x[0]}">${x[0] === 'h' ? esc(S.hero.name) : x[0] === 'pair' ? '室友之間（交情／競爭）' : x[0] === 'coef' ? '個性係數（0～1.5）' : esc(nm(x[0]))}</div>` : ''; last = x[0];
-        const st = x[6] || 1, v = Math.round(x[2]() / st) * st, vs = st < 1 ? v.toFixed(2) : v; return head + `<label class="ckrow"><span>${esc(x[1])}</span><input type="range" min="${x[4]}" max="${x[5]}" step="${st}" value="${vs}" data-ck="${i}"><input type="number" min="${x[4]}" max="${x[5]}" step="${st}" value="${vs}" data-ck="${i}" inputmode="decimal"></label>`; }).join('')}
-        <div class="cksec">邀約／拒絕的冷卻</div><div class="ckcd">${S.residents.map(id => `<button type="button" class="btn sm" data-ckcd="${id}">重置 ${esc(nm(id))}</button>`).join('')}<button type="button" class="btn sm" data-ckcd="all">全部重置</button></div>
-        <button type="button" class="btn wide" id="ckCoef0">個性係數還原成預設</button>
-        ${typeof markCheatHTML === 'function' ? markCheatHTML() : ''}</div>
-      <button class="btn wide" id="ckNpc">🧩 自訂室友行為（新活動、室友之間、來找你的事件）</button><button class="btn wide" id="ckText">📝 修改遊戲裡的文字（事件、台詞、日記…）</button><button class="btn wide" id="ckClose">完成</button>`;
-    const apply = (i, raw) => { if (!S.cheat) return; const x = F[i], st = x[6] || 1, v = clamp(Math.round(Number(raw) / st) * st, x[4], x[5]); if (!Number.isFinite(v)) return; x[3](st < 1 ? Math.round(v * 100) / 100 : v);
-      $('#sheet').querySelectorAll(`[data-ck="${i}"]`).forEach(n => { if (Math.abs(+n.value - v) > 1e-9) n.value = st < 1 ? v.toFixed(2) : v; });
-      if (CHAR[x[0]]){ S.tiers[x[0]] = S.tiers[x[0]] ?? tierIdx(x[0]); checkTier(x[0]); } achThink(); save(); };
-    $('#sheet').querySelectorAll('[data-ck]').forEach(n => { n.oninput = () => apply(+n.dataset.ck, n.value); n.onchange = () => { apply(+n.dataset.ck, n.value); renderAll(true); }; });
-    $('#ckClose').onclick = closeSheet;
-    $('#sheet').querySelectorAll('[data-ckcd]').forEach(b => b.onclick = () => { resetCooldowns(b.dataset.ckcd); toast(b.dataset.ckcd === 'all' ? '已重置所有人的冷卻' : `已重置 ${nm(b.dataset.ckcd)} 的冷卻`); });
-    $('#ckCoef0').onclick = () => { resetCoef(); toast('個性係數已還原成預設'); ui.sheet.render(); };
-    if (typeof markCheatBind === 'function') markCheatBind();
-    $('#ckNpc').onclick = () => openNpcMods();
-    $('#ckText').onclick = () => { txUi.item = null; openTextEditor(); };
+    if (!S.cheat){ closeSheet(); return; }
+    if (ckUi.page === 'vals') renderCheatVals(); else renderCheatMenu();
   }, false);
   ui.sheet.cheat = true; return true;
 }
@@ -5360,7 +5453,7 @@ const COEF_LBL = [['jealousy', '醋意'], ['joke', '被逗笑'], ['praise', '被
 const COEF0 = Object.fromEntries(CHARS.map(c => [c.id, Object.fromEntries(COEF_LBL.map(([k]) => [k, c[k]]))]));
 // 讀檔時：先還原預設，再套用這個存檔改過的係數
 function applyCoef(){ for (const c of CHARS){ for (const [k] of COEF_LBL) c[k] = COEF0[c.id][k]; const o = S && S.coef && S.coef[c.id]; if (o) for (const [k] of COEF_LBL) if (typeof o[k] === 'number' && isFinite(o[k])) c[k] = clamp(o[k], 0, 1.5); } }
-function resetCoef(){ if (!S.cheat) return false; S.coef = {}; applyCoef(); save(); return true; }
+function resetCoef(who){ if (!S.cheat) return false; if (!who || who === 'all') S.coef = {}; else if (S.coef) delete S.coef[who]; applyCoef(); save(); return true; }
 function resetCooldowns(who){ if (!S.cheat) return false; const L = who === 'all' ? S.residents : [who];
   for (const id of L){ S.reqCd[id] = 0; S.rejN[id] = 0; S.lastReq[id] = -99999; }
   if (who === 'all'){ S.lastAnyReq = -99999; S.lastCollide = -99999; } save(); return true; }
@@ -5455,7 +5548,7 @@ function openAchForm(aid){
       achThink(); save(); closeSheet(); switchView('ach'); toast(`已儲存「${a.n}」`); };
   }, false);
 }
-Object.assign(window.__imb, { renderAchView, applyCoef, resetCoef, resetCooldowns, COEF0, setCheat, openCheat, cheatFields, achThink, achList, achCondOk, achClean, achShareText, openAchForm, ACH });
+Object.assign(window.__imb, { renderAchView, applyCoef, resetCoef, resetCooldowns, COEF0, setCheat, openCheat, openCheatVals: cheatGoto, cheatGoto, cheatSet, cheatFields, get ckUi(){ return ckUi; }, achThink, achList, achCondOk, achClean, achShareText, openAchForm, ACH });
 
 </script>
 <script>
@@ -5565,7 +5658,7 @@ function openTextEditor(){
       <select class="txcat" id="txCat" ${q ? 'disabled' : ''}><option value="">全部分類（${list.length} 項）</option>${cats.map(c => `<option value="${esc(c)}" ${c === txUi.cat ? 'selected' : ''}>${esc(c)}（${list.filter(it => it.cat === c).length}）</option>`).join('')}</select>
       <div class="txlist" id="txList"></div>
       <div class="acts2 txacts"><button class="btn" id="txResetWho">還原 <span id="txWhoN"></span> 的全部文字</button><button class="btn" id="txExp">⬇️ 匯出文字修改</button><label class="btn filebtn">⬆️ 匯入文字修改<input type="file" accept=".json,application/json" id="txImp"></label></div>
-      <button class="btn wide" id="txBack">← 回到修改數值</button>`;
+      <button class="btn wide" id="txBack">← 回到選單</button>`;
     sh.querySelectorAll('[data-txw]').forEach(b => { b.textContent = whos.find(w => w[0] === b.dataset.txw)[1]; b.onclick = () => { txUi.who = b.dataset.txw; txUi.cat = ''; txUi.q = ''; ui.sheet.render(); }; });
     const qi = $('#txQ'); qi.value = txUi.q; qi.oninput = () => { txUi.q = qi.value; clearTimeout(txUi.tm); txUi.tm = setTimeout(() => { ui.sheet.render(); const n = $('#txQ'); n.focus(); n.setSelectionRange(n.value.length, n.value.length); }, 250); };
     $('#txCat').onchange = ev => { txUi.cat = ev.target.value; ui.sheet.render(); };
@@ -5721,7 +5814,7 @@ function openNpcMods(){
       <div class="acts3 nmadd"><button class="btn" data-nmadd="solo">＋ 他自己的活動</button><button class="btn" data-nmadd="social">＋ 室友之間</button><button class="btn" data-nmadd="event">＋ 他來找你</button></div>
       <div class="nmlist" id="nmList"></div>
       <div class="acts2"><button class="btn" id="nmExp">⬇️ 匯出 JSON 包</button><label class="btn filebtn">⬆️ 匯入 JSON 包<input type="file" accept=".json,application/json" id="nmImp"></label></div>
-      <button class="btn wide" id="nmBack">← 回到修改數值</button>`;
+      <button class="btn wide" id="nmBack">← 回到選單</button>`;
     const L = $('#nmList');
     if (!(S.npcMods || []).length){ const d = el('div', 'muted small'); d.textContent = '還沒有自訂行為。'; L.append(d); }
     for (const m of S.npcMods || []){
