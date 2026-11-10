@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f7f1e8">
 <title>失衡・公寓觀察</title>
-<meta name="imb-build" content="2026-11-10 22:05 (台北)">
+<meta name="imb-build" content="2026-11-10 23:07 (台北)">
 <style>
 :root{
   --bg:#f7f1e8; --card:#fffaf3; --line:#e8dccb; --ink:#4a3f35; --muted:#9a8b7b; --accent:#c9876b; --accent2:#e7b9a3;
@@ -722,7 +722,7 @@ const WORDS = {
   hintSecEv:'事件',
   hintEv:'當你和室友在同一個空間，有時會跳出一段專屬事件，通常有三種回應。事件有自己的地點、時段和關係階段，看過的比較不會立刻再出現。',
   hintSecMark:'吻痕與獨佔欲',
-  hintMark:'如果有人在你頸側留下吻痕，狀態會持續 12 個遊戲小時（會跟速度和離線補時走），並顯示在你的狀態上。在意你的人看到會吃醋。獨佔欲較高的人（Theo 預設就很高）只要看見你跟別人互動，不論好感高低都會吃醋；吃得兇不兇，看他對你的好感和獨佔欲，分成悶悶不樂、明顯吃醋、大吃飛醋。',
+  hintMark:'如果有人在你頸側留下吻痕，狀態會持續 12 個遊戲小時（會跟速度和離線補時走），並顯示在你的狀態上。在意你的人一看到就會吃醋，不必等到事情結束。獨佔欲較高的人（Theo 預設就很高）只要看見你跟別人互動，不論好感高低、不論是聊天、一起做事、曖昧還是纏綿，當下就會算；就算那個人後來離開了，也已經算過了。吃得兇不兇，看他對你的好感和獨佔欲，分成悶悶不樂、明顯吃醋、大吃飛醋。大吃飛醋時可能會直接打斷你們（Theo 預設一定會；明顯吃醋時也有一點機會）。打斷的機會看每個人的「打斷傾向」，可在作弊模式裡改。如果是在關著門的臥室，只有進到同一間房的人才算看見。纏綿被打斷時，只會寫到門外的敲門聲，不會寫更進一步的內容。',
   hintSecAch:'成就',
   hintAch:'底下分頁有「🏆 成就」。達成條件後會解鎖，也可以自己新增條件。用過作弊的存檔，之後達成的成就會標 🛠️。',
   hintSecCheat:'作弊模式',
@@ -738,6 +738,11 @@ const WORDS = {
   jealTier1:'悶悶不樂', jealTier2:'明顯吃醋', jealTier3:'大吃飛醋',
   markLog:'💋 {tier}　{line}',
   possLog:'💢 {tier}　{line}',
+  cutLine:'{x} 走到你們中間，說：「打擾了。」',
+  cutLinePull:'{x} 拉了拉你的手，把你從 {p} 身邊帶開。',
+  cutLineBlock:'{x} 擋在你們中間。「借過一下。」',
+  cutIntimate:'……門外傳來敲門聲。{x}：「打擾了。」',
+  cutLog:'⚡ {x} 打斷了你和 {p}。{line}',
 };
 const LEGACY_WORDS = [[/歡愛|做愛/g, WORDS.sex], [/自慰/g, WORDS.solo]];
 const W = s => typeof s === 'string' ? LEGACY_WORDS.reduce((a, [re, w]) => a.replace(re, w), s) : s;
@@ -3463,12 +3468,13 @@ function stepMinute(){
   S.t += 1;
   if (S.t % 1440 === 0) endOfDay();
   const hr = hourOf(S.t);
-  for (const id of S.residents) npcThink(S.ents[id]);
-  heroThink();
+  // 先處理進行中的互動，再讓獨佔欲／吻痕「一看到就算」，最後才讓人離開房間（否則第三人可能還沒被算到就走掉）
   groupTick();
   interThink();
   if (typeof markThink === 'function') markThink();
   if (typeof possThink === 'function') possThink();
+  for (const id of S.residents) npcThink(S.ents[id]);
+  heroThink();
   for (const e of allEnts()) if (e.act !== e.actP){ e.actP = e.act; e.actT = S.t; }   // 這段活動從什麼時候開始（泡泡故事固定挑同一段）
   allEnts().forEach(tickNeeds);
   moodTick();
@@ -3715,7 +3721,8 @@ function interThink(){
       if (I.intimate && !I.ik && INTIMATE_SCENE[I.who]) showTalk(I.who, INTIMATE_SCENE[I.who][2]); endInter(true, 1); }
   }
 }
-function endInter(ok, frac){
+function endInter(ok, frac, opt){
+  if (!S._jealCut && typeof possThink === 'function') possThink();
   const I = S.inter; if (!I) return;
   const h = S.ents.h, c = S.ents[I.who];
   h.busy = c.busy = false; h.feed = c.feed = false; S.inter = null;
@@ -3724,7 +3731,7 @@ function endInter(ok, frac){
   if (I.room === 'out') route(h, 'living');
   else { h.act = 'idle'; h.label = '閒著'; goHomeIfForeign(h); }
   if (!S.away) npcThink(c);                                          // 他也馬上回到自己的作息，不會留在你房間發呆
-  if (ok && frac >= 1 && (I.intimate || (I.cx && I.cx.after)) && AFTERCARE[I.who]) startAftercare(I);
+  if (ok && frac >= 1 && !(opt && opt.cut) && !I.cut && (I.intimate || (I.cx && I.cx.after)) && AFTERCARE[I.who]) startAftercare(I);
 }
 // 親密之後：短短的事後照顧，同樣在平面圖上即時進行（依各自的人設，可能走去廚房或浴室）
 function startAftercare(I){
@@ -3749,7 +3756,7 @@ function applyOutcome(I, frac){
   const dimA = v => Math.max(0.15, 1 - Math.max(0, v) / 120), dimD = v => Math.max(0.15, 1 - v / 110);
   addAff(id, 'h', ga * dimA(S.aff[id].h)); addAff('h', id, ga * 0.8 * dimA(S.aff.h[id]));
   addDes(id, 'h', gd * dimD(S.des[id].h)); addDes('h', id, gd * 0.8 * dimD(S.des.h[id]));
-  S.ents[id].buff = clamp(S.ents[id].buff + 6, -30, 30); S.ents.h.buff = clamp(S.ents.h.buff + 6, -30, 30);
+  if (!I.cut){ S.ents[id].buff = clamp(S.ents[id].buff + 6, -30, 30); S.ents.h.buff = clamp(S.ents.h.buff + 6, -30, 30); }
   if (I.cheer){ S.ents.h.buff = clamp(S.ents.h.buff + 12, -30, 30); addMood(5 * frac); }
   addMood((I.intimate ? 8 : I.after ? 8 : 3) * frac); addJeal(id, -4 * frac);
   if (I.feed){ S.ents.h.needs.hunger = clamp(S.ents.h.needs.hunger + 25, 0, 100); }
@@ -3770,9 +3777,11 @@ function applyOutcome(I, frac){
     if (I.ik) log(`💗 你和 ${C.name} 的${IK[I.ik].n}結束了。${INTIMATE_END[id]}`, ['h', id], 'heart'); }
   else if (I.intimate) log(I.room === 'r_h' && !['theo'].includes(id) ? `${C.name} 離開你的房間前，回頭看了你一眼。` : INTIMATE_END[id], ['h', id], 'heart');
   else if (frac >= 1 && I.dur >= 20 && !I.quiet) log(`${C.name}：${ACCEPT_END[id]}`, [id]);
-  if (I.wk) witness(id, I.wk);
-  else if (I.ik || ['flirt','hug','intimate','sex'].includes(evType)) witness(id, I.ik ? 'intimate' : evType);
-  if (I.catchP && Math.random() < I.catchP) caught(id);
+  if (!I.cut){
+    if (I.wk) witness(id, I.wk);
+    else if (I.ik || ['flirt','hug','intimate','sex'].includes(evType)) witness(id, I.ik ? 'intimate' : evType);
+    if (I.catchP && Math.random() < I.catchP) caught(id);
+  }
   if (I.ik === 'night') leaveSeen(id);
   const da = S.aff[id].h - a0, dd = S.des[id].h - d0;
   if (Math.abs(da) >= 0.1 || Math.abs(dd) >= 0.1) toast(`${C.name}　好感 ${fmtD(da)}・情慾 ${fmtD(dd)}`);
@@ -3803,6 +3812,7 @@ function witness(x, kind){
   for (const y of S.residents){
     if (y === x) continue; const ey = S.ents[y], C = CHAR[y];
     if (!home(ey) || ey.act === 'sleep' || (S.inter && S.inter.who === y)) continue;
+    if (typeof possOf === 'function' && possOf(y) > 0) continue;   // 獨佔欲的看見已在進行中當場計算，結束時不再算一次
     const sameRoom = ey.room && ey.room === room && (pub || kind === 'intimate');
     const sameFloor = !sameRoom && (ey.f || 0) === (h.f || 0) && (kind === 'intimate' || pub && !ey.room);
     if (!sameRoom && !sameFloor) continue;
@@ -4977,6 +4987,7 @@ function groupTick(){
     e.act = A.act; e.label = `和 ${hn}${g.members.length > 1 ? '、' + g.members.filter(x => x !== id).map(nm).join('、') : ''} ${g.v.replace(/了/, '')}`; }
 }
 function endGroup(done){
+  if (!S._jealCut && typeof possThink === 'function') possThink();
   const g = S.group; if (!g) return; S.group = null;
   const A = S.hAction, hn = S.hero.name;
   const start = A && A.gid === g.id && A.until != null ? A.until - (A.dur === 'work' ? 0 : A.dur) : null;
@@ -5053,7 +5064,9 @@ Object.assign(window.__imb, { startGroup, endGroup, groupTick, grpAvail, grpP, g
    吻痕：誰留下就記在女主角身上，持續 12 個遊戲小時（會跟時速、離線補時走）。
    在意她的室友（好感達到「曖昧」門檻）看到會吃醋，一次狀態每人只反應一次；強度隨好感與獨佔欲。
    獨佔欲：0～100，預設只有 Theo 高。大於 0 的人，只要在同一個房間看見她和別人做任何互動，
-   不論好感高低都會吃醋。吃得兇不兇＝好感 × 獨佔欲，分三階（悶悶不樂／明顯吃醋／大吃飛醋）。 */
+   不論好感高低都會吃醋，一看到就計算（不必等到事情結束）。吃得兇不兇＝好感 × 獨佔欲，分三階（悶悶不樂／明顯吃醋／大吃飛醋）。
+   打斷傾向：0～100，預設 Theo 100、其他人 20。大吃飛醋時以該比例打斷；明顯吃醋為其 20%。
+   纏綿被打斷只寫敲門聲。同一段互動每人只反應一次。 */
 const MARK_MIN = 12 * 60;          // 12 個遊戲小時
 const MARK_AFF = () => (REL_TIERS[1] && REL_TIERS[1].aff) || 30;  // 曖昧的好感門檻
 const POSS_CD = 3;                 // 同一個行動內不重複；換目標至少隔幾分鐘才再寫一筆
@@ -5063,6 +5076,23 @@ function possOf(id){
   return clamp(Math.round((CHAR[id] && CHAR[id].possess) || 0), 0, 100);
 }
 function setPoss(id, v){ if (!S || !CHAR[id]) return 0; S.poss = S.poss || {}; return S.poss[id] = clamp(Math.round(Number(v) || 0), 0, 100); }
+function cutInDef(id){ return id === 'theo' ? 100 : 20; }
+function cutInOf(id){
+  if (S && S.cutIn && typeof S.cutIn[id] === 'number' && isFinite(S.cutIn[id])) return clamp(Math.round(S.cutIn[id]), 0, 100);
+  return cutInDef(id);
+}
+function setCutIn(id, v){ if (!S || !CHAR[id]) return 0; S.cutIn = S.cutIn || {}; return S.cutIn[id] = clamp(Math.round(Number(v) || 0), 0, 100); }
+function interruptChance(id, tier){
+  if (tier < 2) return 0;
+  const t = cutInOf(id) / 100;
+  return tier >= 3 ? t : 0.2 * t;   // 大吃飛醋＝打斷傾向%；明顯吃醋＝其 20%（Theo 預設 100% / 20%）
+}
+function shouldInterrupt(id, tier){
+  const p = interruptChance(id, tier);
+  if (p <= 0) return false;
+  if (p >= 1) return true;
+  return Math.random() < p;
+}
 function possScore(id, floorPoss){
   const p = Math.max(floorPoss || 0, possOf(id)) / 100;
   const a = clamp(S.aff[id] ? S.aff[id].h : 0, 0, 100) / 100;
@@ -5121,6 +5151,9 @@ function sanitizeMark(s){
   s.poss = {};
   for (const id of (s.residents || [])) if (typeof poss[id] === 'number' && isFinite(poss[id])) s.poss[id] = clamp(Math.round(poss[id]), 0, 100);
   s.possCd = s.possCd && typeof s.possCd === 'object' && !Array.isArray(s.possCd) ? s.possCd : {};
+  const cut = s.cutIn && typeof s.cutIn === 'object' && !Array.isArray(s.cutIn) ? s.cutIn : {};
+  s.cutIn = {};
+  for (const id of (s.residents || [])) if (typeof cut[id] === 'number' && isFinite(cut[id])) s.cutIn[id] = clamp(Math.round(cut[id]), 0, 100);
   s.markN = s.markN || 0;
 }
 
@@ -5140,10 +5173,26 @@ function namedLine(id, line){
 function jealPresent(id, withH){
   const e = S.ents[id], h = S.ents.h;
   if (!e || !h || !home(e) || !home(h)) return false;
-  if (walking(e) || walking(h) || e.act === 'sleep' || e.hidden || h.hidden) return false;
+  if (e.act === 'sleep' || e.hidden || h.hidden) return false;
+  const stillWalk = ev => walking(ev) && ev.path && ev.path.length;
+  if (stillWalk(e)) return false;
+  const started = (S.inter && S.inter.start != null) || (S.group && S.hAction && (S.hAction.until != null || !stillWalk(h)));
+  if (stillWalk(h) && !started) return false;
   if (!e.room || e.room === 'out' || e.room !== h.room) return false;
   if (withH && (S.inter && S.inter.who === id && S.inter.start != null)) return true;
   return true;
+}
+function jealActLive(){
+  const I = S.inter; if (I && I.who && I.start != null && !I.cut) return true;
+  const g = S.group, A = S.hAction, h = S.ents && S.ents.h;
+  if (g && g.members && A && A.gid === g.id && (A.until != null || (h && !walking(h)))) return true;
+  return false;
+}
+function jealAboutToEnd(){
+  const I = S.inter;
+  if (I && I.start != null && I.dur != null && S.t >= I.start + I.dur) return true;
+  const A = S.hAction; if (A && A.until != null && S.t >= A.until) return true;
+  return false;
 }
 
 function applyJealFX(y, target, score, tier){
@@ -5222,17 +5271,62 @@ function possNotice(id, target){
   const bub = pickLine(POSS_BUBBLE, id, tier); if (bub) bubble(id, fill(bub, {x:nm(target), h:hn}), 30);
   applyJealFX(id, target, score, tier);
   if (!S.firsts['possjeal:' + id]){ S.firsts['possjeal:' + id] = 1; addMem(id, `看到 ${hn} 和別人在一起。心裡很不是滋味。`); }
-  return true;
+  return {ok:true, id, target, score, tier};
 }
 function possThink(){
-  if (!S) return;
+  if (!S || S._jealCut) return;
+  const hits = [];
   for (const id of S.residents){
     if (possOf(id) <= 0 || !jealPresent(id)) continue;
     const ps = possPartners(id); if (!ps.length) continue;
-    // 一次只對一個對象反應（挑她比較近、或交情／競爭較高的），避免同一分鐘刷兩筆
+    // 一次只對一個對象反應（挑競爭較高的），避免同一分鐘刷兩筆
     ps.sort((a, b) => (S.rival[pkey(id, b)] || 0) - (S.rival[pkey(id, a)] || 0) || (S.aff.h[b] || 0) - (S.aff.h[a] || 0));
-    possNotice(id, ps[0]);
+    const r = possNotice(id, ps[0]); if (r && r.ok) hits.push(r);
   }
+  if (!hits.length || jealAboutToEnd() || !jealActLive()) return;
+  const cuts = hits.filter(h => shouldInterrupt(h.id, h.tier)).sort((a, b) => b.score - a.score || (b.tier - a.tier));
+  if (cuts[0]) jealCutIn(cuts[0].id, cuts[0].target);
+}
+function jealCutLine(wit, partner, intimate){
+  const hn = S.hero.name, ctx = {x:nm(wit), p:nm(partner), h:hn};
+  if (intimate) return fill(WORDS.cutIntimate || '……門外傳來敲門聲。{x}：「打擾了。」', ctx);
+  const bag = [WORDS.cutLine, WORDS.cutLinePull, WORDS.cutLineBlock].filter(Boolean);
+  // Theo 比較常直接把她拉走；其他人先擋在中間或說打擾了
+  const pick = wit === 'theo' ? (WORDS.cutLinePull || bag[0]) : rnd(bag);
+  return fill(pick, ctx);
+}
+function jealCutIn(wit, partner){
+  if (!S || S._jealCut) return false;
+  const I = S.inter, g = S.group;
+  if (!I && !g) return false;
+  if (I && (I.after || I.cut || I.who === wit)) return false;
+  S._jealCut = true;
+  const intimate = !!(I && (I.intimate || I.ik || I.type === 'intimate' || (I.cx && I.cx.wit === 'intimate')));
+  const line = jealCutLine(wit, partner, intimate);
+  const text = fill(WORDS.cutLog || '⚡ {x} 打斷了你和 {p}。{line}', {x:nm(wit), p:nm(partner), h:S.hero.name, line});
+  log(text, [wit, partner, 'h'], 'rival');
+  bubble(wit, intimate ? '🚪' : '❗️', 40);
+  const rk = pkey(partner, wit);
+  S.rival[rk] = clamp((S.rival[rk] || 0) + 6, 0, 100);
+  if (!intimate && !S.firsts['jealcut:' + wit]){ S.firsts['jealcut:' + wit] = 1; addMem(wit, `看見 ${S.hero.name} 和 ${nm(partner)} 在一起，走過去打斷了。`); }
+  if (I){
+    I.cut = true;
+    const frac = I.start == null ? 0 : clamp((S.t - I.start) / Math.max(1, I.dur), 0, 0.99);
+    endInter(true, frac, {cut:true});
+  } else if (g){
+    if (typeof endGroup === 'function') endGroup(false);
+    S.hAction = null; S.hPending = null;
+    const h = S.ents.h; if (h && !walking(h)){ h.act = 'idle'; h.label = '閒著'; }
+  }
+  const pe = S.ents[partner]; if (pe) pe.buff = clamp((pe.buff || 0) - 5, -30, 30);
+  const h = S.ents.h, we = S.ents[wit];
+  if (we && h && h.room && h.room !== 'out' && home(h)){
+    we.ov = {room:h.room, act:'chat', label:`陪著 ${S.hero.name}`, until:S.t + 12, stay:true};
+    we.busy = false;
+    if (we.room !== h.room) route(we, h.room);
+  }
+  S._jealCut = false;
+  return true;
 }
 
 function markCheatHTML(){
@@ -5254,7 +5348,7 @@ function markCheatBind(){
   if (left()) left().onchange = () => { if (!S.cheat || !S.mark) return; setMarkLeft(left().value); if (S.mark) left().value = markLeft(); renderAll(true); save(); };
 }
 
-Object.assign(window.__imb, { possOf, setPoss, possScore, jealTierOf, jealTierName, markLeft, markClock, markChipText, markHTML, isMarkAct, applyMark, clearMark, setMarkLeft, sanitizeMark, markNotice, markThink, possPartners, possNotice, possThink, markCheatHTML, markCheatBind, MARK_MIN, MARK_AFF });
+Object.assign(window.__imb, { possOf, setPoss, cutInOf, setCutIn, cutInDef, interruptChance, shouldInterrupt, possScore, jealTierOf, jealTierName, markLeft, markClock, markChipText, markHTML, isMarkAct, applyMark, clearMark, setMarkLeft, sanitizeMark, markNotice, markThink, possPartners, possNotice, possThink, jealCutIn, jealPresent, MARK_MIN, MARK_AFF, markCheatHTML, markCheatBind });
 
 </script>
 <script>
@@ -5501,6 +5595,7 @@ function cheatFields(who){
   const coef = (id) => {
     for (const [k, n] of COEF_LBL) add('coef', `${nm(id)}・${n}`, () => CHAR[id][k], v => { (S.coef[id] = S.coef[id] || {})[k] = v; CHAR[id][k] = v; }, 0, 1.5, 0.05, '個性');
     add(id, `${nm(id)} 的獨佔欲`, () => possOf(id), v => setPoss(id, v), 0, 100, 1, '個性');
+    add(id, `${nm(id)} 的打斷傾向`, () => cutInOf(id), v => setCutIn(id, v), 0, 100, 1, '個性');
   };
   const pairs = (id) => {
     for (const o of S.residents){ if (o === id) continue; const k = pkey(id, o);
@@ -6578,7 +6673,7 @@ function fxWrap(name, filt){
   const w = function(...a){ fxBegin(filt); try { return f.apply(this, a); } finally { fxEnd(); } }; w.__fx = true; window[name] = w;
   if (window.__imb && name in window.__imb) window.__imb[name] = w;
 }
-['answerRequest', 'endInter', 'heroInter', 'witness', 'caught', 'leaveSeen', 'endSolo', 'cookShare', 'startGroup', 'endGroup', 'resolveGrpInvite', 'startAftercare', 'fireCollide', 'fireTest', 'resolveHeroInter', 'stopHero', 'resolveEvent', 'heroSoloDone', 'haDone', 'markNotice', 'possNotice'].forEach(n => fxWrap(n));
+['answerRequest', 'endInter', 'heroInter', 'witness', 'caught', 'leaveSeen', 'endSolo', 'cookShare', 'startGroup', 'endGroup', 'resolveGrpInvite', 'startAftercare', 'fireCollide', 'fireTest', 'resolveHeroInter', 'stopHero', 'resolveEvent', 'heroSoloDone', 'haDone', 'markNotice', 'possNotice', 'jealCutIn'].forEach(n => fxWrap(n));
 ['socialThink', 'nmThink'].forEach(n => fxWrap(n, true));
 Object.assign(window.__imb, { fxHtml, fxSeg, fxBegin, fxEnd, fxDiff, get FX(){ return FX; } });
 
