@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f7f1e8">
 <title>失衡・公寓觀察</title>
-<meta name="imb-build" content="2026-11-10 13:41 (台北)">
+<meta name="imb-build" content="2026-11-10 14:02 (台北)">
 <style>
 :root{
   --bg:#f7f1e8; --card:#fffaf3; --line:#e8dccb; --ink:#4a3f35; --muted:#9a8b7b; --accent:#c9876b; --accent2:#e7b9a3;
@@ -387,6 +387,76 @@ span.av,div.av{display:inline-block;border-radius:50%}
 .token.pair-l .tn{left:auto;right:0;transform:none}.token.pair-r .tn{left:0;transform:none}
 .token.pair-l .ti{right:auto;left:-7px}
 .token.pair-l .tag{left:100%;right:auto;transform:translateX(-50%);bottom:38px;max-width:124px;overflow:hidden;text-overflow:ellipsis}
+/* ---- 室友房間風格（女主角的房間維持原樣）---- */
+/* Alexander：清水模灰、極簡、黑 */
+.room.detailed.st-alexander{background:#e3e2df;background-image:linear-gradient(#d3d2ce 1px,transparent 1px),linear-gradient(90deg,#d3d2ce 1px,transparent 1px);background-size:24px 24px}
+.fu.st-alexander.f-bed::after{background:linear-gradient(90deg,#6b7078,#555a62)}
+.fu.st-alexander.f-desk{background:#3d3f44;border-color:#26282c}
+.fu.st-alexander.f-wardrobe{background:linear-gradient(90deg,#5c5f65 0 49%,#3a3c40 49% 51%,#5c5f65 51%);border-color:#3a3c40}
+.fu.st-alexander.f-shelf{background:repeating-linear-gradient(0deg,#2f3135 0 2px,#e9e8e4 2px 6px);border-color:#2f3135}
+.fu.st-alexander.f-ctable{background:#f2f1ee;border-color:#9a9a98;border-radius:1px}
+.fu.st-alexander.f-rug{background:#cfcdc8;border:1px solid #b5b3ae;border-radius:1px}
+.fu.st-alexander.f-nightstand{background:#2f3135}
+.f-armchair.dark{background:#2e2f33;border-color:#1c1d20}
+.f-model{background:linear-gradient(90deg,#fff 0 30%,transparent 30% 40%,#fff 40% 70%,transparent 70% 78%,#fff 78%);border:1px solid #9a9a98}
+.f-flamp{background:radial-gradient(circle,#fff6d8 30%,#2b2b2e 32%);border-radius:50%}
+.f-drafting{background:repeating-linear-gradient(0deg,#f7f6f1 0 5px,#e4e2db 5px 6px);border:2px solid #2f3135;border-radius:1px;transform:skewY(-4deg)}
+.f-drafting::after{content:'';position:absolute;left:8%;right:8%;top:42%;height:2px;background:#2f3135}
+.f-stool{background:#2f3135;border-radius:50%}
+.f-plant.snake{background:repeating-linear-gradient(90deg,#4f7a46 0 2px,#a7c58f 2px 3px);border-radius:2px 2px 30% 30%;box-shadow:0 0 0 1px #2f3135}
+/* Jasper：暖色波希米亞 */
+.room.detailed.st-jasper{background:repeating-linear-gradient(90deg,#efd2b4 0 9px,#e6c29d 9px 10px)}
+.fu.st-jasper.f-bed::after{background:repeating-linear-gradient(90deg,#d8893f 0 5px,#c9702f 5px 7px,#e9b04f 7px 9px)}
+.f-kilim{background:repeating-linear-gradient(45deg,#c65f3d 0 4px,#e8b25a 4px 7px,#7b4a8a 7px 9px,#f1e1c6 9px 12px);border:2px solid #9c4a2e;border-radius:2px;opacity:.75}
+.f-tripod{background:linear-gradient(#2c2c2c,#2c2c2c) 50% 15%/60% 30% no-repeat,linear-gradient(60deg,transparent 46%,#555 47% 53%,transparent 54%),linear-gradient(-60deg,transparent 46%,#555 47% 53%,transparent 54%);border-radius:2px}
+.f-photos{background:repeating-linear-gradient(0deg,#fffdf8 0 9px,#d99a6a 9px 10px,#fffdf8 10px 12px,transparent 12px 15px);box-shadow:0 0 0 1px #b8875c}
+.f-pouf{background:radial-gradient(circle,#e9b04f 30%,#c9702f 32% 60%,#d8893f 62%);border-radius:50%;box-shadow:0 0 0 1px #9c4a2e}
+/* Liam：溫暖木頭、奶油＋陶土 */
+.room.detailed.st-liam{background:repeating-linear-gradient(90deg,#e9c99c 0 13px,#dcb684 13px 14px)}
+.fu.st-liam.f-bed{background:#fbf3e4}
+.fu.st-liam.f-bed::after{background:linear-gradient(90deg,#f1e2c8 0 55%,#c9714f 55% 100%)}
+.fu.st-liam.f-rug{background:repeating-linear-gradient(0deg,rgba(201,113,79,.25) 0 3px,rgba(241,226,200,.6) 3px 6px);border:1px solid rgba(201,113,79,.45);border-radius:6px}
+.f-books{background:repeating-linear-gradient(0deg,#c9714f 0 2px,#e7c76f 2px 4px,#7a9a6a 4px 6px,#8d5a3c 6px 7px);border:1px solid #8d5a3c}
+.f-books.cool{background:repeating-linear-gradient(0deg,#5b84b1 0 2px,#e8edf2 2px 3px,#2f4a6b 3px 5px,#9db7d1 5px 7px);border-color:#2f4a6b}
+.f-herbs{background:radial-gradient(circle at 17% 50%,#6f9a5a 0 22%,transparent 24%),radial-gradient(circle at 50% 50%,#86ad6a 0 22%,transparent 24%),radial-gradient(circle at 83% 50%,#6f9a5a 0 22%,transparent 24%)}
+.f-basket{background:repeating-linear-gradient(45deg,#c8a06c 0 2px,#a97f4f 2px 4px);border-radius:40%;box-shadow:inset 0 0 0 2px #f1e2c8}
+.f-lamp.warm{background:radial-gradient(circle,#fff1c2,#f2b766);box-shadow:0 0 6px 2px rgba(242,183,102,.55)}
+/* Marcus：深色、海軍藍＋炭灰 */
+.room.detailed.st-marcus{background:repeating-linear-gradient(90deg,#4a4d57 0 9px,#3f424b 9px 10px)}
+.room.detailed.st-marcus .rl{background:rgba(255,250,243,.9)}
+.fu.st-marcus.f-bed{background:#d9dbe3}
+.fu.st-marcus.f-bed::after{background:linear-gradient(90deg,#26355a,#1d2946)}
+.fu.st-marcus.f-desk{background:#5a3f33;border-color:#3b2921}
+.fu.st-marcus.f-wardrobe{background:linear-gradient(90deg,#3a3d45 0 49%,#24262c 49% 51%,#3a3d45 51%);border-color:#24262c}
+.fu.st-marcus.f-rug{background:#2f3a55;border:1px solid #1d2946;opacity:.8}
+.fu.st-marcus.f-nightstand{background:#5a3f33}
+.fu.st-marcus.f-chair{background:#2b2b2f;border-color:#151517}
+.f-guitar{background:radial-gradient(ellipse 48% 22% at 50% 76%,#b5652f 98%,transparent),radial-gradient(ellipse 36% 16% at 50% 54%,#b5652f 98%,transparent),linear-gradient(90deg,transparent 42%,#3b2617 42% 58%,transparent 58%) 0 0/100% 55% no-repeat}
+.f-speaker{background:radial-gradient(circle,#555 25%,#111 28%);border-radius:1px;box-shadow:0 0 0 1px #000}
+.f-vinyl{background:repeating-linear-gradient(90deg,#111 0 2px,#d14a3a 2px 3px,#111 3px 5px,#e8c35a 5px 6px);border:1px solid #6a4a35;border-radius:1px}
+.f-lamp.dim{background:radial-gradient(circle,#ffd99a,#c98a3a);box-shadow:0 0 8px 3px rgba(230,160,70,.5);border-color:#8a5a2a}
+/* Samuel：整齊、冷白＋藍 */
+.room.detailed.st-samuel{background:repeating-linear-gradient(90deg,#e6ecf1 0 11px,#d8e1e9 11px 12px)}
+.fu.st-samuel.f-bed::after{background:linear-gradient(90deg,#9fbad6,#7fa0c4)}
+.fu.st-samuel.f-desk{background:#f4f6f8;border-color:#9aa9b8}
+.fu.st-samuel.f-wardrobe{background:linear-gradient(90deg,#eef1f4 0 49%,#aab6c2 49% 51%,#eef1f4 51%);border-color:#aab6c2}
+.fu.st-samuel.f-rug{background:#cfdbe7;border:1px solid #9fb3c7}
+.fu.st-samuel.f-chair{background:#4a6a8a;border-color:#2f4a6b}
+.fu.st-samuel.f-nightstand{background:#dfe5ea;border:1px solid #9aa9b8}
+.f-figures{background:repeating-linear-gradient(0deg,#e9eef3 0 3px,#8a9aaa 3px 4px);border:1px solid #8a9aaa}
+.f-figures::after{content:'';position:absolute;inset:8% 22%;background:radial-gradient(circle,#e25c5c 0 30%,transparent 34%) 50% 8%/100% 25% no-repeat,radial-gradient(circle,#f2c94c 0 30%,transparent 34%) 50% 40%/100% 25% no-repeat,radial-gradient(circle,#5aa0d8 0 30%,transparent 34%) 50% 75%/100% 25% no-repeat}
+/* Theo：明亮、多彩、年輕 */
+.room.detailed.st-theo{background:#f6f1e3;background-image:linear-gradient(45deg,#e9f3ee 25%,transparent 25%,transparent 75%,#e9f3ee 75%),linear-gradient(45deg,#e9f3ee 25%,transparent 25%,transparent 75%,#e9f3ee 75%);background-size:16px 16px;background-position:0 0,8px 8px}
+.fu.st-theo.f-bed::after{background:repeating-linear-gradient(90deg,#4fb3a9 0 6px,#f3c94d 6px 8px)}
+.fu.st-theo.f-rug{background:radial-gradient(circle,#ffb3a7,#f48b7b);border:none;border-radius:50%;opacity:.55}
+.fu.st-theo.f-desk{background:#f0e1bf}
+.fu.st-theo.f-chair{background:#e86d5a;border-color:#b84f3f}
+.f-rack{border-top:2px solid #555;background:repeating-linear-gradient(0deg,transparent 0 2px,#4fb3a9 2px 5px,transparent 5px 6px,#f3c94d 6px 9px,transparent 9px 10px,#e86d5a 10px 13px)}
+.f-poster{background:linear-gradient(#fffdf6,#fffdf6) 50% 50%/80% 92% no-repeat,#c94a4a;box-shadow:0 0 0 1px #8a3030}
+.f-poster::after{content:'';position:absolute;left:30%;right:30%;top:14%;bottom:14%;background:radial-gradient(circle at 50% 12%,#c94a4a 0 18%,transparent 20%),linear-gradient(90deg,transparent 40%,#c94a4a 40% 60%,transparent 60%)}
+.f-mirror{background:linear-gradient(90deg,#dfeef5,#ffffff 40%,#cfe3ec);border:1px solid #9aa9b8}
+.f-dumbbell{background:linear-gradient(90deg,#333 0 24%,transparent 24% 76%,#333 76%),linear-gradient(#888,#888) 50% 50%/100% 30% no-repeat;border-radius:1px}
+.f-gamepad{background:#3b3f4a;border-radius:40%;box-shadow:inset 3px 0 0 -1px #e86d5a,inset -3px 0 0 -1px #4fb3a9}
 
 </style>
 </head>
@@ -956,6 +1026,60 @@ const LAYOUTS = {
 };
 // ---- 倫敦三層排屋（預設格局）：每間臥室都有獨立衛浴、電腦桌、雙人床 ----
 // 傢俱 [類型, x, y, w, h, 選項]；座標單位同格局（寬 100、高 130）
+// ---- 每位室友房間的風格（女主角的房間維持原樣）----
+// 座標用 X(離外牆的距離, 寬)，外牆＝窗戶那一側；房門在內牆（走廊那側）。
+// 留空的地方：房門開門範圍＋門口走道（內牆 10 單位內、門上下 6 單位）、浴室門口，這裡不放任何東西。
+const swapF = (f, type, nt, opt) => { const it = f.find(x => x[0] === type); if (it){ it[0] = nt; if (opt) it[5] = opt; } };
+const BEDROOM_STYLE = {
+  // 建築師：極簡、清水模灰、黑色；製圖桌、建築模型、黑色落地燈；一盆虎尾蘭放在角落
+  alexander(f, X, y, H){
+    const sh = f.find(x => x[0] === 'shelf'); if (sh){ sh[1] = X(1,6); sh[2] = y+27; }   // 書架靠窗那面牆，不擋從房門到書桌的路
+    swapF(f, 'armchair', 'armchair', 'dark');
+    f.push(['model', X(23.5,5), y+31.5, 5, 4]);
+    f.push(['flamp', X(31,3), y+41, 3, 3]);
+    f.push(['drafting', X(4,14), y+64, 14, 10]); f.push(['stool', X(9,4), y+75.5, 4, 4]);
+    f.push(['plant', X(38,4), y+92, 4, 4, 'snake']);
+  },
+  // 攝影師：波希米亞、暖色、地毯花紋；牆上一排照片、三腳架和相機、坐墊、床頭小燈串、綠植
+  jasper(f, X, y, H){
+    swapF(f, 'rug', 'kilim');
+    f.push(['tripod', X(2,5), y+24.5, 5, 5]);
+    f.push(['plant', X(2,4), y+31, 4, 4]);
+    f.push(['photos', X(42,2), y+20, 2, 13]);
+    f.push(['pouf', X(25,5), y+H-8, 5, 5]);
+    f.push(['string', X(2,18), y+H-24, 18, 1.2]);
+  },
+  // 主廚：溫暖木頭、奶油色＋陶土色；食譜書架、書桌上的香草盆栽、毯子籃、暖光檯燈
+  liam(f, X, y, H){
+    f.push(['books', X(1,4), y+24, 4, Math.min(10, H - 38)]);
+    f.push(['herbs', X(25,6), y+8.4, 6, 2]);
+    f.push(['basket', X(25,5), y+H-9, 5, 5]);
+    f.push(['lamp', X(3,3), y+H-26.5, 3, 3, 'warm']);
+    f.push(['plant', X(20.9,2.8), y+2, 2.8, 2.8]);
+  },
+  // 音樂製作人：深色、海軍藍＋炭灰；吉他架、黑膠唱片箱、書桌兩側的喇叭、昏黃小燈
+  marcus(f, X, y, H){
+    f.push(['guitar', X(2,5), y+24, 5, 11]);
+    f.push(['speaker', X(24.5,3), y+8.6, 3, 3]); f.push(['speaker', X(38.5,3), y+8.6, 3, 3]);
+    f.push(['vinyl', X(24,8), y+H-8, 8, 5]);
+    f.push(['lamp', X(3,3), y+H-26.5, 3, 3, 'dim']);
+  },
+  // 工程師：整齊、冷白＋藍；雙螢幕、書架、公仔架
+  samuel(f, X, y, H){
+    const m = f.find(x => x[0] === 'monitor'); if (m){ m[1] = X(27,6); m[3] = 6; f.push(['monitor', X(33.5,6), m[2], 6, m[4]]); }
+    f.push(['books', X(1,4), y+24, 4, 12, 'cool']);
+    f.push(['figures', X(20.9,2.8), y+2, 2.8, 12]);
+  },
+  // 醫學生＋模特：明亮、多彩；解剖海報、開放式衣架、全身鏡、啞鈴、遊戲手把
+  theo(f, X, y, H){
+    swapF(f, 'wardrobe', 'rack');
+    f.push(['poster', X(42,2), y+6.5, 2, 11]);
+    f.push(['mirror', X(23,7), y+H-2.2, 7, 1.6]);
+    f.push(['dumbbell', X(24,6), y+H-8.5, 6, 3]);
+    f.push(['gamepad', X(25,4), y+10, 4, 2.5]);
+    f.push(['plant', X(20.9,2.8), y+2, 2.8, 2.8]);
+  },
+};
 function bedroomFurn(r, outer){ // outer: 'L'（外牆在左）或 'R'
   const X = (rx, w) => outer === 'L' ? r.x + rx : r.x + r.w - rx - w;
   const f = [], y = r.y, H = r.h;
@@ -971,9 +1095,11 @@ function bedroomFurn(r, outer){ // outer: 'L'（外牆在左）或 'R'
   f.push(['monitor', X(29,8), y+8.6, 8, 1.6]);
   f.push(['chair', X(31,5), y+15, 5, 5]);
   f.push(['wardrobe', X(36,6), y+H-19, 6, 17]);
-  if (H > 80){ f.push(['shelf', X(36,6), y+30, 6, 26]); f.push(['armchair', X(22,8), y+40, 8, 8]); f.push(['plant', X(23,5), y+52, 5, 5]); f.push(['ctable', X(22,8), y+30, 8, 7]); }
-  else f.push(['plant', X(38,4), y+24, 4, 4]);
+  if (H > 80){ f.push(['shelf', X(36,6), y+30, 6, 26]); f.push(['armchair', X(22,8), y+40, 8, 8]); f.push(['ctable', X(22,8), y+30, 8, 7]); }
+  // 綠植放在窗邊（外牆，浴室和床頭櫃之間）；房間太短就放在浴室和書桌之間的角落。不放在房門開門的範圍或走道上
+  if (r.owner === 'h' || !BEDROOM_STYLE[r.owner]) f.push(H >= 60 ? ['plant', X(2,4), y+30, 4, 4] : ['plant', X(20.9,2.8), y+2, 2.8, 2.8]);
   r.furn = f;
+  if (r.owner !== 'h' && BEDROOM_STYLE[r.owner]){ r.style = r.owner; BEDROOM_STYLE[r.owner](f, X, y, H); }
   r.spots = { ensuite:[X(6,0)+0, y+12], bed:[X(11,0), y+H-12], desk:[X(33.5,0), y+17], floor:[X(28,0), y + (H > 80 ? 64 : Math.min(35, H - 26))] };   // floor：房間中間的空地（聊天、站著說話）
   if (H > 80) r.spots.sofa = [X(26,0), y+44];
   r.bathZone = [X(1,19), y+1, X(1,19) + 19, y+22+5];   // 浴室＋門口：除了洗澡，誰都不該站在這裡
@@ -986,7 +1112,7 @@ LAYOUTS.townhouse3 = {
   stairs:[[0,1,[50,6]],[1,2,[50,6]]],
   rooms:[
     {id:'entry',name:'玄關',type:'entry',f:0,x:0,y:0,w:44,h:22,door:[44,11],seg:0, furn:[
-      ['rug',8,6,20,10],['shoe',2,1.5,16,4],['coat',30,1.5,10,3],['plant',37,15,5,5],['frontdoor',-0.6,7,2.2,9]]},
+      ['rug',8,6,20,10],['shoe',2,1.5,16,4],['coat',30,1.5,10,3],['plant',22,1.2,4.5,4.5],['frontdoor',-0.6,7,2.2,9]]},
     {id:'living',name:'客廳',type:'living',f:0,x:0,y:22,w:44,h:56,door:[44,52],seg:0, furn:[
       ['shelf',2,23.5,24,4],['tv',1,36,2.4,18],['rug',7,35,28,22],['ctable',11,40,9,12],['sofa',25,34,9,24,'face-l'],
       ['armchair',10,59,9,8],['plant',37,25,5,5],['plant',2,71,5,5],['lamp',36,70,4,4]],
@@ -994,19 +1120,19 @@ LAYOUTS.townhouse3 = {
     {id:'r_theo',name:'Theo 的房間',type:'bed',owner:'theo',f:0,x:0,y:78,w:44,h:52,door:[44,104],seg:0},
     {id:'kitchen',name:'廚房・餐廳',type:'kitchen',f:0,x:56,y:0,w:44,h:50,door:[56,25],seg:0, furn:[
       ['counter',62,1,36,6],['counter',92,7,6,28],['stove',92,10,6,9],['ksink',75,1.6,9,5],['fridge',91.5,36,6.5,9],
-      ['dtable',63,18,17,13],['chair',64.5,14,4,4],['chair',72,14,4,4],['chair',64.5,31,4,4],['chair',72,31,4,4],['chair',59,22.5,4,4],['chair',80,22.5,4,4],
+      ['dtable',67,18,17,13],['chair',68.5,14,4,4],['chair',76,14,4,4],['chair',68.5,31,4,4],['chair',76,31,4,4],['chair',84,22.5,4,4],
       ['plant',58,43,5,5]],
-      spots:{stove:[88,15], table:[71.5,24.5], floor:[70,42]}},
+      spots:{stove:[88,15], table:[75.5,24.5], floor:[72,42]}},
     {id:'r_liam',name:'Liam 的房間',type:'bed',owner:'liam',f:0,x:56,y:50,w:44,h:62,door:[56,81],seg:0},
     {id:'wc',name:'客用洗手間',type:'wc',f:0,x:56,y:112,w:44,h:18,door:[56,121],seg:0, furn:[
-      ['toilet',90,114,6,7],['sink',90,123,7,5],['plant',62,114,4,4]]},
+      ['toilet',90,114,6,7],['sink',90,123,7,5],['plant',84.5,113.5,4,4]]},
     {id:'r_h',name:'你的房間',type:'bed',owner:'h',f:1,x:0,y:0,w:44,h:65,door:[44,40],seg:1},
     {id:'r_samuel',name:'Samuel 的房間',type:'bed',owner:'samuel',f:1,x:0,y:65,w:44,h:65,door:[44,105],seg:1},
     {id:'r_jasper',name:'Jasper 的房間',type:'bed',owner:'jasper',f:1,x:56,y:0,w:44,h:65,door:[56,40],seg:1},
     {id:'r_marcus',name:'Marcus 的房間',type:'bed',owner:'marcus',f:1,x:56,y:65,w:44,h:65,door:[56,105],seg:1},
     {id:'r_alexander',name:'Alexander 的房間',type:'bed',owner:'alexander',f:2,x:0,y:0,w:44,h:130,door:[44,70],seg:2},
     {id:'balcony',name:'屋頂露臺',type:'terrace',f:2,x:56,y:0,w:44,h:130,door:[56,30],seg:2, furn:[
-      ['planter',94,2,5,40],['planter',58,124,40,5],['plant',59,2,6,6],['plant',86,2,6,6],['plant',59,110,6,6],
+      ['planter',94,2,5,40],['planter',58,124,40,5],['plant',86,2,6,6],['plant',91.5,116.5,6,6],['plant',59,110,6,6],
       ['lounge',62,48,9,18],['lounge',76,48,9,18],['otable',68,70,10,10],['chair',64,73,4,4],['chair',79,73,4,4],
       ['parasol',66,86,14,14],['string',58,40,40,1.2]],
       spots:{sofa:[72,58], table:[73,75], floor:[78,100]}},
@@ -3462,14 +3588,15 @@ function buildPlan(){
   Object.values(G.rooms).forEach(r => {
     if (!onF(r.f)) return;
     const empty = r.owner && r.owner !== 'h' && !S.residents.includes(r.owner);
-    const d = el('div', `room t-${r.type}${r.owner === 'h' ? ' mine' : ''}${empty ? ' empty' : ''}`);
+    const st = r.style && !empty ? ' st-' + r.style : '';
+    const d = el('div', `room t-${r.type}${r.owner === 'h' ? ' mine' : ''}${empty ? ' empty' : ''}${st}`);
     d.dataset.room = r.id;
     Object.assign(d.style, {left:r.x+'%', top:r.y/1.3+'%', width:r.w+'%', height:r.h/1.3+'%'});
     d.innerHTML = `<span class="rl${r.furn && r.type === 'bed' ? (r.x < 50 ? ' rl-r' : ' rl-l') : ''}">${empty ? '空房' : r.owner === 'h' ? esc(S.hero.name) + ' 的房間' : r.name}</span>${r.furn ? '' : `<span class="ri">${ROOM_ICON[r.type]}</span>`}`;
     if (r.furn) d.classList.add('detailed');
     d.onclick = () => openRoom(r.id);
     rooms.appendChild(d);
-    if (r.furn) r.furn.forEach(fu => { const [t, x, y, w, h, opt] = fu; const n = el('div', `fu f-${t}${opt ? ' ' + opt : ''}`);
+    if (r.furn) r.furn.forEach(fu => { const [t, x, y, w, h, opt] = fu; const n = el('div', `fu f-${t}${opt ? ' ' + opt : ''}${st}`);
       Object.assign(n.style, {left:x+'%', top:y/1.3+'%', width:w+'%', height:h/1.3+'%'}); rooms.appendChild(n); });
     if (G.L.ensuite){ const [dx, dy] = r.door; const vert = dx === r.x || dx === r.x + r.w; const n = el('div', 'fu f-door' + (vert ? ' v' : ' h') + (dx === r.x ? ' l' : ' r'));
       Object.assign(n.style, vert ? {left:(dx-1)+'%', top:(dy-4)/1.3+'%', width:'2%', height:8/1.3+'%'} : {left:(dx-4)+'%', top:(dy-1)/1.3+'%', width:'8%', height:2/1.3+'%'}); rooms.appendChild(n); }
