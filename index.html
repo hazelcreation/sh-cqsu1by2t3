@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f7f1e8">
 <title>失衡・公寓觀察</title>
-<meta name="imb-build" content="2026-11-10 23:07 (台北)">
+<meta name="imb-build" content="2026-11-11 02:39 (台北)">
 <style>
 :root{
   --bg:#f7f1e8; --card:#fffaf3; --line:#e8dccb; --ink:#4a3f35; --muted:#9a8b7b; --accent:#c9876b; --accent2:#e7b9a3;
@@ -61,6 +61,29 @@ button,input,textarea,select{font:inherit;color:inherit}
 #btnBackTitle{margin:0 0 10px}
 #newForm.hidden{display:none!important}
 @media (min-width:720px){.titlebox{max-width:420px;margin-top:16px}.titlebtn{min-height:56px;font-size:18px}}
+
+/* cloud auth on title + save tab */
+.authbox{display:flex;flex-direction:column;gap:8px;padding:10px 12px 12px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.65)}
+.auth-tabs{display:flex;gap:8px;justify-content:center}
+.authbox label{display:block;margin:6px 0;font-size:13px;color:var(--muted)}
+.authbox input{display:block;width:100%;margin-top:4px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font-size:16px}
+.authwarn{margin:6px 0 8px;line-height:1.5}
+.autherr{color:#b4544a;margin:0 0 8px;line-height:1.4}
+.authhello{text-align:center;font-size:14px;line-height:1.5;padding:2px 4px 4px}
+#authLogged{display:flex;flex-direction:column;align-items:center;gap:6px}
+#authLogged.hidden,#authGuest.hidden,#authSkipped.hidden,#authPass2Row.hidden{display:none!important}
+.cloudcard{margin-bottom:12px}
+.cloudkv{display:flex;flex-direction:column;gap:4px;margin:6px 0 10px}
+.cloudstat{font-size:13px;color:var(--muted);line-height:1.45}
+.cloudstat.ok{color:#2f5a43}
+.cloudstat.warn{color:#8a5a20}
+.cloudstat.err{color:#b4544a}
+.picksave{display:flex;flex-direction:column;gap:8px}
+.pickopt{text-align:left;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;width:100%}
+.pickopt .k{font-size:12px;color:var(--muted)}
+.pickopt .v{font-size:15px;font-weight:600;margin-top:2px}
+@media (min-width:720px){.authbox{padding:14px 16px}}
+
 
 /* game */
 #game{padding-bottom:70px}
@@ -623,6 +646,30 @@ span.av,div.av{display:inline-block;border-radius:50%}
       <div class="logo">失衡</div>
       <div class="sub">倫敦・共享公寓觀察日誌</div>
       <div id="titleBox" class="titlebox">
+        <div id="authBox" class="authbox">
+          <div id="authLogged" class="hidden">
+            <div class="authhello" id="authHello"></div>
+            <button type="button" class="btn ghost sm" id="btnTitleLogout">登出</button>
+          </div>
+          <div id="authGuest">
+            <div class="auth-tabs" role="tablist">
+              <button type="button" class="chip on" id="tabLogin" role="tab">登入</button>
+              <button type="button" class="chip" id="tabRegister" role="tab">註冊</button>
+            </div>
+            <form id="authForm" autocomplete="off">
+              <label>帳號<input id="authUser" name="username" maxlength="20" minlength="3" required placeholder="3～20 個字"></label>
+              <label>密碼<input id="authPass" name="password" type="password" maxlength="72" minlength="6" required placeholder="至少 6 個字"></label>
+              <label id="authPass2Row" class="hidden">密碼確認<input id="authPass2" name="password2" type="password" maxlength="72" minlength="6" placeholder="再輸入一次"></label>
+              <p class="small muted authwarn" id="authWarn">這個帳號沒有綁信箱。忘記密碼的話，沒有辦法找回，請自己記得密碼。</p>
+              <p class="small autherr hidden" id="authErr"></p>
+              <button type="button" class="btn primary wide titlebtn" id="authSubmit">登入</button>
+            </form>
+            <button type="button" class="btn wide titlebtn" id="btnSkipAuth">不登入，繼續用這台裝置</button>
+          </div>
+          <div id="authSkipped" class="hidden">
+            <button type="button" class="btn ghost wide" id="btnBackAuth">登入以同步雲端存檔</button>
+          </div>
+        </div>
         <div id="continueBox" class="hidden">
           <div class="muted small" id="continueInfo"></div>
           <button type="button" class="btn primary wide titlebtn" id="btnContinue">回到小屋</button>
@@ -655,7 +702,7 @@ span.av,div.av{display:inline-block;border-radius:50%}
         <div id="residentPick"></div>
         <button class="btn primary wide" type="submit">開始入住</button>
       </form>
-      <p class="muted small center">遊戲不接 AI。所有對話都是預先寫好的模板，存檔只存在這台裝置的瀏覽器裡。</p>
+      <p class="muted small center">遊戲不接 AI。所有對話都是預先寫好的模板。可登入把存檔放到雲端，或只存在這台裝置的瀏覽器裡。</p>
     </div>
   </section>
 
@@ -728,7 +775,56 @@ const WORDS = {
   hintSecCheat:'作弊模式',
   hintCheat:'左上角有一個「作弊」開關。打開後才能改數值、自訂室友行為、修改遊戲裡的文字，以及調整既有事件的機率、時段、頻率和出現要求。關掉之後，已經改過的文字和事件設定仍會生效，只是不能再改。用過作弊的存檔會一直帶著標記。',
   hintSecSave:'存檔',
-  hintSave:'遊戲每過一個遊戲小時會自動存進這個瀏覽器。開頭畫面有「回到小屋」（繼續上次，並補上你離開的時間）和「搬進小屋」（開新檔；若已有存檔會先請你確認，並把舊檔另外備份）。請在同一台裝置、同一個瀏覽器遊玩。換電腦、換瀏覽器或清除網站資料前，請先到「存檔」頁匯出備份。',
+  hintSave:'遊戲每過一個遊戲小時會自動存進這個瀏覽器。開頭畫面可以註冊或登入帳號（只需帳號和密碼，不必綁信箱），登入後會把存檔同步到雲端，換裝置也能接著玩；也可以選「不登入，繼續用這台裝置」，只把存檔放在這台瀏覽器。沒有綁信箱，忘記密碼的話沒有辦法找回。雲端若暫時連不上（例如免費專案閒置後暫停），這台裝置上的存檔還在，可以繼續玩，連上以後再同步。開頭有「回到小屋」（繼續上次，並補上你離開的時間）和「搬進小屋」（開新檔；若已有存檔會先請你確認，並把舊檔另外備份）。換電腦、換瀏覽器或清除網站資料前，若沒登入，請先到「存檔」頁匯出備份。',
+  authLogin:'登入',
+  authRegister:'註冊',
+  authUser:'帳號',
+  authPass:'密碼',
+  authPass2:'密碼確認',
+  authSubmitLogin:'登入',
+  authSubmitRegister:'註冊帳號',
+  authSkip:'不登入，繼續用這台裝置',
+  authWarn:'這個帳號沒有綁信箱。忘記密碼的話，沒有辦法找回，請自己記得密碼。',
+  authHello:'已登入：{x}',
+  authLogout:'登出',
+  authBack:'登入以同步雲端存檔',
+  authBusy:'請稍候…',
+  authPassMismatch:'兩次輸入的密碼不一樣',
+  authNeedPass2:'請再輸入一次密碼',
+  authOkRegister:'註冊成功，已為你登入',
+  authOkLogin:'已登入',
+  authLoggedOut:'已登出。這台裝置上的存檔還在。',
+  authOffline:'雲端暫時連不上。這台裝置上的存檔還在，可以繼續玩。',
+  authSessionLost:'登入已失效，請重新登入。這台裝置上的存檔還在。',
+  authSyncOk:'雲端已同步',
+  authSyncPending:'尚未上傳到雲端',
+  authSyncing:'正在上傳…',
+  authSyncFail:'雲端同步失敗',
+  authLastSync:'上次同步：{x}',
+  authUploadNow:'立即上傳',
+  authChangePass:'改密碼',
+  authOldPass:'舊密碼',
+  authNewPass:'新密碼',
+  authNewPass2:'新密碼確認',
+  authPassChanged:'密碼已更新',
+  cloudSection:'雲端帳號',
+  cloudNone:'尚未登入。登入後可以把存檔放到雲端，換裝置也能接著玩。',
+  cloudConflictTitle:'兩份存檔不一樣',
+  cloudConflictLead:'這台裝置和雲端的存檔不一致。請選一份繼續（未選的那份不會立刻被蓋掉）。',
+  cloudLocal:'這台裝置',
+  cloudCloud:'雲端',
+  cloudUseLocal:'用這台裝置的存檔',
+  cloudUseCloud:'用雲端的存檔',
+  cloudOfferUpload:'這台裝置上已有存檔（{x}）。雲端還沒有存檔，要現在上傳嗎？',
+  cloudOfferYes:'上傳到雲端',
+  cloudOfferNo:'先不用，只放在這台裝置',
+  cloudOverwriteNew:'雲端已有存檔（{x}）。開新檔並上傳會蓋掉雲端那份（舊的會先留一份備份）。確定要覆蓋嗎？',
+  cloudHoldLocal:'新存檔先只放在這台裝置，不會自動覆蓋雲端。想上傳時請到「存檔」頁按「立即上傳」。',
+  cloudNeedConfirm:'雲端已有較完整的存檔。沒有先確認的話，不會用空白或新開的進度覆蓋。',
+  cloudNoSave:'還沒有可以上傳的存檔。',
+  cloudUploading:'正在上傳到雲端…',
+  cloudUploaded:'已上傳到雲端',
+
   markApply:'💋 {x} 在你頸側留下吻痕。至少十二小時內，大概藏不住。',
   markFade:'頸側的吻痕淡了。',
   markChip:'💋 {mark}（{x}）· 剩 {left}',
@@ -3296,6 +3392,7 @@ function newGame(f){
   S.residents.forEach(id => addMem(id, `${S.hero.name} 搬進來了。${id==='alexander' ? '是我親自挑選的住戶。' : ''}`));
   addMem('h', `搬進倫敦的公寓。房東是 Alexander，室友們各有各的脾氣。`);
   backupSave(); migrate(S); save(); startGame();
+  if (typeof onNewGame === 'function') onNewGame();
 }
 function placeIn(e, roomId, slot){ const r = G.rooms[roomId]; e.f = r.f || 0; e.room = roomId; e.dest = roomId; e.path = []; const p = assignPos(e, roomId, slot); e.x = p[0]; e.y = p[1]; }
 
@@ -4232,6 +4329,7 @@ function save(opts){
     else if (prev && prev !== next && !parseRaw(prev)) lsSet(SAVE_BAK_KEY, prev);
     lsSet(SAVE_KEY, next);
   } catch(e){ console.warn(e); }
+  if (typeof onGameSaved === 'function') onGameSaved(opts);
 }
 function restoreBackup(key){
   const raw = lsGet(key || SAVE_BAK_KEY); if (!raw) return false;
@@ -4663,6 +4761,7 @@ function renderSaveView(){
     rec.querySelectorAll('[data-restore]').forEach(b => b.onclick = () => { if (confirm('要用這份備份取代目前的存檔嗎？目前的進度會先另外備份。')) restoreBackup(b.dataset.restore); });
   }
   $('#sv4').onclick = () => { if (confirm('要回到開始畫面再開新檔嗎？目前的存檔還在，開新檔時會先備份。')){ save(); setSpeed(0); showStart(); } };
+  if (typeof renderCloudSave === 'function') renderCloudSave(box);
 }
 
 /* ---------- 彈出面板 ---------- */
@@ -4859,9 +4958,16 @@ function showStart(pane){
   else box.classList.add('hidden');
   startPane(pane === 'new' ? 'new' : 'title');
   if (pane === 'new') fillNewForm();
+  if (typeof renderCloudTitle === 'function') renderCloudTitle();
 }
-function goReturn(){
-  const s = loadSaved(); if (!s){ toast('找不到可讀的存檔'); return false; }
+async function goReturn(){
+  let s = null;
+  if (typeof cloudPickSave === 'function'){
+    try { s = await cloudPickSave(); } catch(e){ console.warn(e); s = null; }
+    if (s === false) return false;
+  }
+  if (!s) s = loadSaved();
+  if (!s){ toast('找不到可讀的存檔'); return false; }
   S = s; G = buildGeo(S.layout); const ts = S.realTs; startGame(); resumeOffline(ts); return true;
 }
 function goMoveIn(){
@@ -4883,6 +4989,7 @@ function initStart(){
       form.avatar = c.toDataURL('image/jpeg', 0.86); showStart('new'); }; im.src = fr.result; }; fr.readAsDataURL(f); };
   $('#heroAvClear').onclick = () => { form.avatar = null; showStart('new'); };
   $('input[name=name]').addEventListener('input', () => { if (!form.avatar) $('#heroAvPrev').innerHTML = letterAv($('input[name=name]').value); });
+  if (typeof bindCloudAuth === 'function') bindCloudAuth();
   $('#btnContinue').onclick = goReturn;
   $('#btnMoveIn').onclick = goMoveIn;
   $('#btnBackTitle').onclick = () => showStart();
@@ -4904,7 +5011,596 @@ function initStart(){
 }
 // 測試用掛鉤
 function ff(mins, autoAnswer){ for (let i = 0; i < mins; i++){ stepMinute(); allEnts().forEach(e => moveEnt(e, 1)); if (S.pending && autoAnswer != null) answerRequest(autoAnswer); } snapVis(); drawTokens(); renderAll(true); }
-window.__imb = { get S(){ return S; }, socialThink, get form(){ return form; }, compatOf, cmul, heroAuto, ff, pickEvent, fireEvent, fireCollide, fireTest, witness, relTier, pairV, hMood, evById, showResult, migrate, heroInter, doAction, endOfDay, stepMinute, startInter, answerRequest, showRequest, openChar, closeSheet, switchView, setSpeed, save, renderAll, startFF, stopFF, hMem, syncCustom, openCxForm, cxClean, catchUp, get vis(){ return VIS; }, visSpeed, snapVis, route, resumeOffline, get lastAway(){ return ui.lastAway; }, openHist, recHist, pruneHist, caught, leaveSeen, interFromDef, soloOk, endSolo, startAftercare, interTxt, quipFits, interSpot, resolveSpot, spotKey, crowdedPairSeat, setSeatPx: v => { SEAT_PX = v; for (const k in SEAT_CACHE) delete SEAT_CACHE[k]; }, findSeat, seatPair, reseatAll, rectsAt, roomOccupants, npcThink, heroThink, endInter, onArrive, kickHero, goHomeIfForeign, nearestRoom, get ffState(){ return ui.ff; }, get ffLast(){ return ui.ffLast; }, showStart, loadSaved, goReturn, goMoveIn, hasAnySave, peekSaves, restoreBackup, backupSave, fillNewForm, SAVE_KEY, SAVE_BAK_KEY };
+window.__imb = { get S(){ return S; }, socialThink, get form(){ return form; }, compatOf, cmul, heroAuto, ff, pickEvent, fireEvent, fireCollide, fireTest, witness, relTier, pairV, hMood, evById, showResult, migrate, heroInter, doAction, endOfDay, stepMinute, startInter, answerRequest, showRequest, openChar, closeSheet, switchView, setSpeed, save, renderAll, startFF, stopFF, hMem, syncCustom, openCxForm, cxClean, catchUp, get vis(){ return VIS; }, visSpeed, snapVis, route, resumeOffline, get lastAway(){ return ui.lastAway; }, openHist, recHist, pruneHist, caught, leaveSeen, interFromDef, soloOk, endSolo, startAftercare, interTxt, quipFits, interSpot, resolveSpot, spotKey, crowdedPairSeat, setSeatPx: v => { SEAT_PX = v; for (const k in SEAT_CACHE) delete SEAT_CACHE[k]; }, findSeat, seatPair, reseatAll, rectsAt, roomOccupants, npcThink, heroThink, endInter, onArrive, kickHero, goHomeIfForeign, nearestRoom, get ffState(){ return ui.ff; }, get ffLast(){ return ui.ffLast; }, showStart, loadSaved, goReturn, goMoveIn, hasAnySave, peekSaves, peekMeta, restoreBackup, backupSave, fillNewForm, SAVE_KEY, SAVE_BAK_KEY };
+
+</script>
+<script>
+/* 帳號＋密碼雲端存檔（Supabase RPC，不綁信箱）。公開金鑰可放在客戶端；這裡沒有 service role。 */
+const CLOUD_URL = 'https://qiqctholkzggtlghsvsh.supabase.co';
+const CLOUD_KEY = 'sb_publishable_gpKmOqKT7T_HodyCoLPKzw_zaMJ16jX';
+const CLOUD_SESS = 'imbalance_cloud_v1';
+const CLOUD_DEBOUNCE = 120000;
+const CLOUD_MAX = 2 * 1024 * 1024;
+
+let cloudHold = false;      // 開新檔未確認前，不要自動覆蓋雲端
+let cloudTimer = 0;
+let cloudSyncing = false;
+let cloudLastSync = 0;      // Date.now() of last successful upload
+let cloudLastErr = '';
+let cloudStatus = '';       // ok | pending | syncing | fail | offline
+let authMode = 'login';     // login | register
+let authSkipped = false;
+let offeredUpload = false;
+
+function cw(key, fb){ const s = (typeof WORDS === 'object' && WORDS[key]) || fb || ''; return typeof W === 'function' ? W(s) : s; }
+function cfill(key, o, fb){ const s = cw(key, fb); return typeof fill === 'function' ? fill(s, o || {}) : s; }
+
+function cloudSess(){
+  try {
+    const raw = localStorage.getItem(CLOUD_SESS);
+    if (!raw) return null;
+    const s = JSON.parse(raw);
+    if (!s || !s.token || !s.username) return null;
+    if (s.expiresAt && Date.parse(s.expiresAt) && Date.parse(s.expiresAt) < Date.now()) return null;
+    return s;
+  } catch(e){ return null; }
+}
+function cloudLoggedIn(){ return !!cloudSess(); }
+function setCloudSess(s){
+  try {
+    if (!s) localStorage.removeItem(CLOUD_SESS);
+    else localStorage.setItem(CLOUD_SESS, JSON.stringify(s));
+  } catch(e){ console.warn(e); }
+}
+function dropCloudSess(){
+  setCloudSess(null);
+  cloudHold = false;
+  cloudLastSync = 0;
+  cloudLastErr = '';
+  cloudStatus = '';
+  offeredUpload = false;
+}
+
+async function cloudRpc(fn, body, opts){
+  opts = opts || {};
+  const ctrl = typeof AbortController === 'function' && !opts.keepalive ? new AbortController() : null;
+  const timer = ctrl ? setTimeout(() => ctrl.abort(), opts.timeout || 18000) : 0;
+  try {
+    const res = await fetch(CLOUD_URL + '/rest/v1/rpc/' + fn, {
+      method: 'POST',
+      headers: {
+        apikey: CLOUD_KEY,
+        Authorization: 'Bearer ' + CLOUD_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body || {}),
+      keepalive: !!opts.keepalive,
+      signal: ctrl ? ctrl.signal : undefined
+    });
+    let data = null;
+    try { data = await res.json(); } catch(e){ data = null; }
+    if (!res.ok){
+      const err = new Error('cloud_http_' + res.status);
+      err.status = res.status;
+      err.data = data;
+      throw err;
+    }
+    return data;
+  } catch(e){
+    if (e && e.name === 'AbortError') throw new Error('cloud_timeout');
+    throw e;
+  } finally { if (timer) clearTimeout(timer); }
+}
+
+function markSessionLost(){
+  dropCloudSess();
+  toast(cw('authSessionLost', '登入已失效，請重新登入。這台裝置上的存檔還在。'));
+  renderCloudTitle();
+  if (typeof VIS !== 'undefined' && $('#v-save') && !$('#game').classList.contains('hidden')){
+    try { if (typeof renderSaveView === 'function') renderSaveView(); } catch(e){}
+  }
+}
+
+function fmtTs(ts){
+  if (!ts) return '—';
+  const d = new Date(typeof ts === 'number' ? ts : Date.parse(ts));
+  if (!isFinite(d.getTime())) return '—';
+  try { return d.toLocaleString('zh-TW', { timeZone: 'Asia/Taipei', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' }); }
+  catch(e){ return d.toISOString(); }
+}
+function saveLabel(s){
+  if (!s) return '（沒有存檔）';
+  try {
+    const raw = typeof s === 'string' ? s : JSON.stringify(s);
+    if (typeof peekMeta === 'function'){
+      const m = peekMeta(raw);
+      if (m && m.text) return m.text;
+    }
+    const o = typeof s === 'string' ? JSON.parse(s) : s;
+    if (o && o.hero && o.hero.name) return o.hero.name + '・第 ' + dayOf(o.t || 0) + ' 天 ' + clockStr(o.t || 0);
+  } catch(e){}
+  return '一份存檔';
+}
+function isNewish(s){
+  if (!s || !s.hero || !s.ents) return true;
+  const t = s.t || 0;
+  return dayOf(t) <= 1 && t <= 8 * 60 + 5 && (!s.log || s.log.length <= 3);
+}
+function sameish(a, b){
+  if (!a || !b) return false;
+  return Math.abs((a.realTs || 0) - (b.realTs || 0)) < 2000 && a.t === b.t && (a.hero && b.hero && a.hero.name === b.hero.name);
+}
+function clearlyNewer(a, b){
+  if (!a || !b) return !!a;
+  return (a.realTs || 0) > (b.realTs || 0) + 2000 && (a.t || 0) >= (b.t || 0) && a.hero && b.hero && a.hero.name === b.hero.name;
+}
+function meaningfullyConflict(a, b){
+  if (!a || !b) return false;
+  if (sameish(a, b)) return false;
+  if (clearlyNewer(a, b) || clearlyNewer(b, a)) return false;
+  return true;
+}
+
+function applyLoadedSave(s){
+  if (!s || !s.hero || !s.ents) return null;
+  try { return typeof migrate === 'function' ? migrate(JSON.parse(JSON.stringify(s))) : s; }
+  catch(e){ console.warn(e); return s; }
+}
+
+function writeLocalFromCloud(s){
+  const ready = applyLoadedSave(s);
+  if (!ready) return null;
+  try {
+    const prev = typeof lsGet === 'function' ? lsGet(SAVE_KEY) : localStorage.getItem(SAVE_KEY);
+    const next = JSON.stringify(ready);
+    if (prev && prev !== next && typeof lsSet === 'function') lsSet(SAVE_BAK_KEY, prev);
+    if (typeof lsSet === 'function') lsSet(SAVE_KEY, next);
+    else localStorage.setItem(SAVE_KEY, next);
+  } catch(e){ console.warn(e); }
+  return ready;
+}
+
+function askModal(html){
+  return new Promise(resolve => {
+    const m = $('#modal');
+    m.classList.remove('hidden');
+    m.innerHTML = html;
+    m.querySelectorAll('[data-pick]').forEach(b => {
+      b.onclick = ev => { ev.preventDefault(); closeModal(); resolve(b.dataset.pick); };
+    });
+    const cancel = m.querySelector('[data-cancel]');
+    if (cancel) cancel.onclick = ev => { ev.preventDefault(); closeModal(); resolve(null); };
+  });
+}
+
+async function offerUploadIfNeeded(){
+  if (offeredUpload || !cloudLoggedIn()) return;
+  const local = typeof loadSaved === 'function' ? loadSaved() : null;
+  if (!local) return;
+  let remote;
+  try { remote = await cloudRpc('load_cloud', { token: cloudSess().token }); }
+  catch(e){ return; }
+  if (!remote || !remote.ok){
+    if (remote && remote.error === 'bad_session') markSessionLost();
+    return;
+  }
+  offeredUpload = true;
+  if (remote.data && remote.data.hero) return; // 有雲端檔，等回到小屋再比
+  const pick = await askModal(`<div class="box" role="dialog">
+    <h3>${esc(cfill('cloudOfferUpload', {x: saveLabel(local)}))}</h3>
+    <div class="acts">
+      <button type="button" class="btn primary wide" data-pick="yes">${esc(cw('cloudOfferYes', '上傳到雲端'))}</button>
+      <button type="button" class="btn wide" data-pick="no">${esc(cw('cloudOfferNo', '先不用'))}</button>
+    </div>
+  </div>`);
+  if (pick === 'yes'){
+    cloudHold = false;
+    const ok = await flushCloud(local, { force: true });
+    if (ok) toast(cw('cloudUploaded', '已上傳到雲端'));
+  }
+}
+
+async function afterAuth(sess, isNew){
+  setCloudSess(sess);
+  cloudHold = false;
+  authSkipped = false;
+  offeredUpload = false;
+  cloudStatus = 'pending';
+  renderCloudTitle();
+  toast(isNew ? cw('authOkRegister', '註冊成功，已為你登入') : cw('authOkLogin', '已登入'));
+  await offerUploadIfNeeded();
+}
+
+async function doLogout(){
+  const s = cloudSess();
+  if (s && s.token){
+    try { await cloudRpc('logout', { token: s.token }, { timeout: 8000 }); } catch(e){}
+  }
+  dropCloudSess();
+  authSkipped = false;
+  renderCloudTitle();
+  if (typeof renderSaveView === 'function' && $('#v-save') && !$('#game').classList.contains('hidden') && (typeof VIS === 'undefined' || VIS === 'save' || document.querySelector('#v-save')?.children.length)){
+    try { renderSaveView(); } catch(e){}
+  }
+  toast(cw('authLoggedOut', '已登出。這台裝置上的存檔還在。'));
+}
+
+function scheduleCloud(){
+  if (!cloudLoggedIn() || cloudHold) return;
+  if (cloudTimer) clearTimeout(cloudTimer);
+  cloudTimer = setTimeout(() => { cloudTimer = 0; flushCloud(); }, CLOUD_DEBOUNCE);
+}
+async function flushCloud(source, opts){
+  opts = opts || {};
+  if (!cloudLoggedIn()) return false;
+  if (cloudHold && !opts.force && !opts.manual) return false;
+  const s = source || (typeof S !== 'undefined' ? S : null) || (typeof loadSaved === 'function' ? loadSaved() : null);
+  if (!s || !s.hero || !s.ents){
+    if (opts.manual) toast(cw('cloudNoSave', '還沒有可以上傳的存檔。'));
+    return false;
+  }
+  if (!opts.force && !opts.allowNew && !opts.keepalive){
+    // 若雲端已有較完整進度，不要默默用空白／新檔覆蓋
+    try {
+      const remote = await cloudRpc('load_cloud', { token: cloudSess().token });
+      if (remote && remote.error === 'bad_session'){ markSessionLost(); return false; }
+      if (remote && remote.ok && remote.data && wouldClobber(remote.data, s)){
+        if (opts.manual){
+          const ok = confirm(cfill('cloudOverwriteNew', { x: saveLabel(remote.data) }));
+          if (!ok) return false;
+        } else {
+          cloudHold = true;
+          cloudStatus = 'pending';
+          cloudLastErr = cw('cloudNeedConfirm', '雲端已有較完整的存檔。沒有先確認的話，不會用空白或新開的進度覆蓋。');
+          return false;
+        }
+      }
+    } catch(e){ /* 離線時稍後再試；下面的上傳也會失敗並標狀態 */ }
+  }
+  const payload = JSON.parse(JSON.stringify(s));
+  const ts = payload.realTs || Date.now();
+  let raw;
+  try { raw = JSON.stringify(payload); } catch(e){ return false; }
+  if (raw.length > CLOUD_MAX){
+    cloudStatus = 'fail';
+    cloudLastErr = cw('authSyncFail', '雲端同步失敗') + '（太大）';
+    if (opts.manual) toast(cloudLastErr);
+    return false;
+  }
+  cloudSyncing = true;
+  cloudStatus = 'syncing';
+  if (opts.manual) toast(cw('cloudUploading', '正在上傳到雲端…'));
+  try {
+    const iso = new Date(ts).toISOString();
+    const r = await cloudRpc('save_cloud', { token: cloudSess().token, data: payload, client_updated_at: iso }, { keepalive: !!opts.keepalive, timeout: opts.keepalive ? 0 : 20000 });
+    if (r && r.error === 'bad_session'){ markSessionLost(); return false; }
+    if (!r || r.ok === false){
+      cloudStatus = 'fail';
+      cloudLastErr = (r && r.message) || cw('authSyncFail', '雲端同步失敗');
+      if (opts.manual) toast(cloudLastErr);
+      return false;
+    }
+    cloudHold = false;
+    cloudLastSync = Date.now();
+    cloudLastErr = '';
+    cloudStatus = 'ok';
+    if (opts.manual) toast(cw('cloudUploaded', '已上傳到雲端'));
+    if (typeof renderSaveView === 'function' && document.querySelector('#v-save .cloudcard')){
+      try { renderSaveView(); } catch(e){}
+    }
+    return true;
+  } catch(e){
+    cloudStatus = 'offline';
+    cloudLastErr = cw('authOffline', '雲端暫時連不上。這台裝置上的存檔還在，可以繼續玩。');
+    if (opts.manual) toast(cloudLastErr);
+    return false;
+  } finally {
+    cloudSyncing = false;
+  }
+}
+function wouldClobber(cloud, local){
+  if (!cloud || !cloud.hero) return false;
+  if (!local || !local.hero) return true;
+  return isNewish(local) && !isNewish(cloud) && ((cloud.t || 0) > (local.t || 0) + 10 || (cloud.realTs || 0) > (local.realTs || 0));
+}
+
+function onGameSaved(opts){
+  if (!cloudLoggedIn() || cloudHold) return;
+  if (opts && (opts.flush || opts.backup === 'cloud')) flushCloud(undefined, { keepalive: !!opts.keepalive });
+  else scheduleCloud();
+}
+
+async function onNewGame(){
+  if (!cloudLoggedIn()) return;
+  let remote = null;
+  try { remote = await cloudRpc('load_cloud', { token: cloudSess().token }); }
+  catch(e){ return; }
+  if (remote && remote.error === 'bad_session'){ markSessionLost(); return; }
+  if (remote && remote.ok && remote.data && remote.data.hero && !isNewish(remote.data)){
+    const ok = confirm(cfill('cloudOverwriteNew', { x: saveLabel(remote.data) }));
+    if (!ok){
+      cloudHold = true;
+      cloudStatus = 'pending';
+      toast(cw('cloudHoldLocal', '新存檔先只放在這台裝置，不會自動覆蓋雲端。'));
+      return;
+    }
+  }
+  cloudHold = false;
+  flushCloud(undefined, { force: true });
+}
+
+async function cloudPickSave(){
+  const local = typeof loadSaved === 'function' ? loadSaved() : null;
+  if (!cloudLoggedIn()) return local || null;
+  let remote;
+  try { remote = await cloudRpc('load_cloud', { token: cloudSess().token }); }
+  catch(e){
+    toast(cw('authOffline', '雲端暫時連不上。這台裝置上的存檔還在，可以繼續玩。'));
+    return local || null;
+  }
+  if (!remote || remote.ok === false){
+    if (remote && remote.error === 'bad_session') markSessionLost();
+    else toast((remote && remote.message) || cw('authOffline'));
+    return local || null;
+  }
+  const cloud = remote.data && remote.data.hero && remote.data.ents ? applyLoadedSave(remote.data) : null;
+  if (!cloud && !local) return null;
+  if (cloud && !local){
+    return writeLocalFromCloud(cloud);
+  }
+  if (local && !cloud){
+    // 本機有、雲端沒有：先用本機，再詢問是否上傳（若還沒問過）
+    if (!offeredUpload) await offerUploadIfNeeded();
+    else flushCloud(local, { force: true });
+    return local;
+  }
+  if (sameish(local, cloud)) return local;
+  if (meaningfullyConflict(local, cloud)){
+    const pick = await askModal(`<div class="box picksave" role="dialog">
+      <h3>${esc(cw('cloudConflictTitle', '兩份存檔不一樣'))}</h3>
+      <p class="small muted">${esc(cw('cloudConflictLead', '請選一份繼續。'))}</p>
+      <button type="button" class="pickopt" data-pick="local"><div class="k">${esc(cw('cloudLocal', '這台裝置'))}</div><div class="v">${esc(saveLabel(local))}</div></button>
+      <button type="button" class="pickopt" data-pick="cloud"><div class="k">${esc(cw('cloudCloud', '雲端'))}</div><div class="v">${esc(saveLabel(cloud))}</div></button>
+    </div>`);
+    if (pick === 'cloud') return writeLocalFromCloud(cloud);
+    if (pick === 'local'){ flushCloud(local, { force: true }); return local; }
+    return false;
+  }
+  if (clearlyNewer(cloud, local)) return writeLocalFromCloud(cloud);
+  if (clearlyNewer(local, cloud)){ flushCloud(local, { force: true }); return local; }
+  // 其餘（例如只差幾秒）：用較新的 realTs
+  if ((cloud.realTs || 0) > (local.realTs || 0)) return writeLocalFromCloud(cloud);
+  flushCloud(local, { force: true });
+  return local;
+}
+
+
+async function refreshContinueFromCloud(){
+  if (!cloudLoggedIn()) return;
+  const box = $('#continueBox'), info = $('#continueInfo');
+  if (!box || !info) return;
+  const local = typeof loadSaved === 'function' ? loadSaved() : null;
+  try {
+    const r = await cloudRpc('load_cloud', { token: cloudSess().token }, { timeout: 12000 });
+    if (!r || !r.ok) return;
+    if (!r.data || !r.data.hero) return;
+    const label = saveLabel(r.data);
+    if (!local){
+      box.classList.remove('hidden');
+      info.textContent = label + '（雲端）';
+    } else if (!sameish(local, r.data)){
+      const loc = saveLabel(local);
+      if (info.textContent.indexOf('雲端') < 0) info.textContent = loc + '　／　雲端 ' + label;
+    }
+  } catch(e){}
+}
+
+function renderCloudTitle(){
+  const guest = $('#authGuest'), logged = $('#authLogged'), skipped = $('#authSkipped');
+  if (!guest || !logged) return;
+  const s = cloudSess();
+  if (s){
+    guest.classList.add('hidden');
+    skipped.classList.add('hidden');
+    logged.classList.remove('hidden');
+    const hello = $('#authHello');
+    if (hello) hello.textContent = cfill('authHello', { x: s.username }, '已登入：{x}');
+    const lo = $('#btnTitleLogout');
+    if (lo) lo.textContent = cw('authLogout', '登出');
+  } else if (authSkipped){
+    guest.classList.add('hidden');
+    logged.classList.add('hidden');
+    skipped.classList.remove('hidden');
+    const b = $('#btnBackAuth');
+    if (b) b.textContent = cw('authBack', '登入以同步雲端存檔');
+  } else {
+    logged.classList.add('hidden');
+    skipped.classList.add('hidden');
+    guest.classList.remove('hidden');
+    syncAuthForm();
+  }
+  refreshContinueFromCloud();
+}
+
+function syncAuthForm(){
+  const reg = authMode === 'register';
+  const tabL = $('#tabLogin'), tabR = $('#tabRegister');
+  if (tabL){ tabL.classList.toggle('on', !reg); tabL.textContent = cw('authLogin', '登入'); }
+  if (tabR){ tabR.classList.toggle('on', reg); tabR.textContent = cw('authRegister', '註冊'); }
+  const row = $('#authPass2Row');
+  if (row) row.classList.toggle('hidden', !reg);
+  const p2 = $('#authPass2');
+  if (p2) p2.required = reg;
+  const sub = $('#authSubmit');
+  if (sub) sub.textContent = reg ? cw('authSubmitRegister', '註冊帳號') : cw('authSubmitLogin', '登入');
+  const skip = $('#btnSkipAuth');
+  if (skip) skip.textContent = cw('authSkip', '不登入，繼續用這台裝置');
+  const warn = $('#authWarn');
+  if (warn) warn.textContent = cw('authWarn', '這個帳號沒有綁信箱。忘記密碼的話，沒有辦法找回，請自己記得密碼。');
+  const u = $('#authForm label'); // first labels stay as 帳號／密碼 if we set them
+  const labels = document.querySelectorAll('#authForm > label');
+  if (labels[0] && labels[0].childNodes[0]) labels[0].childNodes[0].textContent = cw('authUser', '帳號');
+  if (labels[1] && labels[1].childNodes[0]) labels[1].childNodes[0].textContent = cw('authPass', '密碼');
+  if (labels[2] && labels[2].childNodes[0]) labels[2].childNodes[0].textContent = cw('authPass2', '密碼確認');
+}
+
+function showAuthErr(msg){
+  const n = $('#authErr');
+  if (!n){ if (msg) toast(msg); return; }
+  if (!msg){ n.classList.add('hidden'); n.textContent = ''; return; }
+  n.textContent = msg;
+  n.classList.remove('hidden');
+}
+
+async function submitAuth(ev){
+  if (ev) ev.preventDefault();
+  showAuthErr('');
+  const user = ($('#authUser') && $('#authUser').value || '').trim();
+  const pass = $('#authPass') ? $('#authPass').value : '';
+  const pass2 = $('#authPass2') ? $('#authPass2').value : '';
+  if (authMode === 'register'){
+    if (pass !== pass2){ showAuthErr(cw('authPassMismatch', '兩次輸入的密碼不一樣')); return; }
+    if (!pass2){ showAuthErr(cw('authNeedPass2', '請再輸入一次密碼')); return; }
+  }
+  const sub = $('#authSubmit');
+  if (sub){ sub.disabled = true; sub.textContent = cw('authBusy', '請稍候…'); }
+  try {
+    if (authMode === 'register'){
+      const r = await cloudRpc('register', { username: user, password: pass });
+      if (!r || r.ok === false){ showAuthErr((r && r.message) || cw('authOffline')); return; }
+    }
+    const r = await cloudRpc('login', { username: user, password: pass });
+    if (!r || r.ok === false){ showAuthErr((r && r.message) || cw('authOffline')); return; }
+    await afterAuth({ token: r.token, username: r.username, expiresAt: r.expires_at }, authMode === 'register');
+    showAuthErr('');
+    if ($('#authPass')) $('#authPass').value = '';
+    if ($('#authPass2')) $('#authPass2').value = '';
+  } catch(e){
+    showAuthErr(cw('authOffline', '雲端暫時連不上。這台裝置上的存檔還在，可以繼續玩。'));
+  } finally {
+    if (sub){ sub.disabled = false; syncAuthForm(); }
+  }
+}
+
+function bindCloudAuth(){
+  const form = $('#authForm');
+  if (!form || form.dataset.bound) { renderCloudTitle(); return; }
+  form.dataset.bound = '1';
+  form.addEventListener('submit', ev => { ev.preventDefault(); submitAuth(ev); });
+  const subBtn = $('#authSubmit');
+  if (subBtn) subBtn.addEventListener('click', ev => { ev.preventDefault(); submitAuth(ev); });
+  form.addEventListener('keydown', ev => { if (ev.key === 'Enter'){ ev.preventDefault(); submitAuth(ev); } });
+  const tabL = $('#tabLogin'), tabR = $('#tabRegister');
+  if (tabL) tabL.onclick = () => { authMode = 'login'; showAuthErr(''); syncAuthForm(); };
+  if (tabR) tabR.onclick = () => { authMode = 'register'; showAuthErr(''); syncAuthForm(); };
+  const skip = $('#btnSkipAuth');
+  if (skip) skip.onclick = () => { authSkipped = true; renderCloudTitle(); };
+  const back = $('#btnBackAuth');
+  if (back) back.onclick = () => { authSkipped = false; renderCloudTitle(); };
+  const lo = $('#btnTitleLogout');
+  if (lo) lo.onclick = () => doLogout();
+  renderCloudTitle();
+}
+
+function cloudStatusText(){
+  if (cloudSyncing || cloudStatus === 'syncing') return cw('authSyncing', '正在上傳…');
+  if (cloudStatus === 'ok') return cw('authSyncOk', '雲端已同步') + (cloudLastSync ? '　' + cfill('authLastSync', { x: fmtTs(cloudLastSync) }) : '');
+  if (cloudStatus === 'offline') return cloudLastErr || cw('authOffline');
+  if (cloudStatus === 'fail') return cloudLastErr || cw('authSyncFail', '雲端同步失敗');
+  if (cloudHold) return cw('cloudHoldLocal', '新存檔先只放在這台裝置，不會自動覆蓋雲端。');
+  if (cloudLoggedIn()) return cw('authSyncPending', '尚未上傳到雲端') + (cloudLastSync ? '　' + cfill('authLastSync', { x: fmtTs(cloudLastSync) }) : '');
+  return '';
+}
+
+function renderCloudSave(box){
+  if (!box) return;
+  const card = el('div', 'card cloudcard');
+  const s = cloudSess();
+  if (!s){
+    card.innerHTML = `<h3 class="sec" style="margin-top:0">${esc(cw('cloudSection', '雲端帳號'))}</h3>
+      <p class="small muted">${esc(cw('cloudNone', '尚未登入。登入後可以把存檔放到雲端，換裝置也能接著玩。'))}</p>
+      <button type="button" class="btn wide" id="svLogin">${esc(cw('authBack', '登入以同步雲端存檔'))}</button>`;
+    box.insertBefore(card, box.firstChild);
+    const b = card.querySelector('#svLogin');
+    if (b) b.onclick = () => { save(); setSpeed(0); authSkipped = false; showStart(); };
+    return;
+  }
+  const stClass = cloudStatus === 'ok' ? 'ok' : (cloudStatus === 'fail' || cloudStatus === 'offline') ? 'err' : 'warn';
+  card.innerHTML = `<h3 class="sec" style="margin-top:0">${esc(cw('cloudSection', '雲端帳號'))}</h3>
+    <div class="cloudkv">
+      <div>${esc(cfill('authHello', { x: s.username }, '已登入：{x}'))}</div>
+      <div class="cloudstat ${stClass}">${esc(cloudStatusText())}</div>
+    </div>
+    <button type="button" class="btn primary wide" id="svUpload">${esc(cw('authUploadNow', '立即上傳'))}</button>
+    <button type="button" class="btn wide" id="svChpass">${esc(cw('authChangePass', '改密碼'))}</button>
+    <button type="button" class="btn ghost wide" id="svLogout">${esc(cw('authLogout', '登出'))}</button>
+    <form id="chpassForm" class="hidden" autocomplete="off" style="margin-top:10px">
+      <label>${esc(cw('authOldPass', '舊密碼'))}<input type="password" id="chOld" maxlength="72" required></label>
+      <label>${esc(cw('authNewPass', '新密碼'))}<input type="password" id="chNew" maxlength="72" minlength="6" required></label>
+      <label>${esc(cw('authNewPass2', '新密碼確認'))}<input type="password" id="chNew2" maxlength="72" minlength="6" required></label>
+      <p class="small autherr hidden" id="chErr"></p>
+      <button type="submit" class="btn primary wide">${esc(cw('authChangePass', '改密碼'))}</button>
+    </form>`;
+  box.insertBefore(card, box.firstChild);
+  const sv1 = box.querySelector('#sv1');
+  if (sv1) sv1.onclick = () => { save({ flush: true }); flushCloud(undefined, { manual: true }).then(() => { if (typeof renderSaveView === 'function') renderSaveView(); }); };
+  card.querySelector('#svUpload').onclick = () => { save({ flush: true }); flushCloud(undefined, { manual: true }).then(() => { if (typeof renderSaveView === 'function') renderSaveView(); }); };
+  // 立即上傳：若 hold，仍走確認流程（manual）
+  card.querySelector('#svLogout').onclick = () => doLogout();
+  card.querySelector('#svChpass').onclick = () => {
+    const f = card.querySelector('#chpassForm');
+    f.classList.toggle('hidden');
+  };
+  card.querySelector('#chpassForm').onsubmit = ev => { ev.preventDefault(); submitChangePass(card); };
+}
+
+async function submitChangePass(card){
+  const err = card.querySelector('#chErr');
+  const oldP = card.querySelector('#chOld').value;
+  const n1 = card.querySelector('#chNew').value;
+  const n2 = card.querySelector('#chNew2').value;
+  const show = m => { if (!err) return; if (!m){ err.classList.add('hidden'); err.textContent=''; return; } err.textContent=m; err.classList.remove('hidden'); };
+  show('');
+  if (n1 !== n2){ show(cw('authPassMismatch', '兩次輸入的密碼不一樣')); return; }
+  const sess = cloudSess();
+  if (!sess){ show(cw('authSessionLost')); return; }
+  try {
+    const r = await cloudRpc('change_password', { token: sess.token, old_password: oldP, new_password: n1 });
+    if (!r || r.ok === false){
+      if (r && r.error === 'bad_session'){ markSessionLost(); return; }
+      show((r && r.message) || cw('authSyncFail'));
+      return;
+    }
+    show('');
+    card.querySelector('#chpassForm').classList.add('hidden');
+    card.querySelector('#chOld').value = '';
+    card.querySelector('#chNew').value = '';
+    card.querySelector('#chNew2').value = '';
+    toast(cw('authPassChanged', '密碼已更新'));
+  } catch(e){
+    show(cw('authOffline'));
+  }
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (!cloudLoggedIn()) return;
+  if (document.hidden && typeof S !== 'undefined' && S) flushCloud(undefined, { keepalive: true });
+});
+window.addEventListener('pagehide', () => {
+  if (!cloudLoggedIn()) return;
+  if (typeof S !== 'undefined' && S) flushCloud(undefined, { keepalive: true });
+});
+
+if (typeof window !== 'undefined'){
+  const hook = () => { if (typeof window.__imb === 'object') Object.assign(window.__imb, {
+    cloudLoggedIn, cloudSess, cloudRpc, cloudPickSave, flushCloud, bindCloudAuth, renderCloudTitle, renderCloudSave, refreshContinueFromCloud,
+    onGameSaved, onNewGame, doLogout, get cloudHold(){ return cloudHold; }, set cloudHold(v){ cloudHold = !!v; },
+    get cloudLastSync(){ return cloudLastSync; }, get cloudStatus(){ return cloudStatus; },
+    CLOUD_URL, CLOUD_SESS, CLOUD_KEY
+  }); };
+  hook();
+  document.addEventListener('DOMContentLoaded', hook);
+}
 
 </script>
 <script>
