@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f7f1e8">
 <title>失衡・公寓觀察</title>
-<meta name="imb-build" content="2026-11-10 15:39 (台北)">
+<meta name="imb-build" content="2026-11-10 15:55 (台北)">
 <style>
 :root{
   --bg:#f7f1e8; --card:#fffaf3; --line:#e8dccb; --ink:#4a3f35; --muted:#9a8b7b; --accent:#c9876b; --accent2:#e7b9a3;
@@ -539,6 +539,26 @@ span.av,div.av{display:inline-block;border-radius:50%}
 .fx{font-size:11px;line-height:1.4;color:var(--muted);margin-top:2px;font-weight:400}
 .fx .up{color:#3f8a55}.fx .dn{color:#c0504d}
 .hrow .fx{grid-column:2}
+/* 自訂行動 */
+.agrid .btn{position:relative}
+.agrid .haed{position:absolute;top:2px;right:3px;font-size:12px;line-height:1;padding:3px;border-radius:6px;opacity:.75}
+.agrid .haed:hover,.agrid .haed:focus{opacity:1;background:rgba(0,0,0,.06)}
+.agrid .haadd{border-style:dashed;color:var(--muted)}
+.agrid .haadd i{font-weight:700}
+.haemo{display:flex;flex-wrap:wrap;gap:4px;margin:2px 0 6px}
+.haemo .emo{font-size:18px;width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:transparent;padding:0}
+.haemo .emo.on{border-color:var(--accent,#c97);background:rgba(201,119,153,.12)}
+#packImpL{cursor:pointer}
+/* 自訂行動 */
+.agrid .btn{position:relative}
+.agrid .haed{position:absolute;top:2px;right:3px;font-size:12px;line-height:1;padding:3px;border-radius:6px;opacity:.75}
+.agrid .haed:hover,.agrid .haed:focus{opacity:1;background:rgba(0,0,0,.06)}
+.agrid .haadd{border-style:dashed;color:var(--muted)}
+.agrid .haadd i{font-weight:700}
+.haemo{display:flex;flex-wrap:wrap;gap:4px;margin:2px 0 6px}
+.haemo .emo{font-size:18px;width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:transparent;padding:0}
+.haemo .emo.on{border-color:var(--accent,#c97);background:rgba(201,119,153,.12)}
+#packImpL{cursor:pointer}
 
 </style>
 </head>
@@ -3361,8 +3381,9 @@ function heroThink(){
   const done = S.t >= A.until || (A.id === 'sleep' && !A.fixed && e.needs.energy >= 100 && S.t - (A.until - A.dur) > 240);
   if (done){
     if (A.gid && S.group && S.group.id === A.gid) endGroup(true);
-    else if (A.id !== 'stay' && !A.auto) log(`你結束了「${A.lbl || A.label}」。`, ['h']);
-    if (A.id === 'cook' && !A.gid) cookShare(e); else if (A.id === 'snack') addMood(2); else if (A.id === 'solo') heroSoloDone();
+    else if (A.id !== 'stay' && !A.auto && !A.ha) log(`你結束了「${A.lbl || A.label}」。`, ['h']);
+    if (A.ha) haDone(A);
+    if (A.id === 'cook' && !A.gid) cookShare(e); else if (A.id === 'snack') addMood(2); else if (A.act === 'solo') heroSoloDone();
     S.autoNext = S.t + 2 + Math.floor(Math.random() * 6);
     if (A.room === 'out'){ S.hAction = null; route(e, 'living'); e.act = 'walk'; e.label = '回家'; }
     else { S.hAction = null; e.act = 'idle'; e.label = '閒著'; }
@@ -3939,7 +3960,7 @@ function endOfDay(){
   log(`—— 第 ${d} 天結束。每個人都寫了今天的日記。——`, [], 'day');
   toast(`📔 第 ${d} 天的日記寫好了`);
 }
-const EV_PRI = ['sex','caress','night','morning','photo','studio','intimate','after','cxd','group','act','solo','laugh','jealous','flirt','hug','care','together','office','rejected','refused','chat','npc'];
+const EV_PRI = ['sex','caress','night','morning','photo','studio','intimate','after','cxd','hax','group','act','solo','laugh','jealous','flirt','hug','care','together','office','rejected','refused','chat','npc'];
 function writeDiary(id){
   const D = DIARY[id], hn = S.hero.name, ev = S.dayEv[id];
   const out = [rnd(D.open)];
@@ -3956,9 +3977,9 @@ function topAct(id){ const m = S.ents[id].actMin; const ks = Object.keys(m).filt
 function writeHeroDiary(){
   const D = H_DIARY, ev = S.dayEv.h; const out = [rnd(D.open)]; const groups = {};
   for (const e of ev){ let x = e.x || '', y = ''; if (x.includes('|')) [x, y] = x.split('|'); const xn = CHAR[x] ? CHAR[x].name : x;
-    const k = e.type === 'together' || e.type === 'act' ? e.type + ':' + y : e.type; (groups[k] = groups[k] || {type:e.type, y, names:new Set()}).names.add(xn); }
+    const k = e.type === 'together' || e.type === 'act' || e.type === 'hax' ? e.type + ':' + y : e.type; (groups[k] = groups[k] || {type:e.type, y, names:new Set()}).names.add(xn); }
   const keys = Object.keys(groups).sort((a, b) => EV_PRI.indexOf(groups[a].type) - EV_PRI.indexOf(groups[b].type)).slice(0, 4);
-  for (const k of keys){ const g = groups[k]; let tpl = D.ev[g.type]; if (Array.isArray(tpl)) tpl = rnd(tpl); if (!tpl) continue; const xs = [...g.names].filter(Boolean).join(' 和 ');
+  for (const k of keys){ const g = groups[k]; if (g.type === 'hax'){ out.push(g.y.replace(/[。！？!?…」]?$/, m => m || '。')); continue; } let tpl = D.ev[g.type]; if (Array.isArray(tpl)) tpl = rnd(tpl); if (!tpl) continue; const xs = [...g.names].filter(Boolean).join(' 和 ');
     if (g.type === 'together' && /你|他/.test(g.y)) out.push(`${xs}：${g.y.replace(/你/g, '我')}。`); else out.push(fill(tpl, {x:xs, y:g.y})); }
   if (out.length === 1){ const top = topAct('h'); out.push(top ? `今天大多在${top}，沒什麼特別的事。` : '平淡的一天。'); }
   const md = hMood(); if (md >= 72) out.push('今天心情很好。'); else if (md < 35) out.push('今天心裡悶悶的，說不上為什麼。');
@@ -4050,7 +4071,7 @@ function showAwaySummary(A){
 let lastFrame = 0, acc = 0, running = false;
 function startGame(){
   $('#start').classList.add('hidden'); $('#game').classList.remove('hidden');
-  S.custom = S.custom || []; S.textOv = S.textOv || {}; applyTextOv(); syncCustom(); S.npcMods = S.npcMods || []; syncNpcMods(); S.coef = S.coef || {}; applyCoef(); reseatAll(); for (const k in VIS) delete VIS[k]; ui.follow = true; ui.floor = G.floors ? (S.ents.h.f || 0) : 0; $('#tokens').innerHTML = ''; buildPlan(); ui.ff = null; ffUi(); setSpeed(SPEEDS.includes(S.speed) ? S.speed : DEFAULT_SPEED); switchView('home');
+  S.custom = S.custom || []; S.textOv = S.textOv || {}; applyTextOv(); syncCustom(); if (typeof syncHacts === 'function') syncHacts(); S.npcMods = S.npcMods || []; syncNpcMods(); S.coef = S.coef || {}; applyCoef(); reseatAll(); for (const k in VIS) delete VIS[k]; ui.follow = true; ui.floor = G.floors ? (S.ents.h.f || 0) : 0; $('#tokens').innerHTML = ''; buildPlan(); ui.ff = null; ffUi(); setSpeed(SPEEDS.includes(S.speed) ? S.speed : DEFAULT_SPEED); switchView('home');
   if (S.pending) showRequest();
   $('#cheatChk').onchange = ev => setCheat(ev.target.checked); $('#cheatBtn').onclick = openCheat; cheatSync();
   if (!running){ running = true; lastFrame = performance.now(); requestAnimationFrame(frame); }
@@ -4443,17 +4464,24 @@ function openActions(){
   openSheet(() => {
     const e = S.ents.h, busy = !!S.inter;
     $('#sheet').innerHTML = `<div class="grab"></div><h3>你要做什麼？</h3><div class="small muted">${busy ? '你正在和室友相處，先結束才能做別的事。' : '你會走過去，到了才開始。時間會照常流動。'}</div>
-      <div class="agrid">${H_ACTIONS.filter(a => !a.hobby || hasH(a.hobby)).map(a => `<button class="btn" data-a="${a.id}" ${busy ? 'disabled' : ''}><i>${a.icon}</i>${a.label}<small>${a.dur === 'work' ? '到 18:00' : a.dur >= 60 ? (a.dur/60) + ' 小時' : a.dur + ' 分'}</small></button>`).join('')}</div>
+      <div class="agrid">${H_ACTIONS.filter(a => !a.hobby || hasH(a.hobby)).map(a => { const off = a.ha && !haInWin(a.ha); const dt = a.dur === 'work' ? '到 18:00' : a.dur >= 60 ? (Math.round(a.dur / 6) / 10) + ' 小時' : a.dur + ' 分';
+        return `<button class="btn${a.ha ? ' hatile' : ''}" data-a="${esc(a.id)}" ${busy || off ? 'disabled' : ''}><i>${esc(a.icon)}</i>${esc(a.label)}<small>${off ? '只在 ' + haWinTxt(a.ha) : dt}</small>${a.ha ? `<span class="haed" role="button" tabindex="0" data-hed="${esc(a.id)}" title="編輯" aria-label="編輯「${esc(a.label)}」">✏️</span>` : ''}</button>`; }).join('')}<button class="btn haadd" id="haAdd"><i>＋</i>自訂行動<small>自己做一件事</small></button></div>
       <div class="field-title">去找室友</div><div class="agrid">${S.residents.map(id => { const o = S.ents[id]; return `<button class="btn" data-f="${id}" ${!home(o) || busy ? 'disabled' : ''}><span class="av" style="width:30px;height:30px">${avOf(id)}</span>${CHAR[id].name}<small>${home(o) ? esc(o.label) : '不在家'}</small></button>`; }).join('')}</div>
       <div class="small muted" style="margin-top:8px">也可以直接點平面圖上的房間走過去，或點室友的頭像跟他互動。</div>`;
-    $('#sheet').querySelectorAll('[data-a]').forEach(b => b.onclick = () => grpOk(b.dataset.a) ? openGroupPicker(b.dataset.a) : doAction(b.dataset.a));
+    $('#sheet').querySelectorAll('[data-a]').forEach(b => { b.onclick = ev => { if (b.dataset.lp){ delete b.dataset.lp; return; } const ed = ev.target.closest('[data-hed]'); if (ed){ ev.stopPropagation(); return openHaForm(ed.dataset.hed); } grpOk(b.dataset.a) ? openGroupPicker(b.dataset.a) : doAction(b.dataset.a); };
+      if (b.classList.contains('hatile')){ let tm = null; const clr = () => { clearTimeout(tm); tm = null; };
+        b.addEventListener('pointerdown', () => { clr(); tm = setTimeout(() => { b.dataset.lp = 1; openHaForm(b.dataset.a); }, 550); }); ['pointerup','pointerleave','pointercancel'].forEach(t => b.addEventListener(t, clr));
+        b.addEventListener('contextmenu', ev => { ev.preventDefault(); clr(); openHaForm(b.dataset.a); }); } });
+    $('#sheet').querySelectorAll('.haed').forEach(s => s.onkeydown = ev => { if (ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); ev.stopPropagation(); openHaForm(s.dataset.hed); } });
+    $('#haAdd').onclick = () => openHaForm();
     $('#sheet').querySelectorAll('[data-f]').forEach(b => b.onclick = () => openChar(b.dataset.f));
   }, false);
 }
 function doAction(aid, withIds){
   const a = H_ACTIONS.find(x => x.id === aid); const room = actRoom(a);
   if (withIds && withIds.length && typeof grpOk === 'function' && grpOk(aid) && !S.inter){ startGroup(aid, withIds); closeSheet(); kickHero(); renderAll(true); return; }
-  if (aid === 'solo' && allEnts().some(o => o.id !== 'h' && o.room === room && !o.hidden)){ toast('房間裡有人，不方便獨處。'); return; }
+  if (!a) return; if (a.ha && !haInWin(a.ha)){ toast(`「${a.label}」只能在 ${haWinTxt(a.ha)} 做。`); return; }
+  if (a.act === 'solo' && allEnts().some(o => o.id !== 'h' && o.room === room && !o.hidden)){ toast('房間裡有人，不方便獨處。'); return; }
   S.hPending = null; S.hAction = {...a, room, until:null, auto:false};
   log(`你決定「${a.label}」。`, ['h']); closeSheet(); kickHero(); renderAll(true);
 }
@@ -4650,11 +4678,11 @@ function startGroup(aid, ids, opt = {}){
   const yes = [], no = [];
   for (const id of ids){ if (!S.residents.includes(id)) continue; const [ok, why] = grpAvail(id);
     if (!ok){ no.push([id, `${nm(id)} ${why}。`]); continue; }
-    if (opt.pre || Math.random() < grpP(id, aid, ids)) yes.push(id); else no.push([id, `${nm(id)}：${GRP_LINES[id][1]}`]); }
+    if (opt.pre || Math.random() < grpP(id, aid, ids)) yes.push(id); else no.push([id, `${nm(id)}：${grpLine(aid, id, 1)}`]); }
   S.hPending = null; S.hAction = {...a, room, until:null, auto:false, gid};
   if (opt.host) log(`🎉 ${nm(opt.host)} 約你和 ${yes.filter(x => x !== opt.host).map(nm).join('、') || '大家'}「${a.label}」。`, ['h', ...yes]);
   else log(`🎉 你約了 ${ids.map(nm).join('、')} 一起「${a.label}」。`, ['h', ...ids]);
-  yes.filter(id => id !== opt.host).forEach(id => log(`${nm(id)}：${GRP_LINES[id][0]}`, [id, 'h']));
+  yes.filter(id => id !== opt.host).forEach(id => log(`${nm(id)}：${grpLine(aid, id, 0)}`, [id, 'h']));
   no.forEach(([id, t]) => { log(t, [id, 'h']); dayEv(id, 'refused'); });
   if (!yes.length){ toast('沒有人能來，你自己去。'); S.group = null; return; }
   S.group = {id:gid, aid, room, v:GRP[aid].v, members:yes, host:opt.host || null, t0:S.t};
@@ -4684,7 +4712,7 @@ function endGroup(done){
   const names = here.map(nm), d = GRP[g.aid];
   for (const id of here){
     const others = here.filter(x => x !== id).map(nm), sent = `和 ${hn}${others.length ? '、' + others.join('、') : ''} ${d.v}。`;
-    gain(id, (2.5 + (d.like[id] > 0 ? 1 : 0)) * frac, 0); addAff('h', id, 1.5 * frac);
+    gain(id, (d.ha ? d.gAff : 2.5 + (d.like[id] > 0 ? 1 : 0)) * frac, 0); addAff('h', id, 1.5 * frac);
     hMem(id, 'together', g.v, g.room === 'out' ? 'out' : g.room, sent);
     dayEv(id, 'group', sent); dayEv('h', 'together', id + '|' + d.v.replace(/了/, ''));
     checkTier(id);
@@ -5149,7 +5177,7 @@ function txBuild(){
   for (const [tn, T] of Object.entries(TX_TABLES)){
     if (tn === 'SNIP'){ for (const cat of Object.keys(T)) for (const id of Object.keys(T[cat])) add(id, tn, [tn, cat, id], `${cat}`); continue; }
     if (tn === 'CHARS'){ T.forEach((c, i) => add(c.id, tn, [tn, i], c.name)); continue; }
-    if (tn === 'ACTS'){ for (const k of Object.keys(T)) if (!k.startsWith('nm_')) add('all', tn, [tn, k, 'label'], `活動名稱：${k}`); continue; }
+    if (tn === 'ACTS'){ for (const k of Object.keys(T)) if (!k.startsWith('nm_') && !k.startsWith('ha_')) add('all', tn, [tn, k, 'label'], `活動名稱：${k}`); continue; }
     if (TX_HERO.has(tn)){ add('h', tn, [tn], tn === 'SNIP_H' ? '泡泡' : tn === 'H_DIARY' ? '你的日記' : '你的語氣'); continue; }
     if (Array.isArray(T)){ add('all', tn, [tn], TX_CAT[tn] || tn); continue; }
     for (const k of Object.keys(T)){
@@ -5450,6 +5478,173 @@ Object.assign(window.__imb, { nmClean, syncNpcMods, nmThink, nmSnippet, nmSave, 
 
 </script>
 <script>
+/* ---------- 女主角的自訂行動（「你要做什麼？」最後一格「＋ 自訂行動」） ----------
+   不用作弊模式也能用。名稱、圖示、地點（我的房間／公共空間／出門）、家具位置（依名稱自動建議，可改）、
+   時間、可做的時段、對她的效果（心情、精力／飽足／清潔／娛樂／社交）、平面圖狀態、日記、三段泡泡小故事、
+   能不能找人一起（只限非親密；可設每位同伴的好感與答應／拒絕台詞）、是不是獨處型。
+   存在存檔裡（S.hacts），也能和其他自訂內容一起匯出／匯入成 JSON。玩家寫的字只用 esc()／textContent 顯示。 */
+const HA_SPOTS = {auto:'自動（依名稱）', sofa:'沙發', desk:'書桌／桌邊', bed:'床邊', table:'餐桌', stove:'爐台', floor:'房間中間（站著／地板）'};
+const HA_KEYS = [[/睡|躺|床|滑手機|手機/, 'bed'], [/煮|烤|做菜|料理|蛋糕|烘焙|餅乾|泡麵|炒|燉/, 'stove'], [/吃|喝|茶|咖啡|點心|甜點|宵夜|早餐|桌遊|牌|拼圖/, 'table'],
+  [/書桌|電腦|工作|寫|程式|畫|念書|讀書|作業|手作|縫|織|日記|記帳/, 'desk'], [/沙發|電視|影|劇|看書|閱讀|小說|放空|聽|音樂|追|漫畫/, 'sofa'], [/瑜伽|伸展|運動|跳舞|打掃|整理|澆花|植物|健身|拉筋/, 'floor']];
+const HA_NEEDS = ['energy', 'hunger', 'hygiene', 'fun', 'social'];
+const haSuggest = label => { const s = String(label || ''); for (const [re, k] of HA_KEYS) if (re.test(s)) return k; return 'floor'; };
+function haPlaces(){
+  const pub = Object.values(G.rooms).filter(r => !r.owner && r.type !== 'entry').map(r => [r.id, roomName(r.id)]);
+  return [['h_room', '我的房間'], ...pub, ['out', '出門（外面）']];
+}
+const haRoman = c => typeof NM_ROMANCE !== 'undefined' && NM_ROMANCE.test([c.label, c.status, c.gOk, c.gNo, c.s1, c.s2, c.s3].join('|'));
+function haClean(o){
+  if (!o || typeof o !== 'object') return null;
+  const label = cxClip(o.label, 20); if (!label) return null;
+  const solo = !!o.solo;
+  const place = solo ? 'h_room' : (o.place === 'h_room' || o.place === 'out' || (typeof G !== 'undefined' && G && G.rooms[o.place] && !G.rooms[o.place].owner) || /^(living|kitchen|balcony|bath|study|gym|terrace|dining|laundry)$/.test(o.place || '')) ? o.place : 'h_room';
+  const hr = v => v === '' || v == null ? null : cxNum(v, 0, 24, null);
+  const c = { id: /^ha_[a-z0-9]{4,16}$/.test(o.id || '') ? o.id : 'ha_' + Math.random().toString(36).slice(2, 10),
+    label, icon: cxClip(o.icon, 4), place, spot: HA_SPOTS[o.spot] ? o.spot : 'auto', dur: cxNum(o.dur, 5, 480, 30),
+    from: hr(o.from), to: hr(o.to), dMood: cxNum(o.dMood, -20, 20, 2), needs: {},
+    status: cxClip(o.status, 24), diary: cxClip(o.diary, 120), s1: cxClip(o.s1, 120), s2: cxClip(o.s2, 120), s3: cxClip(o.s3, 120),
+    solo, grp: false, gAff: cxNum(o.gAff, 0, 10, 3), gOk: cxClip(o.gOk, 80), gNo: cxClip(o.gNo, 80) };
+  if (c.from == null || c.to == null || c.from === c.to){ c.from = null; c.to = null; }
+  const n = o.needs && typeof o.needs === 'object' ? o.needs : {};
+  for (const k of HA_NEEDS){ const v = cxNum(n[k], -40, 40, 0); if (v) c.needs[k] = v; }
+  c.grp = !!o.grp && !solo && !haRoman(c);           // 親密／獨處不能找人一起
+  return c;
+}
+const haSpot = c => c.spot === 'auto' ? haSuggest(c.label + '|' + c.status) : c.spot;
+const haStatus = c => c.status || `${c.label}中`;
+const haInWin = (c, t = S.t) => { if (c.from == null) return true; const h = hourOf(t); return c.from < c.to ? h >= c.from && h < c.to : h >= c.from || h < c.to; };
+const haWinTxt = c => c.from == null ? '' : `${pad(c.from % 24)}:00–${pad(c.to % 24)}:00`;
+// 把存檔裡的自訂行動同步成 H_ACTIONS／ACTS／SPOT_OF／GRP 的項目
+function syncHacts(){
+  for (let i = H_ACTIONS.length - 1; i >= 0; i--) if (H_ACTIONS[i].ha) H_ACTIONS.splice(i, 1);
+  for (const k of Object.keys(ACTS)) if (k.startsWith('ha_')){ delete ACTS[k]; delete SPOT_OF[k]; }
+  for (const k of Object.keys(GRP)) if (k.startsWith('ha_')) delete GRP[k];
+  if (!S) return; S.hacts = (S.hacts || []).map(haClean).filter(Boolean).slice(0, 60);
+  for (const c of S.hacts){
+    const act = c.solo ? 'solo' : c.id;
+    if (!c.solo){ ACTS[c.id] = {label:haStatus(c), icon:c.icon || '⭐'}; SPOT_OF[c.id] = haSpot(c); }
+    H_ACTIONS.push({id:c.id, label:c.label, icon:c.icon || '⭐', room:c.place, act, dur:c.dur, lbl:c.solo ? '在房間獨處（自我取悅中）' : haStatus(c), ha:c});
+    if (c.grp) GRP[c.id] = {v:`一起${c.label}`, p:.55, like:{}, ha:true, gAff:c.gAff, ok:c.gOk, no:c.gNo};
+  }
+}
+// 同伴答應／拒絕時說的話（自訂行動可以自己寫，沒寫就用他的預設）
+function grpLine(aid, id, i){ const d = GRP[aid], own = d && d.ha && (i ? d.no : d.ok); return own ? fill(own, {h:S.hero.name, n:S.hero.name, x:(H_ACTIONS.find(a => a.id === aid) || {}).label || ''}) : GRP_LINES[id][i]; }
+// 做完：效果（心情、需求）、紀錄、日記
+function haDone(A){
+  const c = A.ha; if (!c) return; const e = S.ents.h;
+  for (const k of Object.keys(c.needs || {})) e.needs[k] = clamp(e.needs[k] + c.needs[k], 0, 100);
+  if (c.dMood) addMood(c.dMood);
+  if (!A.gid) log(`${c.icon || '⭐'} 你結束了「${c.label}」。`, ['h']);
+  const dl = c.diary ? fill(c.diary, {h:S.hero.name, n:S.hero.name, x:c.label}) : '';
+  dayEv('h', 'hax', '|' + (dl || `做了「${c.label}」`));
+  S.haDone = (S.haDone || 0) + 1;
+  const fk = 'ha:' + c.id; if (!S.firsts[fk]){ S.firsts[fk] = S.t; addMem('h', dl || `第一次「${c.label}」。`); }
+}
+// 泡泡小故事
+function haSnippet(id){
+  const A = S.hAction, g = S.group; if (!A || !A.ha) return null; const c = A.ha, e = S.ents[id];
+  if (!e || walking(e) || (id !== 'h' && !(g && g.id === A.gid && g.members.includes(id))) || e.act !== A.act) return null;
+  const own = [c.s1, c.s2, c.s3].filter(Boolean); if (!own.length) return null;
+  const others = g && g.id === A.gid ? g.members.map(nm).join('、') : '';
+  return {title:`${c.icon || '⭐'} ${S.hero.name}${others ? '、' + others : ''}：${c.label}`, text:fill(snipPick(own, `${c.id}|${A.until}`), {h:S.hero.name, o:others || S.hero.name, x:c.label}), cat:'ha'};
+}
+const _snippetFor = snippetFor;
+snippetFor = function(id){ if (S && S.hAction && S.hAction.ha && !(S.inter && S.inter.start != null)){ const r = haSnippet(id); if (r) return r; } return _snippetFor(id); };
+/* ---- 儲存／刪除／匯出入 ---- */
+function haSave(o){ const c = haClean(o); if (!c) return null; S.hacts = S.hacts || []; const i = S.hacts.findIndex(x => x.id === c.id); if (i >= 0) S.hacts[i] = c; else S.hacts.push(c); syncHacts(); save(); return c; }
+function haDelete(id){ S.hacts = (S.hacts || []).filter(x => x.id !== id); if (S.hAction && S.hAction.id === id && !S.hAction.until) S.hAction = null; syncHacts(); save(); }
+function packData(){
+  const d = {format:'imb-pack-v1', hacts:S.hacts || [], custom:S.custom || [], achCustom:S.achCustom || []};
+  if ((S.npcMods || []).length) d.npcMods = S.npcMods; if (Object.keys(S.textOv || {}).length) d.textOv = S.textOv; return d;
+}
+function packExport(){
+  const blob = new Blob([JSON.stringify(packData(), null, 1)], {type:'application/json'});
+  const a = el('a'); a.href = URL.createObjectURL(blob); a.download = `失衡_自訂內容_${S.hero.name}.json`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  toast(`已匯出自訂內容（行動 ${(S.hacts || []).length}・互動 ${(S.custom || []).length}）`);
+}
+function packImport(json){
+  let d; try { d = typeof json === 'string' ? JSON.parse(json) : json; if (!d || typeof d !== 'object') throw 0; } catch(e){ toast('這不是有效的自訂內容檔'); return null; }
+  if (Array.isArray(d)) d = {hacts:d};
+  if (d.format === 'imb-npc-v1') d = {npcMods:d.mods};
+  const n = {hacts:0, custom:0, ach:0, npc:0, text:0}, uid = (p, L, id) => L.some(x => x.id === id) ? p + Math.random().toString(36).slice(2, 10) : id;
+  S.hacts = S.hacts || []; for (const o of (Array.isArray(d.hacts) ? d.hacts : []).slice(0, 60)){ const c = haClean(o); if (!c) continue; c.id = uid('ha_', S.hacts, c.id); S.hacts.push(c); n.hacts++; }
+  S.custom = S.custom || []; for (const o of (Array.isArray(d.custom) ? d.custom : []).slice(0, 60)){ const c = cxClean(o); if (!c) continue; c.id = uid('cx_', S.custom, c.id); S.custom.push(c); n.custom++; }
+  if (Array.isArray(d.achCustom) && typeof achClean === 'function'){ S.achCustom = S.achCustom || []; for (const o of d.achCustom.slice(0, 60)){ const c = achClean(o); if (!c) continue; if (S.achCustom.some(x => x.id === c.id)) continue; S.achCustom.push(c); n.ach++; } }
+  if (Array.isArray(d.npcMods) && d.npcMods.length){ if (S.cheat) n.npc = nmImport({mods:d.npcMods}) || 0; else n.npcSkip = d.npcMods.length; }
+  if (d.textOv && typeof d.textOv === 'object'){ if (S.cheat){ const r = txImport({ov:d.textOv}); n.text = typeof r === 'number' ? r : 0; } else n.textSkip = 1; }
+  syncHacts(); syncCustom(); save();
+  toast(`已匯入：行動 ${n.hacts}・互動 ${n.custom}・成就 ${n.ach}${n.npcSkip ? `（${n.npcSkip} 個室友行為要打開作弊模式才能匯入）` : ''}${n.textSkip ? '（改過的文字要打開作弊模式才能匯入）' : ''}`);
+  return n;
+}
+/* ---- 表單 ---- */
+function openHaForm(haId){
+  const old = haId ? (S.hacts || []).find(c => c.id === haId) : null;
+  const c = old || {label:'', icon:'', place:'h_room', spot:'auto', dur:30, from:null, to:null, dMood:2, needs:{}, status:'', diary:'', s1:'', s2:'', s3:'', solo:false, grp:false, gAff:3, gOk:'', gNo:''};
+  openSheet(() => {
+    const opt = (v, n, cur) => `<option value="${esc(v)}" ${String(cur) === String(v) ? 'selected' : ''}>${esc(n)}</option>`;
+    const hrs = cur => opt('', '不限', cur ?? '') + Array.from({length:24}, (_, i) => opt(i, pad(i) + ':00', cur)).join('');
+    const rng = (name, lbl, v, lo, hi) => `<label class="cxf"><span>${lbl} <output>${fmtD(v)}</output></span><input name="${name}" type="range" min="${lo}" max="${hi}" value="${v}"></label>`;
+    $('#sheet').innerHTML = `<div class="grab"></div><h3>${old ? '編輯自訂行動' : '＋ 新增自訂行動'}</h3>
+      <div class="small muted">自己做一件事：取名字、選地點和時間。之後會出現在「你要做什麼？」裡。</div>
+      <form id="haForm" class="cxform" autocomplete="off">
+        <label class="cxf"><span>名稱 <b class="req">必填</b></span><input name="label" maxlength="20" required value="${esc(c.label)}" placeholder="例如：烤餅乾"></label>
+        <div class="cxf"><span>圖示（點一個，或自己打 emoji）</span><div class="haemo">${['⭐','🍪','🧶','🎨','🎧','📚','🧘','🌱','☕','🎮','📝','🛋️','🎹','🧩','🍰','🕯️'].map(x => `<button type="button" class="emo${c.icon === x ? ' on' : ''}" data-emo="${x}">${x}</button>`).join('')}</div><input name="icon" maxlength="8" value="${esc(c.icon)}" placeholder="⭐"></div>
+        <label class="cxchk"><input type="checkbox" name="solo" ${c.solo ? 'checked' : ''}> 獨處型（只在我的房間、關上門、房間裡要沒人；不能找人一起）</label>
+        <label class="cxf"><span>地點</span><select name="place" ${c.solo ? 'disabled' : ''}>${haPlaces().map(([v, n]) => opt(v, n, c.place)).join('')}</select></label>
+        <label class="cxf"><span>在哪件家具旁 <small class="muted" id="haSug"></small></span><select name="spot">${Object.entries(HA_SPOTS).map(([v, n]) => opt(v, n, c.spot)).join('')}</select></label>
+        <div class="cxrow"><label class="cxf cx-s"><span>時間（分鐘）</span><input name="dur" type="number" inputmode="numeric" min="5" max="480" step="5" value="${c.dur}"></label>
+          <label class="cxf"><span>可以做的時段：從</span><select name="from">${hrs(c.from)}</select></label><label class="cxf"><span>到</span><select name="to">${hrs(c.to)}</select></label></div>
+        <div class="cxsec">做完後對你的效果</div>
+        <div class="cxrow">${rng('dMood', '心情', c.dMood, -20, 20)}</div>
+        <div class="cxrow">${HA_NEEDS.map(k => rng('n_' + k, NEED_LBL[k], (c.needs || {})[k] || 0, -40, 40)).join('')}</div>
+        <label class="cxf"><span>平面圖上的狀態（可空白，預設「名稱中」）</span><input name="status" maxlength="24" value="${esc(c.status)}" placeholder="${esc(haStatus(c))}"></label>
+        <label class="cxf"><span>你的日記裡寫的一句話（選填，{h} 會換成你的名字）</span><input name="diary" maxlength="120" value="${esc(c.diary)}" placeholder="例如：烤了一盤餅乾，整間屋子都是奶油味。"></label>
+        <div class="cxsec">點頭上泡泡時看到的小故事（三段都選填；{h}＝你，{o}＝一起的人）</div>
+        ${[1, 2, 3].map(i => `<label class="cxf"><span>小故事 ${i}（選填）</span><textarea name="s${i}" rows="2" maxlength="120">${esc(c['s' + i] || '')}</textarea></label>`).join('')}
+        <div class="cxsec">和誰一起？（只限非親密的日常事）</div>
+        <label class="cxchk"><input type="checkbox" name="grp" ${c.grp ? 'checked' : ''} ${c.solo ? 'disabled' : ''}> 可以邀室友一起（選這個行動時會出現「和誰一起？」）</label>
+        <div id="haGrp" ${c.grp && !c.solo ? '' : 'hidden'}>
+          <div class="cxrow">${rng('gAff', '每位同伴對你的好感', c.gAff, 0, 10)}</div>
+          <label class="cxf"><span>他答應時說的話（選填）</span><input name="gOk" maxlength="80" value="${esc(c.gOk)}" placeholder="例如：「好啊，{h}，等我一下。」"></label>
+          <label class="cxf"><span>他拒絕時說的話（選填）</span><input name="gNo" maxlength="80" value="${esc(c.gNo)}" placeholder="例如：「今天先不了。」"></label>
+        </div>
+        <div class="cxerr hidden" id="haErr"></div>
+        <div class="cxacts"><button type="button" class="btn" id="haCancel">取消</button>${old ? '<button type="button" class="btn danger" id="haDel">刪除</button>' : ''}<button type="submit" class="btn primary">儲存</button></div>
+      </form>`;
+    const f = $('#haForm'), sug = () => { $('#haSug').textContent = `（建議：${HA_SPOTS[haSuggest(f.label.value + '|' + f.status.value)]}）`; };
+    f.querySelectorAll('input[type=range]').forEach(r => r.oninput = () => { r.parentElement.querySelector('output').textContent = fmtD(+r.value); });
+    f.querySelectorAll('[data-emo]').forEach(b => b.onclick = () => { f.icon.value = b.dataset.emo; f.querySelectorAll('[data-emo]').forEach(x => x.classList.toggle('on', x === b)); });
+    f.label.oninput = () => { f.status.placeholder = `${cxClip(f.label.value, 20) || '名稱'}中`; sug(); }; f.status.oninput = sug; sug();
+    f.solo.onchange = () => { f.place.disabled = f.solo.checked; if (f.solo.checked){ f.place.value = 'h_room'; f.grp.checked = false; } f.grp.disabled = f.solo.checked; $('#haGrp').hidden = !f.grp.checked; };
+    f.grp.onchange = () => { $('#haGrp').hidden = !f.grp.checked; };
+    $('#haCancel').onclick = openActions;
+    const del = $('#haDel');
+    if (del) del.onclick = () => { if (del.dataset.sure){ haDelete(haId); toast('已刪除自訂行動'); openActions(); } else { del.dataset.sure = 1; del.textContent = '確定刪除？'; } };
+    f.onsubmit = ev => { ev.preventDefault();
+      const d = Object.fromEntries(new FormData(f).entries()); d.solo = f.solo.checked; d.grp = f.grp.checked; if (d.solo) d.place = 'h_room';
+      d.needs = {}; HA_NEEDS.forEach(k => { d.needs[k] = d['n_' + k]; delete d['n_' + k]; }); d.id = old ? old.id : undefined;
+      const er = $('#haErr'), cl = haClean(d);
+      if (!cl){ er.textContent = '請先填行動的名稱。'; er.classList.remove('hidden'); f.label.focus(); return; }
+      if (d.grp && !cl.grp){ er.textContent = '親密的內容不能找人一起，請改成日常的事，或取消「可以邀室友一起」。'; er.classList.remove('hidden'); return; }
+      haSave(cl); toast(`已儲存「${cl.label}」`); openActions(); };
+  }, false);
+}
+// 存檔頁：自訂內容包
+const _renderSaveView = renderSaveView;
+renderSaveView = function(){
+  _renderSaveView(); const box = $('#v-save'); if (!box) return;
+  const card = el('div', 'card'); card.id = 'packCard';
+  card.innerHTML = `<div class="small muted">自訂行動 ${(S.hacts || []).length}・自訂互動 ${(S.custom || []).length}・自訂成就 ${(S.achCustom || []).length}${(S.npcMods || []).length ? `・室友行為 ${S.npcMods.length}` : ''}。可以單獨匯出成一個檔案，分享或帶到別的存檔。</div>
+    <button class="btn wide" id="packExp">🧩 匯出自訂內容（.json）</button><label class="btn wide" id="packImpL">🧩 匯入自訂內容<input type="file" id="packImp" accept=".json,application/json" hidden></label>`;
+  const h = el('h3', 'sec'); h.textContent = '自訂內容';
+  const set = box.querySelectorAll('h3.sec')[1]; if (set){ box.insertBefore(h, set); box.insertBefore(card, set); } else { box.append(h, card); }
+  $('#packExp').onclick = packExport;
+  $('#packImp').onchange = ev => { const fl = ev.target.files[0]; if (!fl) return; const r = new FileReader(); r.onload = () => { packImport(r.result); renderSaveView(); }; r.readAsText(fl); };
+};
+Object.assign(window.__imb, { snippetFor, haClean, syncHacts, haSuggest, haSave, haDelete, haDone, haSnippet, haInWin, openHaForm, packData, packExport, packImport, grpLine });
+
+</script>
+<script>
 /* ---------- 每一筆紀錄下面的「數值變化」 ----------
    一個互動／事件／撞見／一起做事從開始到結束，比較前後的好感、情慾、吃醋、室友交情、競爭、心情（已經過上下限的真實變化），
    把變化存進這段時間寫下的每一筆紀錄（主紀錄、他的重要時刻、回憶）。舊紀錄沒有就不顯示。 */
@@ -5514,7 +5709,7 @@ function fxWrap(name, filt){
   const w = function(...a){ fxBegin(filt); try { return f.apply(this, a); } finally { fxEnd(); } }; w.__fx = true; window[name] = w;
   if (window.__imb && name in window.__imb) window.__imb[name] = w;
 }
-['answerRequest', 'endInter', 'heroInter', 'witness', 'caught', 'leaveSeen', 'endSolo', 'cookShare', 'startGroup', 'endGroup', 'resolveGrpInvite', 'startAftercare', 'fireCollide', 'fireTest', 'resolveHeroInter', 'stopHero', 'resolveEvent', 'heroSoloDone'].forEach(n => fxWrap(n));
+['answerRequest', 'endInter', 'heroInter', 'witness', 'caught', 'leaveSeen', 'endSolo', 'cookShare', 'startGroup', 'endGroup', 'resolveGrpInvite', 'startAftercare', 'fireCollide', 'fireTest', 'resolveHeroInter', 'stopHero', 'resolveEvent', 'heroSoloDone', 'haDone'].forEach(n => fxWrap(n));
 ['socialThink', 'nmThink'].forEach(n => fxWrap(n, true));
 Object.assign(window.__imb, { fxHtml, fxSeg, fxBegin, fxEnd, fxDiff, get FX(){ return FX; } });
 
