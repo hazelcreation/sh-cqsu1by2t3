@@ -2,11 +2,10 @@
 <html lang="zh-Hant-TW">
 <head>
 <meta charset="utf-8">
-<meta name="robots" content="noindex,nofollow">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f7f1e8">
 <title>失衡・公寓觀察</title>
-<meta name="imb-build" content="2026-11-10 10:59 (台北)">
+<meta name="imb-build" content="2026-11-10 11:27 (台北)">
 <style>
 :root{
   --bg:#f7f1e8; --card:#fffaf3; --line:#e8dccb; --ink:#4a3f35; --muted:#9a8b7b; --accent:#c9876b; --accent2:#e7b9a3;
@@ -2195,15 +2194,17 @@ function route(e, target, slot){
   shortest(startNode, toNode).forEach(k => { const q = G.pts[k]; wps.push({x:q.x, y:q.y, f:q.f, node:k, cost:q.f !== pf ? 40 : 0}); pf = q.f; });
   e.path = wps.concat(tail); e.dest = target;
 }
-function moveEnt(e, dm){
-  let budget = WALK * dm;
+function moveEnt(e, dm, units){
+  // units 有給：即時模式（畫面上看得到的走路），用和頭像一樣的速度走，不在樓梯額外停；沒給：照遊戲分鐘走（快轉、離線補算）
+  const live = units != null; let budget = live ? units : WALK * dm;
+  if (live) e.waitU = 0;
   while (budget > 0 && e.path.length){
     if (e.waitU > 0){ const t = Math.min(e.waitU, budget); e.waitU -= t; budget -= t; continue; }
     const w = e.path[0]; const dx = w.x - e.x, dy = w.y - e.y, d = Math.hypot(dx, dy);
     if (d <= budget){ e.x = w.x; e.y = w.y; budget -= d; e.path.shift();
       if (w.node) e.node = w.node;
       if (w.f != null) e.f = w.f;
-      if (w.cost) e.waitU = (e.waitU || 0) + w.cost;
+      if (w.cost && !live) e.waitU = (e.waitU || 0) + w.cost;
       if (w.arrive){ if (w.arrive === 'out'){ e.room = 'out'; e.hidden = true; } else if (w.arrive.startsWith('node:')) { e.room = null; e.node = w.arrive.slice(5); } else e.room = w.arrive; }
     } else { e.x += dx / d * budget; e.y += dy / d * budget; budget = 0; }
   }
@@ -2211,6 +2212,25 @@ function moveEnt(e, dm){
 const walking = e => e.path.length > 0;
 const allEnts = () => Object.values(S.ents);
 const home = e => e.room !== 'out' && !(e.dest === 'out' && !walking(e));
+// 一走到就開始做：不用等下一個遊戲分鐘（1x 時一分鐘＝現實一分鐘）
+function stepWalk(e, move){ const was = walking(e); move(); if (was && !walking(e)) onArrive(e); }
+function onArrive(e){
+  if (!S || S.away) return;
+  const I = S.inter;
+  if (I && (e.id === 'h' || e.id === I.who)){ if (I.start == null) interThink(); return; }
+  if (e.busy) return;
+  if (e.id === 'h') heroThink();
+  else { npcThink(e); if (S.hPending && S.hPending.who === e.id) heroThink(); }
+}
+// 別人的臥室：沒有正在進行的互動就不該待在裡面
+const ownRoom = e => e.id === 'h' ? 'r_h' : 'r_' + e.id;
+const foreignRoom = (e, r = e.room) => { const R = r && G.rooms[r]; return !!(R && R.owner && R.owner !== (e.id === 'h' ? 'h' : e.id)); };
+function goHomeIfForeign(e){
+  if (walking(e) || e.busy || !foreignRoom(e) || (S.pending && e.id === 'h')) return false;
+  if (!G.rooms[ownRoom(e)]) return false;
+  route(e, ownRoom(e)); if (walking(e)){ e.act = 'walk'; e.label = '回自己房間'; }
+  return true;
+}
 
 /* ---------- 新遊戲 ---------- */
 function newEnt(id, x, y, room){
@@ -2387,7 +2407,7 @@ function addMem(id, text){ if (S.mem[id]) S.mem[id].push({t:S.t, text}); }
 // 和女主角相處時的即時回憶（時間、地點、他自己的語氣）
 function hMem(id, cat, x, room, text){
   const V = typeof MEM_VOICE !== 'undefined' && MEM_VOICE[id]; if (!V || !S.mem[id]) return;
-  const L = V[cat] || V.chat, r = room || S.ents[id].room;
+  const L = V[cat] || V.chat, r = room || S.ents[id].room || S.ents[id].dest;   // 走在路上時記目的地
   const place = r === 'out' ? '外面' : (G.rooms[r] ? roomName(r) : '');
   S.mem[id].push({t:S.t, text:W(text || fill(rnd(L), {h:S.hero.name, x:x || ''})), place, h:true, cat});
 }
@@ -2467,7 +2487,7 @@ function heroThink(){
   // 主角去找某人
   if (S.hPending){
     const o = S.ents[S.hPending.who];
-    if (!o || !home(o) || o.busy){ if (!S.hPending.auto) toast(`${nm(S.hPending.who)} 現在不方便。`); S.hPending = null; e.act = 'idle'; e.label = '站在原地'; return; }
+    if (!o || !home(o) || o.busy){ if (!S.hPending.auto) toast(`${nm(S.hPending.who)} 現在不方便。`); S.hPending = null; e.act = 'idle'; e.label = '站在原地'; goHomeIfForeign(e); return; }
     const tr = o.room || (o.dest && G.rooms[o.dest] ? o.dest : null);
     if (tr && e.dest !== tr) route(e, tr);
     if (!walking(e) && e.room && e.room === o.room && !walking(o)){ const p = S.hPending; S.hPending = null; resolveHeroInter(p.who, p.itype); return; }
@@ -2476,7 +2496,7 @@ function heroThink(){
   }
   if (!S.hAction && S.heroAuto !== false && !S.pending) heroAuto(e);
   const A = S.hAction;
-  if (!A){ if (!walking(e)){ e.act = 'idle'; e.label = e.room === 'out' ? '在外面' : '閒著'; } return; }
+  if (!A){ if (!walking(e) && !goHomeIfForeign(e)){ e.act = 'idle'; e.label = e.room === 'out' ? '在外面' : '閒著'; } return; }
   if (A.room === 'bath' && e.room !== 'bath' && bathBusy('h')){
     if (e.dest !== 'node:' + G.rooms.bath.node){ route(e, 'node:' + G.rooms.bath.node); toast('浴室有人，你在門口排隊。'); }
     if (!walking(e)){ e.act = 'wait'; e.label = '在浴室門口等'; } return;
@@ -2601,7 +2621,8 @@ function startInter(o){
   // o: {who, place, dur, label, type, aff, des, feed, cheer, src, reqId}
   const h = S.ents.h, c = S.ents[o.who];
   let room = o.place;
-  if (room === 'here') room = (h.room && G.rooms[h.room]) ? h.room : (c.room && G.rooms[c.room] ? c.room : 'living');
+  if (room === 'here'){ room = (h.room && G.rooms[h.room]) ? h.room : (c.room && G.rooms[c.room] ? c.room : 'living');
+    const ow = G.rooms[room] && G.rooms[room].owner; if (ow && ow !== 'h' && ow !== o.who) room = 'living'; }   // 不在第三個人的臥室裡相處
   else if (room === 'his') room = 'r_' + o.who; else if (room === 'h_room') room = 'r_h';
   S.hAction = null; S.hPending = null;
   S.inter = {...o, room, start:null, created:S.t, intimate:o.type === 'intimate'};
@@ -2647,7 +2668,8 @@ function endInter(ok, frac){
   if (I.intimate && ui.ff) stopFF('intimate_end');
   if (ok && frac > 0) applyOutcome(I, frac);
   if (I.room === 'out') route(h, 'living');
-  else { h.act = 'idle'; h.label = '閒著'; }
+  else { h.act = 'idle'; h.label = '閒著'; goHomeIfForeign(h); }
+  if (!S.away) npcThink(c);                                          // 他也馬上回到自己的作息，不會留在你房間發呆
   if (ok && frac >= 1 && (I.intimate || (I.cx && I.cx.after)) && AFTERCARE[I.who]) startAftercare(I);
 }
 // 親密之後：短短的事後照顧，同樣在平面圖上即時進行（依各自的人設，可能走去廚房或浴室）
@@ -2987,7 +3009,7 @@ function heroInter(id, itype, auto){
   if (interLocked(id, def)){ toast(def.cx && cxLocked(id, def) ? `「${def.label}」還沒解鎖（${cxNeed(def)}）。` : `你們的關係還沒到這一步（需要「${REL_TIERS[def.tier].n}」）。`); return; }
   S.hAction = null; if (!auto) closeSheet();
   if (h.room && h.room === o.room && !walking(o)) resolveHeroInter(id, itype);
-  else { S.hPending = {who:id, itype, auto:!!auto}; log(`你${auto ? '想找人說說話，' : ''}去找 ${nm(id)}。`, ['h']); }
+  else { S.hPending = {who:id, itype, auto:!!auto}; log(`你${auto ? '想找人說說話，' : ''}去找 ${nm(id)}。`, ['h']); if (!auto) kickHero(); }
 }
 const inHrs = (r) => { const h = hourOf(S.t); return (h >= r[0] && h < r[1]) || (h + 24 >= r[0] && h + 24 < r[1]); };
 // 由選項定義開始一段互動（你邀他、或他提出時都用這個）
@@ -3182,9 +3204,9 @@ function frame(now){
   const dt = Math.min(0.25, (now - lastFrame) / 1000); lastFrame = now;
   if (S && S.speed > 0){
     const gm = dt * MIN_PER_SEC * S.speed; acc += gm;
-    const fast = S.speed >= 300; let steps = 0;
-    while (acc >= 1 && steps < 120){ acc -= 1; steps++; stepMinute(); if (fast) allEnts().forEach(e => moveEnt(e, 1)); if (ffCheck() || (S.pending && S.autoPause && S.speed === 0)) { acc = 0; break; } }
-    if (!fast) allEnts().forEach(e => moveEnt(e, gm));
+    const fast = S.speed > 300; let steps = 0;               // 只有 ⏩ 快轉逐分鐘走；1x～300x 照畫面速度即時走，走到就開始
+    while (acc >= 1 && steps < 120){ acc -= 1; steps++; stepMinute(); if (fast) allEnts().forEach(e => stepWalk(e, () => moveEnt(e, 1))); if (ffCheck() || (S.pending && S.autoPause && S.speed === 0)) { acc = 0; break; } }
+    if (!fast && S.speed > 0){ const u = visSpeed(S.speed) * dt; allEnts().forEach(e => stepWalk(e, () => moveEnt(e, 0, u))); }
   }
   if (S){ if (ui.visSnap){ ui.visSnap = false; snapVis(); } else updVis(dt); drawTokens(); if (now - ui.lastUi > 250){ ui.lastUi = now; renderAll(); } }
   requestAnimationFrame(frame);
@@ -3262,8 +3284,8 @@ function renderFloorTabs(){
   $('#followBtn').onclick = () => { ui.follow = true; setFloor(S.ents.h.f || 0); renderFloorTabs(); };
 }
 /* ---------- 畫面上的走路動畫：和遊戲時間脫鉤 ----------
-   邏輯位置（e.x/e.y/e.path）照遊戲分鐘走，抵達時間不變；畫面上的頭像用自己的速度沿同一條路線走，
-   1x 時一段約 1～2 秒，速度越快走得越快。走到了就在目的地等邏輯抵達。 */
+   1x～300x：邏輯位置和頭像用同一個速度（visSpeed）即時走，1x 時一段約 1～2 秒，走到的那一刻就開始做事（onArrive）。
+   ⏩ 快轉與離線補算：邏輯照遊戲分鐘走（每分鐘 WALK 單位＋換樓層成本），頭像跟著。 */
 const VIS_BASE = 45;                                   // 1x 時每「真實秒」走 45 單位（平面圖寬 100）
 const visSpeed = sp => sp <= 0 ? 0 : Math.max(VIS_BASE * (1 + Math.log10(sp)), WALK * MIN_PER_SEC * sp * 1.1);
 const VIS = {};
@@ -3350,6 +3372,8 @@ function renderHero(){
   $('#autoChk').onchange = ev => { S.heroAuto = ev.target.checked; if (!S.heroAuto && S.hAction && S.hAction.auto && S.hAction.until == null) S.hAction = null; toast(S.heroAuto ? '女主角會照自己的作息生活' : '女主角只照你的指令行動'); renderAll(true); };
   const bs = $('#btnStop'); if (bs) bs.onclick = stopHero;
 }
+// 玩家下指令後馬上出發（不等下一個遊戲分鐘）
+function kickHero(){ if (S && !S.away && !S.ents.h.busy) heroThink(); }
 function stopHero(){
   if (S.inter){ const I = S.inter; const frac = I.start == null ? 0 : clamp((S.t - I.start) / I.dur, 0, 1);
     log(`你提早結束了和 ${nm(I.who)} 的「${I.label}」。`, ['h', I.who]);
@@ -3358,7 +3382,7 @@ function stopHero(){
   else { S.hAction = null; S.hPending = null; S.autoNext = S.t + 15; const e = S.ents.h; if (walking(e) && e.room !== 'out'){ const last = e.path[e.path.length-1]; e.path = []; e.dest = null; route(e, nearestRoom(e)); } e.act = 'idle'; e.label = '閒著'; }
   renderAll(true);
 }
-function nearestRoom(e){ let best = 'living', bd = Infinity; Object.values(G.rooms).forEach(r => { const d = Math.hypot(r.cx - e.x, r.cy - e.y); if (d < bd){ bd = d; best = r.id; } }); return best; }
+function nearestRoom(e){ let best = 'living', bd = Infinity; Object.values(G.rooms).forEach(r => { if ((r.f || 0) !== (e.f || 0) || foreignRoom(e, r.id)) return; const d = Math.hypot(r.cx - e.x, r.cy - e.y); if (d < bd){ bd = d; best = r.id; } }); return best; }
 function renderTicker(){
   const box = $('#ticker'), ids = ['all', ...S.residents, 'h'], key = ids.join() + '|' + S.hero.name;
   if (!ui.tickWho || !ids.includes(ui.tickWho)) ui.tickWho = 'all';
@@ -3565,7 +3589,7 @@ function doAction(aid){
   const a = H_ACTIONS.find(x => x.id === aid); const room = actRoom(a);
   if (aid === 'solo' && allEnts().some(o => o.id !== 'h' && o.room === room && !o.hidden)){ toast('房間裡有人，不方便獨處。'); return; }
   S.hPending = null; S.hAction = {...a, room, until:null, auto:false};
-  log(`你決定「${a.label}」。`, ['h']); closeSheet(); renderAll(true);
+  log(`你決定「${a.label}」。`, ['h']); closeSheet(); kickHero(); renderAll(true);
 }
 function openRoom(rid){
   const r = G.rooms[rid];
@@ -3579,7 +3603,7 @@ function openRoom(rid){
       ${acts.map(a => `<button class="btn" data-a="${a.id}" ${S.inter ? 'disabled' : ''}><i>${a.icon}</i>${a.label}</button>`).join('')}</div>
       ${r.owner && r.owner !== 'h' && S.residents.includes(r.owner) ? (S.ents[r.owner].room === rid && S.ents[r.owner].act !== 'sleep' ? `<button class="btn wide" id="knock">🚪 敲門找 ${CHAR[r.owner].name}</button>` : `<div class="small muted" style="margin-top:8px">這是 ${CHAR[r.owner].name} 的房間。${S.ents[r.owner].room === rid ? '他已經睡了。' : '他不在房間。'}</div>`) : ''}`;
     const kn = $('#knock'); if (kn) kn.onclick = () => { log(`你敲了敲 ${CHAR[r.owner].name} 的門。他${S.ents[r.owner].label}。`, ['h', r.owner]); openChar(r.owner); };
-    const g = $('#goRoom'); if (g) g.onclick = () => { S.hPending = null; S.hAction = {id:'stay', label:'待著', icon:'👣', room:rid, act:'idle', dur:30, lbl:'待著'}; closeSheet(); };
+    const g = $('#goRoom'); if (g) g.onclick = () => { S.hPending = null; S.hAction = {id:'stay', label:'待著', icon:'👣', room:rid, act:'idle', dur:30, lbl:'待著'}; closeSheet(); kickHero(); renderAll(true); };
     $('#sheet').querySelectorAll('[data-a]').forEach(b => b.onclick = () => doAction(b.dataset.a));
     $('#sheet').querySelectorAll('.chip[data-id]').forEach(c => c.onclick = () => c.dataset.id === 'h' ? openHero() : openChar(c.dataset.id));
   });
@@ -3697,7 +3721,7 @@ function initStart(){
 }
 // 測試用掛鉤
 function ff(mins, autoAnswer){ for (let i = 0; i < mins; i++){ stepMinute(); allEnts().forEach(e => moveEnt(e, 1)); if (S.pending && autoAnswer != null) answerRequest(autoAnswer); } snapVis(); drawTokens(); renderAll(true); }
-window.__imb = { get S(){ return S; }, get form(){ return form; }, compatOf, cmul, heroAuto, ff, pickEvent, fireEvent, fireCollide, fireTest, witness, relTier, pairV, hMood, evById, showResult, migrate, heroInter, doAction, endOfDay, stepMinute, startInter, answerRequest, showRequest, openChar, closeSheet, switchView, setSpeed, save, renderAll, startFF, stopFF, hMem, syncCustom, openCxForm, cxClean, catchUp, get vis(){ return VIS; }, visSpeed, snapVis, route, resumeOffline, get lastAway(){ return ui.lastAway; }, openHist, recHist, pruneHist, caught, leaveSeen, interFromDef, soloOk, endSolo, startAftercare, interTxt, get ffState(){ return ui.ff; }, get ffLast(){ return ui.ffLast; } };
+window.__imb = { get S(){ return S; }, get form(){ return form; }, compatOf, cmul, heroAuto, ff, pickEvent, fireEvent, fireCollide, fireTest, witness, relTier, pairV, hMood, evById, showResult, migrate, heroInter, doAction, endOfDay, stepMinute, startInter, answerRequest, showRequest, openChar, closeSheet, switchView, setSpeed, save, renderAll, startFF, stopFF, hMem, syncCustom, openCxForm, cxClean, catchUp, get vis(){ return VIS; }, visSpeed, snapVis, route, resumeOffline, get lastAway(){ return ui.lastAway; }, openHist, recHist, pruneHist, caught, leaveSeen, interFromDef, soloOk, endSolo, startAftercare, interTxt, npcThink, heroThink, endInter, onArrive, kickHero, goHomeIfForeign, nearestRoom, get ffState(){ return ui.ff; }, get ffLast(){ return ui.ffLast; } };
 Promise.race([loadAvatars(), new Promise(r => setTimeout(r, 2000))]).then(initStart);
 
 </script>
