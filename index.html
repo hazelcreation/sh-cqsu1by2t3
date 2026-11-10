@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f7f1e8">
 <title>失衡・公寓觀察</title>
-<meta name="imb-build" content="2026-11-10 15:55 (台北)">
+<meta name="imb-build" content="2026-11-10 20:27 (台北)">
 <style>
 :root{
   --bg:#f7f1e8; --card:#fffaf3; --line:#e8dccb; --ink:#4a3f35; --muted:#9a8b7b; --accent:#c9876b; --accent2:#e7b9a3;
@@ -560,6 +560,13 @@ span.av,div.av{display:inline-block;border-radius:50%}
 .haemo .emo.on{border-color:var(--accent,#c97);background:rgba(201,119,153,.12)}
 #packImpL{cursor:pointer}
 
+.hp-buffs{display:flex;flex-wrap:wrap;gap:4px;margin:3px 0 2px}
+.markchip{display:inline-flex;align-items:center;border-radius:999px;padding:2px 8px;font-size:11px;background:#fde4ea;color:#9a3d56;font-weight:600;line-height:1.35;max-width:100%}
+.ckmark{display:grid;gap:8px;margin:4px 0 10px;font-size:13px}
+.ckmark label{display:flex;flex-direction:column;gap:4px;color:var(--muted)}
+.ckmark select,.ckmark input[type=number]{font:inherit;font-size:16px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:#fff;color:inherit}
+@media (min-width:480px){.ckmark{grid-template-columns:1fr 1fr}.ckmark .ckcd,.ckmark .small{grid-column:1/-1}}
+
 </style>
 </head>
 <body>
@@ -650,7 +657,18 @@ span.av,div.av{display:inline-block;border-radius:50%}
 </div>
 <script>
 // ===== 用詞（集中在這裡；要換字只改這裡，舊字放進 LEGACY_WORDS 會自動替換，含舊存檔） =====
-const WORDS = { sex:'纏綿', solo:'自我取悅' };
+const WORDS = {
+  sex:'纏綿', solo:'自我取悅', mark:'吻痕', poss:'獨佔欲',
+  markApply:'💋 {x} 在你頸側留下吻痕。至少十二小時內，大概藏不住。',
+  markFade:'頸側的吻痕淡了。',
+  markChip:'💋 {mark}（{x}）· 剩 {left}',
+  markMemApply:'{x} 在我頸側留下吻痕。',
+  markMemFade:'頸側的吻痕淡了。',
+  markDiary:'{x} 在我頸側留下吻痕。藏不太住。',
+  jealTier1:'悶悶不樂', jealTier2:'明顯吃醋', jealTier3:'大吃飛醋',
+  markLog:'💋 {tier}　{line}',
+  possLog:'💢 {tier}　{line}',
+};
 const LEGACY_WORDS = [[/歡愛|做愛/g, WORDS.sex], [/自慰/g, WORDS.solo]];
 const W = s => typeof s === 'string' ? LEGACY_WORDS.reduce((a, [re, w]) => a.replace(re, w), s) : s;
 function deepW(o, seen = new Set()){
@@ -684,7 +702,7 @@ const CHARS = [
    tags:['冷靜控制者','沉默','觀察者','秩序'],
    likes:['秩序與留白','手沖黑咖啡','建築期刊','晨跑','安靜的夜晚'],
    dislikes:['凌亂','噪音','被打斷','沒有分寸的人'],
-   jealousy:0.6, joke:0.3, praise:0.8, flirt:0.7,
+   jealousy:0.6, joke:0.3, praise:0.8, flirt:0.7, possess:0,
  },
  { id:'jasper', name:'Jasper', nick:'Jazz', age:29, job:'自由攝影師・商業廣告導演',
    color:'#cf8a5e', hair:'#7d4f33', hairStyle:'pony', skin:'#e8c4a2', eye:'#6b4a2e', earring:true,
@@ -693,7 +711,7 @@ const CHARS = [
    tags:['玩世不恭','撩人','視覺系','自由'],
    likes:['自然光','底片相機','老電影','夕陽','有趣的人'],
    dislikes:['無聊','被束縛','太嚴肅的規矩'],
-   jealousy:0.05, joke:1.4, praise:1.0, flirt:1.5,
+   jealousy:0.05, joke:1.4, praise:1.0, flirt:1.5, possess:0,
  },
  { id:'liam', name:'Liam', nick:'大廚哥', age:28, job:'高級餐館主廚・私人料理課講師',
    color:'#d9ac45', hair:'#d8b04c', hairStyle:'wavy', skin:'#ecc9a3', eye:'#5b7a4a', dimple:true,
@@ -702,7 +720,7 @@ const CHARS = [
    tags:['溫柔','照顧者','傾聽','暖'],
    likes:['新鮮的食材','安靜的早晨','下雨天在家煮湯','看人吃飽','紅豆湯'],
    dislikes:['浪費食物','有人不吃飯','勉強別人'],
-   jealousy:0.25, joke:1.0, praise:1.1, flirt:0.9,
+   jealousy:0.25, joke:1.0, praise:1.1, flirt:0.9, possess:0,
  },
  { id:'marcus', name:'Marcus', nick:'Marc', age:35, job:'音樂製作人・Live 演出導演・地下樂團前吉他手',
    color:'#8b4b5a', hair:'#1f1c1d', hairStyle:'curlshort', skin:'#dcb08c', eye:'#2c4b7a', stubble:true,
@@ -711,7 +729,7 @@ const CHARS = [
    tags:['沉穩','低調主導','界線感','深夜'],
    likes:['深夜的錄音室','黑咖啡','老派搖滾樂與靈魂樂','黑膠唱片','吉他'],
    dislikes:['吵鬧','多管閒事','沒分寸'],
-   jealousy:0.35, joke:0.6, praise:0.7, flirt:1.0,
+   jealousy:0.35, joke:0.6, praise:0.7, flirt:1.0, possess:0,
  },
  { id:'samuel', name:'Samuel', nick:'Sam', age:30, job:'程式工程師（和你同公司、不同部門）',
    color:'#5c9a8d', hair:'#4a3528', hairStyle:'messy', skin:'#f4e0d2', eye:'#5a6e7c', glasses:true,
@@ -720,7 +738,7 @@ const CHARS = [
    tags:['靦腆','不配得感','宅','慢半拍'],
    likes:['寫程式','雙人遊戲','咖啡','安靜的角落','被認真聽說話'],
    dislikes:['人多的場合','被注目','講電話'],
-   jealousy:0.5, joke:0.8, praise:1.8, flirt:0.8,
+   jealousy:0.5, joke:0.8, praise:1.8, flirt:0.8, possess:0,
  },
  { id:'theo', name:'Theo', nick:'Theo', age:21, job:'醫學系三年級・兼職模特',
    color:'#76a4d4', hair:'#5a3a28', hairStyle:'curly', skin:'#f6e2d6', eye:'#4a3426',
@@ -729,7 +747,7 @@ const CHARS = [
    tags:['年下','黏人','直白','愛吃醋'],
    likes:['健身','甜食','被稱讚','熱鬧','你'],
    dislikes:['被忽視','解剖學考試','早八'],
-   jealousy:0.9, joke:1.5, praise:1.6, flirt:1.3,
+   jealousy:0.9, joke:1.5, praise:1.6, flirt:1.3, possess:85,
  },
 ];
 // 頭像圖片：填入路徑就會改用圖片（圓形裁切）；null 表示用畫的 Q 版頭。
@@ -1084,7 +1102,7 @@ const H_DIARY = {
   open:['今天的倫敦是灰色的。','搬來這裡之後，日子過得比想像中快。','早上的地鐵擠得不像話。','今天的天氣難得放晴。'],
   ev:{ chat:['和 {x} 聊了一會。','{x} 今天跟我說了不少話。'], together:['和 {x} {y}。','今天和 {x} {y}，比想像中自在。'],
        flirt:['{x} 今天的眼神有點危險。','{x} 靠得好近，我假裝沒事。','想起 {x} 今天說的話，臉還是會熱。'], intimate:'和 {x} 度過了一段只屬於我們的時間。', care:'{x} 注意到我今天不太好。', jealous:'',
-       rejected:'拒絕了 {x}。', refused:'被 {x} 拒絕了，有點尷尬。', office:'在公司遇到 Samuel，他差點把咖啡灑出來。', hug:'抱了 {x}。', laugh:'我逗笑了 Alexander！' },
+       rejected:'拒絕了 {x}。', refused:'被 {x} 拒絕了，有點尷尬。', office:'在公司遇到 Samuel，他差點把咖啡灑出來。', hug:'抱了 {x}。', laugh:'我逗笑了 Alexander！', mark:'{x} 在我頸側留下吻痕。藏不太住。' },
   close:['這間公寓還有很多我不知道的事。','六個室友，六種脾氣。','明天也要好好過。'],
 };
 
@@ -1258,6 +1276,89 @@ const QUIPS = {
   theo:['「我話很多，你要一直聽。」','「看你認真，我就想干擾你。」','「你今天看起來……好想咬一口。」'],
 };
 const LIAM_GOODNIGHT = '「晚安，睡個好覺。」';
+
+/* ---------- 吻痕／獨佔欲：吃醋台詞（不露骨；{x}＝留下痕跡或正在互動的那個人，{h}＝女主角，{room}＝房間） ----------
+   依強度分三階：1 悶悶不樂、2 明顯吃醋、3 大吃飛醋。作弊模式的文字編輯器可以改。 */
+const MARK_JEAL = {
+  alexander:{
+    1:['Alexander 的視線在你頸側停了一瞬。「遮一下。」他說得很淡，像在提醒一件該被收好的細節。','他把杯子轉回原來的角度，沒再看那塊痕。'],
+    2:['Alexander 淡淡說：「有人在你身上留記號了。」視線卻多停了半秒。','他看了你頸側一眼：「那是你的事。不過我會看見。」'],
+    3:['他把聲音壓得很低：「下次，不要帶著別人的痕跡走到我面前。」','Alexander 站在你面前，語氣平得發冷：「那是 {x} 的。記住，這棟房子裡沒有秘密。」'],
+  },
+  jasper:{
+    1:['Jasper 吹了聲很輕的口哨：「還挺明顯。」','他看了一眼你的頸側，笑得很淺：「有人在蓋章？」'],
+    2:['他用手指在空中框了一下你的頸側：「這光打得剛好。不過——不是我拍的。」','Jasper 挑眉：「{x} 挺急著讓大家都看見。」'],
+    3:['他笑意淡了，相機垂下來：「有人挺急著蓋章。下次換我？」','Jasper 少見地不開玩笑了，只看著那塊痕：「別帶著別人的作品在我面前走來走去。」'],
+  },
+  liam:{
+    1:['Liam 看了一眼，又很快移開，切菜的節奏亂了一拍。「要不要我幫你拿圍巾？」','他笑了笑，酒窩卻淡了：「那塊……會痛嗎？」'],
+    2:['Liam 把圍巾輕輕遞過來，聲音很輕：「這樣走出去，會被看到。」','他看了你頸側一眼，又低下頭：「是 {x} 吧。我沒有要問，只是……看見了。」'],
+    3:['他把圍巾遞到你手裡，很少用這種語氣：「我不想讓別人一直看著。」','Liam 站在旁邊，聲音溫柔卻很認真：「下一次，能不能先想想我會怎麼想。」'],
+  },
+  marcus:{
+    1:['Marcus 的視線在你頸側停了半秒，戴回耳機。「挺明顯。」','他看了你一眼，又看向別處。'],
+    2:['Marcus 靠在牆邊：「不是意外吧。」','他低聲說：「藏好一點。」'],
+    3:['他走到近處，低聲說：「藏好。或者下次換一個會負責的人。」','Marcus 只看了 {x} 的方向一眼：「夠了。」'],
+  },
+  samuel:{
+    1:['Samuel 看見你頸側，耳朵立刻紅了，推了推眼鏡：「你、你知不知道看得到……」','他愣了一下，小聲說：「對、對不起，我不是故意看的……」然後把耳機戴上。'],
+    2:['他小聲問：「是、是 {x} 嗎……？」又馬上搖頭，「我、我不是要打聽。」','Samuel 把視線從你頸側拉開，耳根卻紅到脖子。'],
+    3:['他小聲卻很認真：「這樣走出去，大家都會知道……我、我會在意。」','Samuel 第一次把話說完：「不要……帶著他留的東西，走到我面前。」'],
+  },
+  theo:{
+    1:['Theo 看見你頸側的吻痕，嘴巴撅起來，一時沒說話。','他瞅了那塊痕一眼，把音樂開大聲了一點，還是沒走。'],
+    2:['他盯著那塊痕看了好久：「……是 {x} 留的？」','Theo 整個人悶悶的：「明明也可以是我……」'],
+    3:['Theo 眼睛睜得大大的，幾乎要跳起來：「那是誰留的！為什麼不是我！」','他湊得很近，聲音又急又委屈：「不准帶著別人的吻痕在我面前走來走去！」'],
+  },
+};
+const MARK_BUBBLE = {
+  alexander:{1:['……遮一下。','……'], 2:['有人留記號了。','我看見了。'], 3:['不要帶到我面前。','到此為止。']},
+  jasper:{1:['還挺明顯。','有人蓋章？'], 2:['不是我拍的。','挺急的。'], 3:['下次換我？','別在我面前走。']},
+  liam:{1:['要圍巾嗎？','會痛嗎？'], 2:['會被看到。','……我看見了。'], 3:['不想讓人一直看。','先想想我。']},
+  marcus:{1:['挺明顯。','……'], 2:['藏好一點。','不是意外吧。'], 3:['夠了。','藏好。']},
+  samuel:{1:['看、看得到……','對、對不起……'], 2:['是、是他嗎……','我不是要打聽。'], 3:['我會在意。','不要帶到我面前。']},
+  theo:{1:['……那是什麼。','哼。'], 2:['是他留的？','明明可以是我。'], 3:['為什麼不是我！','不准帶著走來走去！']},
+};
+const POSS_JEAL = {
+  alexander:{
+    1:['Alexander 的視線在你和 {x} 之間停了一瞬，把手上的杯子轉回原來的角度。','他什麼也沒說，只是在{room}另一頭多站了幾秒。'],
+    2:['他站在旁邊看了很久，才淡淡說：「動線有點擠。」','Alexander 把聲音放得很平：「你們，靠得太近了。」'],
+    3:['Alexander 走到你們中間，聲音平得發冷：「到此為止。」','他看了 {x} 一眼：「這棟房子的平衡，不是這樣用的。」'],
+  },
+  jasper:{
+    1:['Jasper 看了一眼，笑得很淺：「喔，今天的光線分給別人了。」','他在一旁吹了聲幾乎聽不見的口哨，沒有走過來。'],
+    2:['他用手指框住你和 {x}，笑意卻沒到眼睛裡：「有趣。」','Jasper 把相機垂下來：「鏡頭現在有點忙。先讓一讓？」'],
+    3:['Jasper 少見地不笑了：「鏡頭現在只准看我。」','他站到你旁邊，對 {x} 揚了揚下巴：「戲演完了。」'],
+  },
+  liam:{
+    1:['Liam 笑了笑，酒窩卻淡了，切菜的節奏亂了一拍。','他看了你們一眼，又低下頭，把盤子擦了一遍。'],
+    2:['他把盤子放回櫃台上，輕聲說：「……我以為今天是我。」','Liam 站在不遠的地方：「我沒有要打擾，只是……看見了。」'],
+    3:['Liam 很少用這種語氣：「可以先看我一眼嗎。就一下。」','他走到近處，聲音溫柔卻很認真：「我也可以在這裡。不是只有他。」'],
+  },
+  marcus:{
+    1:['Marcus 看了你們一眼，把耳機戴回去，音量轉大了一格。','他靠在牆邊，沒說話。'],
+    2:['他只說了一個字：「嗯。」視線卻沒離開你。','Marcus 從{room}另一頭看著你們，看到你才移開。'],
+    3:['Marcus 走到近處，低聲說：「夠了。過來。」','他看了 {x} 一眼：「讓開。」'],
+  },
+  samuel:{
+    1:['Samuel 看見你和 {x}，推了推眼鏡，把視線趕快挪回螢幕。','他小聲吸了一口氣，什麼也沒說。'],
+    2:['他小聲說：「那、那個……我、我也可以……」然後又把話吞回去。','Samuel 在不遠的地方停住，耳根紅了，卻沒有走。'],
+    3:['Samuel 耳根紅透，卻第一次說得比較清楚：「不要只跟他說話。」','他抓住自己的袖口，聲音在抖：「我、我也想……被你這樣找。」'],
+  },
+  theo:{
+    1:['Theo 看著你和 {x}，嘴巴抿成一條線，還是沒走開。','他抱著手臂站在旁邊，小聲說：「……我也在這裡耶。」'],
+    2:['Theo 看到你和 {x} 在一起，整個人繃緊了：「你明明也可以找我。」','他盯著 {x} 看了好幾秒，又轉過來拉你的袖子：「陪我一下嘛。」'],
+    3:['Theo 一步跨到你和 {x} 中間，聲音少見地低：「那是我的位置。」','他抓住你的袖子，幾乎要發脾氣：「為什麼是他？我也可以。」','「不准搶。」他擋在前面，眼睛亮亮的，卻一點也不像在開玩笑。'],
+  },
+};
+const POSS_BUBBLE = {
+  alexander:{1:['……','……看見了。'], 2:['動線有點擠。','靠太近了。'], 3:['到此為止。','不是這樣用的。']},
+  jasper:{1:['喔。','光線分出去了。'], 2:['有趣。','先讓一讓？'], 3:['只准看我。','戲演完了。']},
+  liam:{1:['……嗯。','……'], 2:['我以為是我。','我看見了。'], 3:['看我一眼。','我也可以。']},
+  marcus:{1:['……','……'], 2:['嗯。','……'], 3:['過來。','讓開。']},
+  samuel:{1:['啊、嗯……','……'], 2:['我也可以……','……'], 3:['不要只跟他。','我也想被找。']},
+  theo:{1:['……我也在。','哼。'], 2:['也可以找我。','陪我一下。'], 3:['那是我的位置。','不准搶。','為什麼是他！']},
+};
 
 </script>
 <script>
@@ -2610,6 +2711,7 @@ function cxOutcome(I, frac){
   if (c.wit !== 'none') witness(id, c.wit);
   const da = S.aff[id].h - a0, dd = S.des[id].h - d0;
   toast(`${C.name}　好感 ${fmtD(da)}・情慾 ${fmtD(dd)}`);
+  if (frac >= 0.5 && typeof isMarkAct === 'function' && isMarkAct(I)) applyMark(id);
   checkTier(id);
 }
 /* 表單 */
@@ -3227,6 +3329,7 @@ function migrate(s){
   for (const [k, v] of Object.entries(ov)) if (typeof v === 'string' && v.trim() && k.length < 200) s.textOv[k] = txClean(v);
   s.coef = s.coef && typeof s.coef === 'object' && !Array.isArray(s.coef) ? s.coef : {};
   s.npcMods = Array.isArray(s.npcMods) ? s.npcMods.map(nmClean).filter(Boolean).slice(0, 100) : [];
+  if (typeof sanitizeMark === 'function') sanitizeMark(s); else { s.mark = s.mark && typeof s.mark === 'object' ? s.mark : null; s.poss = s.poss && typeof s.poss === 'object' && !Array.isArray(s.poss) ? s.poss : {}; s.possCd = s.possCd && typeof s.possCd === 'object' ? s.possCd : {}; }
   return s;
 }
 function checkUnlock(id){
@@ -3288,6 +3391,8 @@ function stepMinute(){
   heroThink();
   groupTick();
   interThink();
+  if (typeof markThink === 'function') markThink();
+  if (typeof possThink === 'function') possThink();
   for (const e of allEnts()) if (e.act !== e.actP){ e.actP = e.act; e.actT = S.t; }   // 這段活動從什麼時候開始（泡泡故事固定挑同一段）
   allEnts().forEach(tickNeeds);
   moodTick();
@@ -3595,6 +3700,7 @@ function applyOutcome(I, frac){
   if (I.ik === 'night') leaveSeen(id);
   const da = S.aff[id].h - a0, dd = S.des[id].h - d0;
   if (Math.abs(da) >= 0.1 || Math.abs(dd) >= 0.1) toast(`${C.name}　好感 ${fmtD(da)}・情慾 ${fmtD(dd)}`);
+  if (frac >= 0.5 && typeof isMarkAct === 'function' && isMarkAct(I)) applyMark(id);
   checkTier(id);
 }
 // 被撞見（沙發、露臺、深夜廚房）：比平常更容易被看到
@@ -3960,7 +4066,7 @@ function endOfDay(){
   log(`—— 第 ${d} 天結束。每個人都寫了今天的日記。——`, [], 'day');
   toast(`📔 第 ${d} 天的日記寫好了`);
 }
-const EV_PRI = ['sex','caress','night','morning','photo','studio','intimate','after','cxd','hax','group','act','solo','laugh','jealous','flirt','hug','care','together','office','rejected','refused','chat','npc'];
+const EV_PRI = ['sex','caress','night','morning','photo','studio','intimate','after','cxd','hax','group','act','solo','laugh','mark','jealous','flirt','hug','care','together','office','rejected','refused','chat','npc'];
 function writeDiary(id){
   const D = DIARY[id], hn = S.hero.name, ev = S.dayEv[id];
   const out = [rnd(D.open)];
@@ -3979,7 +4085,7 @@ function writeHeroDiary(){
   for (const e of ev){ let x = e.x || '', y = ''; if (x.includes('|')) [x, y] = x.split('|'); const xn = CHAR[x] ? CHAR[x].name : x;
     const k = e.type === 'together' || e.type === 'act' || e.type === 'hax' ? e.type + ':' + y : e.type; (groups[k] = groups[k] || {type:e.type, y, names:new Set()}).names.add(xn); }
   const keys = Object.keys(groups).sort((a, b) => EV_PRI.indexOf(groups[a].type) - EV_PRI.indexOf(groups[b].type)).slice(0, 4);
-  for (const k of keys){ const g = groups[k]; if (g.type === 'hax'){ out.push(g.y.replace(/[。！？!?…」]?$/, m => m || '。')); continue; } let tpl = D.ev[g.type]; if (Array.isArray(tpl)) tpl = rnd(tpl); if (!tpl) continue; const xs = [...g.names].filter(Boolean).join(' 和 ');
+  for (const k of keys){ const g = groups[k]; const xs = [...g.names].filter(Boolean).join(' 和 '); if (g.type === 'hax'){ out.push(g.y.replace(/[。！？!?…」]?$/, m => m || '。')); continue; } if (g.type === 'mark'){ out.push(fill((typeof WORDS !== 'undefined' && WORDS.markDiary) || D.ev.mark, {x:xs})); continue; } let tpl = D.ev[g.type]; if (Array.isArray(tpl)) tpl = rnd(tpl); if (!tpl) continue;
     if (g.type === 'together' && /你|他/.test(g.y)) out.push(`${xs}：${g.y.replace(/你/g, '我')}。`); else out.push(fill(tpl, {x:xs, y:g.y})); }
   if (out.length === 1){ const top = topAct('h'); out.push(top ? `今天大多在${top}，沒什麼特別的事。` : '平淡的一天。'); }
   const md = hMood(); if (md >= 72) out.push('今天心情很好。'); else if (md < 35) out.push('今天心裡悶悶的，說不上為什麼。');
@@ -4249,7 +4355,7 @@ function renderHero(){
   else if (S.hAction && S.hAction.until) actTxt += `・剩 ${Math.max(0, S.hAction.until - S.t)} 分`;
   const autoOn = S.heroAuto !== false; const byAuto = (S.hAction && S.hAction.auto) || (S.hPending && S.hPending.auto);
   const where = e.room === 'out' ? '外面' : roomName(e.room);
-  $('#heroPanel').innerHTML = `<div class="av">${avOf('h')}</div><div class="hp-main"><div><b>${esc(S.hero.name)}</b> <span class="muted small">在${where}</span></div><div class="hp-act">${esc(actTxt)}${byAuto ? ' <span class="pill">自動</span>' : ''}</div>${moodHTML()}${needsHTML(e)}
+  $('#heroPanel').innerHTML = `<div class="av">${avOf('h')}</div><div class="hp-main"><div><b>${esc(S.hero.name)}</b> <span class="muted small">在${where}</span></div><div class="hp-act">${esc(actTxt)}${byAuto ? ' <span class="pill">自動</span>' : ''}</div>${typeof markHTML === 'function' ? markHTML() : ''}${moodHTML()}${needsHTML(e)}
    <label class="autotog"><input type="checkbox" id="autoChk" ${autoOn ? 'checked' : ''}><span class="sw"></span>女主角自動生活</label></div>
    <div class="hp-btns"><button class="btn sm primary" id="btnAct">行動</button>${I || S.hAction || S.hPending ? `<button class="btn sm" id="btnStop">${I ? '結束' : '取消'}</button>` : ''}</div>`;
   $('#btnAct').onclick = openActions;
@@ -4455,7 +4561,7 @@ function openHero(){
   ui.sel = 'h';
   openSheet(() => { const e = S.ents.h, H = S.hero;
     $('#sheet').innerHTML = `<div class="grab"></div><div class="sh"><div class="av">${avOf('h')}</div><div><h3>${esc(H.name)} <span class="muted small">${esc(H.age)}歲</span></h3><div class="small muted">${esc(H.job)}</div></div></div>
-    <div class="kv"><span class="k">外貌</span><span>${esc(H.look || '—')}</span><span class="k">個性</span><span>${(H.traits || []).map(t => `<span class="pill">${TRAITS[t].icon} ${TRAITS[t].n}</span>`).join('') || '—'}</span><span class="k">興趣</span><span>${(H.hobbies || []).map(t => `<span class="pill">${HOBBIES[t].icon} ${HOBBIES[t].n}</span>`).join('') || '—'}</span><span class="k">現在</span><span>${ACTS[e.act]?.icon || ''} ${esc(e.label)}</span></div>${moodHTML()}${needsHTML(e)}<div class="small muted">心情會隨睡眠、吃飯、上班、和室友的相處起伏；心情好時比較容易聊得開，心情差時室友會注意到。</div>
+    <div class="kv"><span class="k">外貌</span><span>${esc(H.look || '—')}</span><span class="k">個性</span><span>${(H.traits || []).map(t => `<span class="pill">${TRAITS[t].icon} ${TRAITS[t].n}</span>`).join('') || '—'}</span><span class="k">興趣</span><span>${(H.hobbies || []).map(t => `<span class="pill">${HOBBIES[t].icon} ${HOBBIES[t].n}</span>`).join('') || '—'}</span><span class="k">現在</span><span>${ACTS[e.act]?.icon || ''} ${esc(e.label)}</span></div>${typeof markHTML === 'function' ? markHTML('in-sheet') : ''}${moodHTML()}${needsHTML(e)}<div class="small muted">心情會隨睡眠、吃飯、上班、和室友的相處起伏；心情好時比較容易聊得開，心情差時室友會注意到。</div>
     <button class="btn primary wide" id="hAct">選擇行動</button>`;
     $('#hAct').onclick = openActions; });
 }
@@ -4774,6 +4880,215 @@ Object.assign(window.__imb, { startGroup, endGroup, groupTick, grpAvail, grpP, g
 
 </script>
 <script>
+/* ---------- 吻痕狀態、獨佔欲吃醋 ----------
+   吻痕：誰留下就記在女主角身上，持續 12 個遊戲小時（會跟時速、離線補時走）。
+   在意她的室友（好感達到「曖昧」門檻）看到會吃醋，一次狀態每人只反應一次；強度隨好感與獨佔欲。
+   獨佔欲：0～100，預設只有 Theo 高。大於 0 的人，只要在同一個房間看見她和別人做任何互動，
+   不論好感高低都會吃醋。吃得兇不兇＝好感 × 獨佔欲，分三階（悶悶不樂／明顯吃醋／大吃飛醋）。 */
+const MARK_MIN = 12 * 60;          // 12 個遊戲小時
+const MARK_AFF = () => (REL_TIERS[1] && REL_TIERS[1].aff) || 30;  // 曖昧的好感門檻
+const POSS_CD = 3;                 // 同一個行動內不重複；換目標至少隔幾分鐘才再寫一筆
+
+function possOf(id){
+  if (S && S.poss && typeof S.poss[id] === 'number' && isFinite(S.poss[id])) return clamp(Math.round(S.poss[id]), 0, 100);
+  return clamp(Math.round((CHAR[id] && CHAR[id].possess) || 0), 0, 100);
+}
+function setPoss(id, v){ if (!S || !CHAR[id]) return 0; S.poss = S.poss || {}; return S.poss[id] = clamp(Math.round(Number(v) || 0), 0, 100); }
+function possScore(id, floorPoss){
+  const p = Math.max(floorPoss || 0, possOf(id)) / 100;
+  const a = clamp(S.aff[id] ? S.aff[id].h : 0, 0, 100) / 100;
+  return p * (0.4 + 0.6 * a);
+}
+function jealTierOf(score){ return score >= 0.65 ? 3 : score >= 0.4 ? 2 : 1; }
+function jealTierName(t){ return WORDS['jealTier' + t] || ['', '悶悶不樂', '明顯吃醋', '大吃飛醋'][t] || ''; }
+
+function markLeft(t){ return S && S.mark ? Math.max(0, S.mark.until - (t != null ? t : S.t)) : 0; }
+function markClock(mins){ mins = Math.max(0, Math.ceil(mins)); return Math.floor(mins / 60) + ':' + pad(mins % 60); }
+function markChipText(){
+  if (!S || !S.mark) return '';
+  return fill(WORDS.markChip, {mark:WORDS.mark, x:nm(S.mark.who), left:markClock(markLeft())});
+}
+function markHTML(cls){
+  if (!S || !S.mark) return '';
+  return `<div class="hp-buffs${cls ? ' ' + cls : ''}"><span class="markchip" id="heroMark">${esc(markChipText())}</span></div>`;
+}
+
+function isMarkAct(I){
+  if (!I) return false;
+  if (I.kind === 'th_mark' || I.reqId === 'th_mark' || I.reqId === 'st_th_mark') return true;
+  const bag = [I.label, I.dk, I.kind, I.reqId, I.cx && I.cx.label, I.cx && I.cx.diary, I.cx && I.cx.status, I.cx && I.cx.line].filter(Boolean).join('|');
+  return bag.includes('吻痕');
+}
+function applyMark(who){
+  if (!S || !CHAR[who]) return null;
+  S.markN = (S.markN || 0) + 1;
+  S.mark = {who, until:S.t + MARK_MIN, id:S.markN, seen:{}};
+  const line = fill(WORDS.markApply, {x:nm(who)});
+  log(line, ['h', who], 'heart');
+  addMem('h', fill(WORDS.markMemApply, {x:nm(who)}));
+  dayEv('h', 'mark', who);
+  if (typeof renderHero === 'function' && $('#heroPanel')) renderHero();
+  return S.mark;
+}
+function clearMark(silent){
+  if (!S || !S.mark) return false;
+  const who = S.mark.who; S.mark = null;
+  if (!silent){ log(WORDS.markFade, ['h', who]); addMem('h', WORDS.markMemFade); }
+  if (typeof renderHero === 'function' && $('#heroPanel')) renderHero();
+  return true;
+}
+function setMarkLeft(mins){
+  if (!S || !S.mark) return 0;
+  const v = clamp(Math.round(Number(mins) || 0), 0, MARK_MIN * 2);
+  if (v <= 0){ clearMark(false); return 0; }
+  S.mark.until = S.t + v; return v;
+}
+function sanitizeMark(s){
+  if (!s) return;
+  const m = s.mark;
+  if (!m || typeof m !== 'object' || !CHAR[m.who] || typeof m.until !== 'number' || !isFinite(m.until)){ s.mark = null; }
+  else { s.mark.seen = m.seen && typeof m.seen === 'object' && !Array.isArray(m.seen) ? m.seen : {}; s.mark.id = m.id || 1; s.markN = Math.max(s.markN || 0, s.mark.id); }
+  const poss = s.poss && typeof s.poss === 'object' && !Array.isArray(s.poss) ? s.poss : {};
+  s.poss = {};
+  for (const id of (s.residents || [])) if (typeof poss[id] === 'number' && isFinite(poss[id])) s.poss[id] = clamp(Math.round(poss[id]), 0, 100);
+  s.possCd = s.possCd && typeof s.possCd === 'object' && !Array.isArray(s.possCd) ? s.possCd : {};
+  s.markN = s.markN || 0;
+}
+
+function pickLine(table, id, tier){
+  const pack = table && table[id] && (table[id][tier] || table[id][String(tier)]);
+  const L = pack && pack.length ? pack : (table && table[id] && (table[id][1] || table[id]['1']));
+  return L && L.length ? rnd(L) : '';
+}
+function markRoomName(){ const r = S.ents.h && S.ents.h.room, R = r && G.rooms[r]; return R ? (R.name || '這裡') : '這裡'; }
+function namedLine(id, line){
+  const n = nm(id), s = String(line || '');
+  if (!s) return n;
+  if (s.includes(n)) return s;
+  if (s.startsWith('他')){ const rest=s.slice(1); return n + (/^[\s「（【『]/.test(rest) ? '' : ' ') + rest; }
+  return n + '　' + s;
+}
+function jealPresent(id, withH){
+  const e = S.ents[id], h = S.ents.h;
+  if (!e || !h || !home(e) || !home(h)) return false;
+  if (walking(e) || walking(h) || e.act === 'sleep' || e.hidden || h.hidden) return false;
+  if (!e.room || e.room === 'out' || e.room !== h.room) return false;
+  if (withH && (S.inter && S.inter.who === id && S.inter.start != null)) return true;
+  return true;
+}
+
+function applyJealFX(y, target, score, tier){
+  const C = CHAR[y], k = tier === 3 ? 1 : tier === 2 ? 0.62 : 0.32;
+  const flavor = 0.85 + 0.3 * (C && C.jealousy != null ? C.jealousy : 0.4);
+  addJeal(y, (6 + 10 * score) * k * flavor);
+  S.jealOf[y] = target;
+  const rk = pkey(y, target);
+  S.rival[rk] = clamp((S.rival[rk] || 0) + (7 + 16 * score) * k * flavor, 0, 100);
+  const ey = S.ents[y]; if (ey) ey.buff = clamp((ey.buff || 0) - (2.5 + 8 * score) * k, -30, 30);
+  addDes(y, 'h', 0.4 * tier);
+  if (tier >= 3) addAff(y, 'h', 0.3);
+  else if (tier === 2) addAff(y, 'h', 0.1);
+  if (tier >= 2) addPair(y, target, -0.8 * tier * flavor);
+  dayEv(y, 'jealous', nm(target));
+}
+
+function markNotice(id){
+  const M = S && S.mark; if (!M || id === M.who || M.seen[id] || !CHAR[id]) return false;
+  if (S.aff[id].h < MARK_AFF()) return false;
+  if (!jealPresent(id)) return false;
+  const score = possScore(id, 18), tier = jealTierOf(score), hn = S.hero.name;
+  const raw = pickLine(MARK_JEAL, id, tier) || `${nm(id)} 看見你頸側的吻痕。`;
+  const line = fill(raw, {x:nm(M.who), h:hn, room:markRoomName()});
+  const text = fill(WORDS.markLog, {tier:jealTierName(tier), line:namedLine(id, line)});
+  M.seen[id] = 1;
+  log(text, [id, M.who, 'h'], 'rival');
+  const bub = pickLine(MARK_BUBBLE, id, tier); if (bub) bubble(id, fill(bub, {x:nm(M.who), h:hn}), 35);
+  applyJealFX(id, M.who, score, tier);
+  if (!S.firsts['markjeal:' + id]){ S.firsts['markjeal:' + id] = 1; addMem(id, `看到 ${hn} 頸側有 ${nm(M.who)} 留下的吻痕。`); }
+  return true;
+}
+function markThink(){
+  if (!S || !S.mark) return;
+  if (S.t >= S.mark.until){ clearMark(false); return; }
+  for (const id of S.residents){ if (id === S.mark.who || S.mark.seen[id]) continue; markNotice(id); }
+}
+
+function possPartners(watcher){
+  const out = [], h = S.ents.h; if (!h) return out;
+  const seen = new Set();
+  const add = id => { if (id && id !== watcher && id !== 'h' && CHAR[id] && !seen.has(id)){ seen.add(id); out.push(id); } };
+  const I = S.inter;
+  if (I && I.who && I.who !== watcher && I.start != null) add(I.who);  // 含 aftercare：也是和別人待在一起
+  const g = S.group;
+  if (g && g.members){
+    const A = S.hAction;
+    const started = A && A.gid === g.id && (A.until != null || !walking(h));
+    const here = g.room !== 'out' && h.room === g.room && started;
+    if (here) g.members.forEach(add);
+  }
+  return out;
+}
+function possActKey(watcher, target){
+  const I = S.inter;
+  if (I && I.who === target && I.start != null) return 'i:' + target + ':' + (I.created || I.start || 0);
+  const g = S.group; if (g && g.members && g.members.includes(target)) return 'g:' + g.id + ':' + target;
+  return 'x:' + target + ':' + Math.floor(S.t / 5);
+}
+function possNotice(id, target){
+  if (!S || !CHAR[id] || !CHAR[target] || id === target) return false;
+  if (possOf(id) <= 0) return false;
+  if (!jealPresent(id)) return false;
+  const partners = possPartners(id); if (!partners.includes(target)) return false;
+  const key = possActKey(id, target);
+  S.possCd = S.possCd || {};
+  const prev = S.possCd[id];
+  if (prev && prev.key === key) return false;
+  if (prev && S.t < (prev.until || 0) && prev.target === target) return false;
+  S.possCd[id] = {key, target, until:S.t + POSS_CD};
+  const score = possScore(id, 0), tier = jealTierOf(score), hn = S.hero.name;
+  const raw = pickLine(POSS_JEAL, id, tier) || `${nm(id)} 看見你和 ${nm(target)} 在一起。`;
+  const line = fill(raw, {x:nm(target), h:hn, room:markRoomName()});
+  const text = fill(WORDS.possLog, {tier:jealTierName(tier), line:namedLine(id, line)});
+  log(text, [id, target, 'h'], 'rival');
+  const bub = pickLine(POSS_BUBBLE, id, tier); if (bub) bubble(id, fill(bub, {x:nm(target), h:hn}), 30);
+  applyJealFX(id, target, score, tier);
+  if (!S.firsts['possjeal:' + id]){ S.firsts['possjeal:' + id] = 1; addMem(id, `看到 ${hn} 和別人在一起。心裡很不是滋味。`); }
+  return true;
+}
+function possThink(){
+  if (!S) return;
+  for (const id of S.residents){
+    if (possOf(id) <= 0 || !jealPresent(id)) continue;
+    const ps = possPartners(id); if (!ps.length) continue;
+    // 一次只對一個對象反應（挑她比較近、或交情／競爭較高的），避免同一分鐘刷兩筆
+    ps.sort((a, b) => (S.rival[pkey(id, b)] || 0) - (S.rival[pkey(id, a)] || 0) || (S.aff.h[b] || 0) - (S.aff.h[a] || 0));
+    possNotice(id, ps[0]);
+  }
+}
+
+function markCheatHTML(){
+  const M = S.mark, left = M ? markLeft() : 0;
+  const opts = S.residents.map(id => `<option value="${id}" ${M && M.who === id ? 'selected' : id === 'theo' && !M ? 'selected' : ''}>${esc(nm(id))}</option>`).join('');
+  return `<div class="cksec" id="ckMarkSec">${esc(WORDS.mark)}（12 小時）</div>
+    <div class="ckmark" id="ckMarkBox">
+      <label>留下的人<select id="ckMarkWho">${opts}</select></label>
+      <label>剩餘分鐘<input type="number" id="ckMarkLeft" min="0" max="${MARK_MIN * 2}" step="5" value="${left}" inputmode="numeric" ${M ? '' : 'disabled'}></label>
+      <div class="ckcd"><button type="button" class="btn sm" id="ckMarkOn">套用 12 小時</button><button type="button" class="btn sm" id="ckMarkOff" ${M ? '' : 'disabled'}>清除</button></div>
+      <div class="small muted">${M ? esc(markChipText()) : '目前沒有吻痕。選一個人再按「套用」。'}</div>
+    </div>`;
+}
+function markCheatBind(){
+  const who = () => $('#ckMarkWho') && $('#ckMarkWho').value;
+  const left = () => $('#ckMarkLeft');
+  if ($('#ckMarkOn')) $('#ckMarkOn').onclick = () => { if (!S.cheat) return; applyMark(who()); if (left()){ left().disabled = false; left().value = markLeft(); } if ($('#ckMarkOff')) $('#ckMarkOff').disabled = false; toast('已套用吻痕（12 小時）'); if (ui.sheet && ui.sheet.render) ui.sheet.render(); renderAll(true); };
+  if ($('#ckMarkOff')) $('#ckMarkOff').onclick = () => { if (!S.cheat) return; clearMark(false); toast('已清除吻痕'); if (ui.sheet && ui.sheet.render) ui.sheet.render(); renderAll(true); };
+  if (left()) left().onchange = () => { if (!S.cheat || !S.mark) return; setMarkLeft(left().value); if (S.mark) left().value = markLeft(); renderAll(true); save(); };
+}
+
+Object.assign(window.__imb, { possOf, setPoss, possScore, jealTierOf, jealTierName, markLeft, markClock, markChipText, markHTML, isMarkAct, applyMark, clearMark, setMarkLeft, sanitizeMark, markNotice, markThink, possPartners, possNotice, possThink, markCheatHTML, markCheatBind, MARK_MIN, MARK_AFF });
+
+</script>
+<script>
 /* ---------- 點頭上的泡泡（活動圖示／狀態）看一小段故事 ----------
    每種活動、每個人 2～3 段，2～4 句；同一段活動期間固定同一段。{h}＝女主角的名字，{o}＝一起的室友。
    親密的只寫氛圍、點到為止（最多寫到一個吻），之後淡出。 */
@@ -4991,7 +5306,7 @@ function cheatSync(){
 function setCheat(on){
   S.cheat = !!on; if (on && !S.cheatUsed){ S.cheatUsed = S.t; log('🛠️ 打開了作弊模式。這個存檔之後會帶著 🛠️ 標記。', ['h']); }
   cheatSync();
-  if (on) openCheat(); else { if (ui.sheet && ui.sheet.cheat) closeSheet(); document.querySelectorAll('[data-ck],[data-ckcd],#ckCoef0,#ckText,#ckNpc,#nmForm,#nmList,#txList,#txFields').forEach(n => n.remove()); }
+  if (on) openCheat(); else { if (ui.sheet && ui.sheet.cheat) closeSheet(); document.querySelectorAll('[data-ck],[data-ckcd],#ckCoef0,#ckText,#ckNpc,#nmForm,#nmList,#txList,#txFields,#ckMarkSec,#ckMarkBox').forEach(n => n.remove()); }
   save(); toast(on ? '🛠️ 作弊模式：可以修改數值' : '作弊模式關閉：數值不能修改');
   if (ui.view === 'save' || ui.view === 'ach') renderView(ui.view);
 }
@@ -5003,6 +5318,7 @@ function cheatFields(){
     f.push([id, `${nm(id)} 對你的情慾`, () => S.des[id].h, v => { S.des[id].h = v; }, 0, 100]);
     f.push([id, `你對 ${nm(id)} 的好感`, () => S.aff.h[id], v => { S.aff.h[id] = v; }, -100, 100]);
     f.push([id, `${nm(id)} 的醋意`, () => S.jeal[id] || 0, v => { S.jeal[id] = v; }, 0, 100]);
+    f.push([id, `${nm(id)} 的獨佔欲`, () => possOf(id), v => setPoss(id, v), 0, 100]);
   }
   f.push(['h', '你的心情', () => hMood(), v => { S.hero.mood = v; }, 0, 100]);
   for (const k of Object.keys(NEED_LBL)) f.push(['h', `你的${NEED_LBL[k]}`, () => S.ents.h.needs[k], v => { S.ents.h.needs[k] = v; }, 0, 100]);
@@ -5024,7 +5340,8 @@ function openCheat(){
       <div class="cheatpanel">${F.map((x, i) => { const head = x[0] !== last ? `<div class="cksec" id="cks-${x[0]}">${x[0] === 'h' ? esc(S.hero.name) : x[0] === 'pair' ? '室友之間（交情／競爭）' : x[0] === 'coef' ? '個性係數（0～1.5）' : esc(nm(x[0]))}</div>` : ''; last = x[0];
         const st = x[6] || 1, v = Math.round(x[2]() / st) * st, vs = st < 1 ? v.toFixed(2) : v; return head + `<label class="ckrow"><span>${esc(x[1])}</span><input type="range" min="${x[4]}" max="${x[5]}" step="${st}" value="${vs}" data-ck="${i}"><input type="number" min="${x[4]}" max="${x[5]}" step="${st}" value="${vs}" data-ck="${i}" inputmode="decimal"></label>`; }).join('')}
         <div class="cksec">邀約／拒絕的冷卻</div><div class="ckcd">${S.residents.map(id => `<button type="button" class="btn sm" data-ckcd="${id}">重置 ${esc(nm(id))}</button>`).join('')}<button type="button" class="btn sm" data-ckcd="all">全部重置</button></div>
-        <button type="button" class="btn wide" id="ckCoef0">個性係數還原成預設</button></div>
+        <button type="button" class="btn wide" id="ckCoef0">個性係數還原成預設</button>
+        ${typeof markCheatHTML === 'function' ? markCheatHTML() : ''}</div>
       <button class="btn wide" id="ckNpc">🧩 自訂室友行為（新活動、室友之間、來找你的事件）</button><button class="btn wide" id="ckText">📝 修改遊戲裡的文字（事件、台詞、日記…）</button><button class="btn wide" id="ckClose">完成</button>`;
     const apply = (i, raw) => { if (!S.cheat) return; const x = F[i], st = x[6] || 1, v = clamp(Math.round(Number(raw) / st) * st, x[4], x[5]); if (!Number.isFinite(v)) return; x[3](st < 1 ? Math.round(v * 100) / 100 : v);
       $('#sheet').querySelectorAll(`[data-ck="${i}"]`).forEach(n => { if (Math.abs(+n.value - v) > 1e-9) n.value = st < 1 ? v.toFixed(2) : v; });
@@ -5033,6 +5350,7 @@ function openCheat(){
     $('#ckClose').onclick = closeSheet;
     $('#sheet').querySelectorAll('[data-ckcd]').forEach(b => b.onclick = () => { resetCooldowns(b.dataset.ckcd); toast(b.dataset.ckcd === 'all' ? '已重置所有人的冷卻' : `已重置 ${nm(b.dataset.ckcd)} 的冷卻`); });
     $('#ckCoef0').onclick = () => { resetCoef(); toast('個性係數已還原成預設'); ui.sheet.render(); };
+    if (typeof markCheatBind === 'function') markCheatBind();
     $('#ckNpc').onclick = () => openNpcMods();
     $('#ckText').onclick = () => { txUi.item = null; openTextEditor(); };
   }, false);
@@ -5145,7 +5463,7 @@ Object.assign(window.__imb, { renderAchView, applyCoef, resetCoef, resetCooldown
    每一句和角色有關、玩家看得到的文字（事件、邀約、回應、吃醋、撞見、日記、回憶、台詞、泡泡小故事、作息狀態……）
    都可以改。修改存成「覆蓋」放在存檔裡（S.textOv），不動預設；可以單項／整個角色還原，也可以單獨匯出／匯入。
    作弊模式關掉時：修改照樣生效，但不能再改。玩家寫的字一律用 textContent／esc() 顯示，並把 < > 換成全形。 */
-const TX_TABLES = {EVENTS, TEST_EV, COLLIDE_OPEN, COLLIDE_LOSE, WITNESS, WITNESS_FLOOR, REQUESTS, IK_REQ, STAGED_REQ, H_LINES, H_LINES_EXTRA, PERSONA_LINES, STAGE_LINES, CX_LINES, IK_LINES,
+const TX_TABLES = {EVENTS, TEST_EV, COLLIDE_OPEN, COLLIDE_LOSE, WITNESS, WITNESS_FLOOR, REQUESTS, IK_REQ, STAGED_REQ, H_LINES, H_LINES_EXTRA, PERSONA_LINES, STAGE_LINES, CX_LINES, IK_LINES, MARK_JEAL, MARK_BUBBLE, POSS_JEAL, POSS_BUBBLE, WORDS,
   GRP_LINES, REJECT_LINES, REJ, ALT_LINES, ACCEPT_END, INTIMATE_START, INTIMATE_END, INTIMATE_SCENE, AFTERCARE, TALK, MEM_VOICE, DIARY, IK_DIARY, QUIPS, COOK_SHARE, NPC_SPECIAL, PAIR_NOTE, NPC_REL_NOTE,
   SNIP, SNIP_H, H_DIARY, TRAIT_VOICE, NPC_CHAT_LINES, NPC_BAD_LINES, RIVAL_LINES, GRP_TENSE, GRP_WARM, CAUGHT_LINES, LEAVE_LINES, SNIP_CX_GENERIC, ACTS, CHARS};
 const TX_CAT = {EVENTS:'事件', TEST_EV:'吃醋試探', COLLIDE_OPEN:'兩人同時找你', COLLIDE_LOSE:'兩人同時找你', WITNESS:'撞見・吃醋反應', WITNESS_FLOOR:'撞見・吃醋反應', CAUGHT_LINES:'撞見（共用）', LEAVE_LINES:'撞見（共用）',
@@ -5153,8 +5471,9 @@ const TX_CAT = {EVENTS:'事件', TEST_EV:'吃醋試探', COLLIDE_OPEN:'兩人同
   GRP_LINES:'一起做事的回應', REJECT_LINES:'被拒絕・冷卻', REJ:'被拒絕・冷卻', ALT_LINES:'被拒絕・冷卻', ACCEPT_END:'互動開始與結束', INTIMATE_START:'互動開始與結束', INTIMATE_END:'互動開始與結束', INTIMATE_SCENE:'互動開始與結束', AFTERCARE:'互動開始與結束',
   TALK:'聊天敘述', MEM_VOICE:'回憶', DIARY:'日記', IK_DIARY:'日記', H_DIARY:'日記', QUIPS:'台詞（同房間時）', COOK_SHARE:'分享料理', NPC_SPECIAL:'室友之間', PAIR_NOTE:'室友之間', NPC_REL_NOTE:'室友之間',
   SNIP:'泡泡小故事', SNIP_H:'泡泡小故事', SNIP_CX_GENERIC:'泡泡小故事', SCHED:'作息・狀態', ACTS:'作息・狀態', CHARS:'角色簡介', TRAIT_VOICE:'你的語氣',
+  MARK_JEAL:'吻痕・吃醋反應', MARK_BUBBLE:'吻痕・吃醋反應', POSS_JEAL:'獨佔欲・吃醋反應', POSS_BUBBLE:'獨佔欲・吃醋反應', WORDS:'吻痕與用詞',
   NPC_CHAT_LINES:'室友之間（共用）', NPC_BAD_LINES:'室友之間（共用）', RIVAL_LINES:'室友之間（共用）', GRP_TENSE:'一起做事（共用）', GRP_WARM:'一起做事（共用）'};
-const TX_HERO = new Set(['SNIP_H', 'H_DIARY', 'TRAIT_VOICE']);
+const TX_HERO = new Set(['SNIP_H', 'H_DIARY', 'TRAIT_VOICE', 'WORDS']);
 const TX_FIELD = {text:'內容', a:'接受', r:'拒絕', d:'第三種回應', 0:'①', 1:'②', 2:'③', 3:'④', lbl:'名稱', label:'名稱', txt:'冷卻時的反應', look:'外貌', persona:'個性', open:'開頭', close:'結尾', ev:'事件句'};
 const hasCJK = s => typeof s === 'string' && /[\u3400-\u9fff\uff00-\uffef「」……]/.test(s);
 const TX = {items:[], orig:new Map(), ready:false};
@@ -5178,7 +5497,7 @@ function txBuild(){
     if (tn === 'SNIP'){ for (const cat of Object.keys(T)) for (const id of Object.keys(T[cat])) add(id, tn, [tn, cat, id], `${cat}`); continue; }
     if (tn === 'CHARS'){ T.forEach((c, i) => add(c.id, tn, [tn, i], c.name)); continue; }
     if (tn === 'ACTS'){ for (const k of Object.keys(T)) if (!k.startsWith('nm_') && !k.startsWith('ha_')) add('all', tn, [tn, k, 'label'], `活動名稱：${k}`); continue; }
-    if (TX_HERO.has(tn)){ add('h', tn, [tn], tn === 'SNIP_H' ? '泡泡' : tn === 'H_DIARY' ? '你的日記' : '你的語氣'); continue; }
+    if (TX_HERO.has(tn)){ add('h', tn, [tn], tn === 'SNIP_H' ? '泡泡' : tn === 'H_DIARY' ? '你的日記' : tn === 'WORDS' ? '吻痕與用詞' : '你的語氣'); continue; }
     if (Array.isArray(T)){ add('all', tn, [tn], TX_CAT[tn] || tn); continue; }
     for (const k of Object.keys(T)){
       const pair = k.includes('|') ? k.split('|') : null, who = pair ? pair : [k];
@@ -5709,7 +6028,7 @@ function fxWrap(name, filt){
   const w = function(...a){ fxBegin(filt); try { return f.apply(this, a); } finally { fxEnd(); } }; w.__fx = true; window[name] = w;
   if (window.__imb && name in window.__imb) window.__imb[name] = w;
 }
-['answerRequest', 'endInter', 'heroInter', 'witness', 'caught', 'leaveSeen', 'endSolo', 'cookShare', 'startGroup', 'endGroup', 'resolveGrpInvite', 'startAftercare', 'fireCollide', 'fireTest', 'resolveHeroInter', 'stopHero', 'resolveEvent', 'heroSoloDone', 'haDone'].forEach(n => fxWrap(n));
+['answerRequest', 'endInter', 'heroInter', 'witness', 'caught', 'leaveSeen', 'endSolo', 'cookShare', 'startGroup', 'endGroup', 'resolveGrpInvite', 'startAftercare', 'fireCollide', 'fireTest', 'resolveHeroInter', 'stopHero', 'resolveEvent', 'heroSoloDone', 'haDone', 'markNotice', 'possNotice'].forEach(n => fxWrap(n));
 ['socialThink', 'nmThink'].forEach(n => fxWrap(n, true));
 Object.assign(window.__imb, { fxHtml, fxSeg, fxBegin, fxEnd, fxDiff, get FX(){ return FX; } });
 
