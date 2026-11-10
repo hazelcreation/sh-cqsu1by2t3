@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f7f1e8">
 <title>失衡・公寓觀察</title>
-<meta name="imb-build" content="2026-11-10 14:02 (台北)">
+<meta name="imb-build" content="2026-11-10 15:04 (台北)">
 <style>
 :root{
   --bg:#f7f1e8; --card:#fffaf3; --line:#e8dccb; --ink:#4a3f35; --muted:#9a8b7b; --accent:#c9876b; --accent2:#e7b9a3;
@@ -457,6 +457,81 @@ span.av,div.av{display:inline-block;border-radius:50%}
 .f-mirror{background:linear-gradient(90deg,#dfeef5,#ffffff 40%,#cfe3ec);border:1px solid #9aa9b8}
 .f-dumbbell{background:linear-gradient(90deg,#333 0 24%,transparent 24% 76%,#333 76%),linear-gradient(#888,#888) 50% 50%/100% 30% no-repeat;border-radius:1px}
 .f-gamepad{background:#3b3f4a;border-radius:40%;box-shadow:inset 3px 0 0 -1px #e86d5a,inset -3px 0 0 -1px #4fb3a9}
+/* ---- 一起做事：和誰一起？ ---- */
+.gchips{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:6px}
+.gchip{display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:7px 9px;cursor:pointer;text-align:left;font:inherit;color:inherit;min-height:48px}
+.gchip .av{width:32px;height:32px;flex:none}
+.gchip .gn{display:flex;flex-direction:column;min-width:0;font-size:14px}
+.gchip .gn small{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gchip.on{border-color:#c8826a;background:#fbe9e1;box-shadow:0 0 0 2px rgba(200,130,106,.25)}
+.gchip.on .gn::after{content:'✓ 一起';font-size:11px;color:#b0644c}
+.gchip:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.8)}
+.acts2{display:flex;gap:8px;flex-wrap:wrap}.acts2 .btn{flex:1 1 auto}
+/* ---- 自訂互動：分別幫每位室友寫 ---- */
+.cxper{grid-column:1/-1;border:1px dashed var(--line);border-radius:12px;padding:6px 10px}
+.cxper summary{cursor:pointer;font-size:13px;color:var(--muted);padding:4px 0}
+.cxperone{display:grid;grid-template-columns:1fr 1fr;gap:6px 8px;margin:8px 0;padding-top:8px;border-top:1px solid var(--line)}
+.cxpern{grid-column:1/-1;font-weight:600;font-size:13px}
+/* ---- 點泡泡看小故事 ---- */
+.token .ti,.token .tag,.token .tb{pointer-events:auto;cursor:pointer}
+.token .ti::after{content:'';position:absolute;inset:-9px}
+.token .tag::after,.token .tb::after{content:'';position:absolute;inset:-6px -4px}
+.snippop{position:fixed;z-index:80;background:#fffaf3;border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 28px rgba(60,40,20,.22);padding:10px 12px 12px;font-size:14px;line-height:1.65;color:var(--ink,#3b2f25)}
+.snippop.hidden{display:none}
+.snippop .sph{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.snippop .sph .av{width:26px;height:26px;flex:none}
+.snippop .sph b{font-size:12.5px;color:var(--muted);font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.snippop .spx{border:none;background:none;font-size:15px;color:var(--muted);cursor:pointer;padding:4px 6px;min-width:32px;min-height:32px}
+.snippop p{margin:0}
+.cxf textarea{width:100%;box-sizing:border-box;font-size:16px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:#fff;color:inherit;font-family:inherit;resize:vertical}
+/* ---- 作弊模式開關（左上角，時鐘下方）＋面板 ---- */
+.topbar{padding-bottom:18px}
+.cheatsw{position:absolute;left:10px;bottom:1px;display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted);cursor:pointer;user-select:none;z-index:2}
+.cheatsw::before{content:'';position:absolute;inset:-6px -6px -2px -6px}
+.cheatsw input{position:absolute;opacity:0;width:1px;height:1px}
+.cheatsw .sw{width:22px;height:12px;border-radius:999px;background:#d9cbb8;position:relative;transition:background .15s;flex:none}
+.cheatsw .sw::after{content:'';position:absolute;left:2px;top:2px;width:8px;height:8px;border-radius:50%;background:#fff;transition:left .15s}
+.cheatsw.on .sw{background:#c8826a}.cheatsw.on .sw::after{left:12px}
+.cheatsw input:focus-visible+.sw{outline:2px solid #c8826a;outline-offset:2px}
+.cheatbtn{position:absolute;left:66px;bottom:0;font-size:10px;border:1px solid #c8826a;color:#b0644c;background:#fff6f1;border-radius:999px;padding:0 7px;line-height:14px;cursor:pointer;z-index:2}
+.cheatbtn.hidden{display:none}
+.cheatpanel{margin:8px 0}
+.cksec{font-weight:700;font-size:13px;margin:12px 0 4px;border-top:1px solid var(--line);padding-top:8px}
+.ckrow{display:grid;grid-template-columns:1fr 1fr 64px;gap:8px;align-items:center;font-size:12.5px;padding:3px 0}
+.ckrow input[type=number]{width:64px;box-sizing:border-box;font-size:16px;padding:4px 6px;border:1px solid var(--line);border-radius:8px}
+@media (max-width:480px){.ckrow{grid-template-columns:1fr 64px}.ckrow span{grid-column:1/-1}}
+/* ---- 成就 ---- */
+.achlist .ach{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line);opacity:.55}
+.achlist .ach.got{opacity:1}
+.achlist .ach .ai{font-size:22px;width:30px;text-align:center;flex:none}
+.achlist .ach .an{display:flex;flex-direction:column;flex:1;min-width:0}
+.achlist .ach .an small{color:var(--muted);font-size:11.5px}
+.cheatbadge{font-size:11px}
+.sharebox{width:100%;box-sizing:border-box;margin-top:8px;font-size:14px;border:1px solid var(--line);border-radius:10px;padding:8px}
+.sharebox.hidden{display:none}
+/* ---- 文字編輯器 ---- */
+.txq{width:100%;box-sizing:border-box;font-size:16px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;margin:8px 0}
+.txwho{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.txwho .chip.on{background:#c8826a;color:#fff;border-color:#c8826a}
+.txcat{width:100%;font-size:16px;padding:7px 8px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:#fff}
+.txlist{display:flex;flex-direction:column;gap:6px;max-height:52vh;overflow:auto;margin-bottom:10px}
+.txitem{display:flex;flex-direction:column;align-items:flex-start;text-align:left;border:1px solid var(--line);background:#fff;border-radius:10px;padding:7px 10px;font:inherit;color:inherit;cursor:pointer;position:relative}
+.txitem b{font-size:13px}.txitem small{font-size:11.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.txitem.edited{border-color:#c8826a;background:#fff6f1}
+.txmark{position:absolute;right:8px;top:6px;font-size:10px;color:#b0644c}
+.txf{margin-bottom:10px}.txf textarea{width:100%;box-sizing:border-box;font-size:16px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;font-family:inherit;resize:vertical}
+.txorig{color:var(--muted);font-size:11px;white-space:pre-wrap}
+.txacts .filebtn{position:relative;overflow:hidden}.txacts .filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+/* ---- 自訂室友行為 ---- */
+.nmadd{margin:10px 0}
+.nmlist{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;max-height:50vh;overflow:auto}
+.nmrow{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:7px 9px;background:#fff}
+.nmrow.off{opacity:.55}
+.nmrow .ni{font-size:20px;width:26px;text-align:center}
+.nmrow .nt{flex:1;min-width:0;display:flex;flex-direction:column}.nmrow .nt b{font-size:13px}.nmrow .nt small{font-size:11.5px;color:var(--muted)}
+.nmon{display:flex;align-items:center;gap:3px;font-size:12px;white-space:nowrap}
+.nmchecks{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:4px}.nmchecks label{display:flex;gap:4px;align-items:center;font-size:13px}
+.nmfx{display:flex;gap:8px;margin-top:4px}.nmfx label{display:flex;flex-direction:column;font-size:12px;flex:1}.nmfx input{width:100%;font-size:16px;padding:5px;border:1px solid var(--line);border-radius:8px;box-sizing:border-box}
 
 </style>
 </head>
@@ -507,6 +582,7 @@ span.av,div.av{display:inline-block;border-radius:50%}
       <div class="speeds" id="speeds">
         <button data-s="0" title="暫停">⏸</button><button data-s="1" title="1x＝真實時間：1 遊戲分鐘＝現實 1 分鐘">1x</button><button data-s="10">10x</button><button data-s="60">60x</button><button data-s="300">300x</button><button id="ffBtn" class="ffbtn" title="快轉（3600x，逐分鐘模擬）">⏩</button>
       </div>
+      <label class="cheatsw" id="cheatSw" title="作弊模式：打開才能修改數值"><input type="checkbox" id="cheatChk" aria-label="作弊模式"><span class="sw"></span><span class="cl">作弊</span></label><button class="cheatbtn hidden" id="cheatBtn" type="button" title="修改數值">🛠️ 編輯</button>
       <div class="spdnote" id="spdNote">1x＝真實時間</div>
       <div class="ffpick hidden" id="ffPick"><span>快轉到</span><button data-ff="next">下個事件</button><button data-ff="420">07:00</button><button data-ff="720">12:00</button><button data-ff="1080">18:00</button><button data-ff="1320">22:00</button></div>
       <div class="ffbar hidden" id="ffBar"><span id="ffTxt">⏩ 快轉中</span><button id="ffStop">停止</button></div>
@@ -1374,7 +1450,7 @@ const INTIMATE_SCENE = {
 
 </script>
 <script>
-// 《失衡》室友主動找你的事件（51 則）——改編自 失衡 Bot 試玩版的事件文本
+// 《失衡》室友主動找你的事件（98 則）——改編自 失衡 Bot 試玩版的事件文本
 // t：0 日常／1 曖昧／2 親近／3 心動（最多到吻；之後在平面圖上即時「共度中」，不跳時間）
 // rooms：你所在的位置（entry 玄關、living 客廳、kitchen 廚房、balcony 露臺、r_h 你的房間〔他會走來敲門〕、office 公司）
 // fl：n 只在晚上 20:00–03:00；m 只在早上 7:00–10:00；low 你心情不好時才會出現
@@ -1644,6 +1720,259 @@ E('theo','t3a',3,['hero'],'n',
 ['捧住他的臉','他的吻還是很急，但這一次，他記得放慢。\n……門關上了。'],
 ['不是今晚','他咬著嘴唇點頭，努力不讓自己看起來太失望。「那……明天早上，一起吃早餐？」'],
 ['讓他陪你聊到睡著','他的話一直沒停，從解剖學講到小時候養的狗。後來他先睡著了，手還抓著你的衣角。']);
+
+/* ===== 新增事件（每位室友 8 則：日常、曖昧、親近、心動各 2）===== */
+/* —— Alexander —— */
+E('alexander','a0x',0,['living'],'',
+'Alexander 在客廳重排書架，一本一本按高度。地上堆著一疊被抽出來的攝影集，書背上都是 Jasper 歪歪扭扭的字。\n「這些，」他說，「不屬於任何一個系統。」\n他看向你，像在徵求一個意見。',
+['幫他找個位置','你把攝影集斜放在最下層的角落。他看了很久。「……不對稱。」停頓。「但可以。」之後他再也沒移動過它們。'],
+['那是 Jasper 的事','「嗯。」他把那疊書原封不動推到牆邊，對齊地板的縫。對齊得很仔細，仔細得有點用力。'],
+['「你其實滿在意他的書。」','他手上的動作停了。「我在意的是秩序。」他說，然後把最上面那本的書角，輕輕拍平。']);
+E('alexander','a0y',0,['kitchen'],'m',
+'早上，Alexander 站在流理台前，用電子秤量咖啡豆。\n「十八克。」他把豆子倒進磨豆機，轉頭看你，「你的那杯，要幾克？」\n他問得很認真，像在問一面牆要開多寬的窗。',
+['跟他一樣','他多量了一份。兩杯並排放好，杯柄朝同一個方向。「一樣的人不多。」他說。'],
+['我喝即溶就好','他看著你撕開即溶包，沒說話，只是把熱水壺從九十二度調到一百。「至少水要對。」'],
+['「隨便，你決定。」','他想了三秒，量了十六克。「你早上講話比較慢，」他說，「不需要太濃。」']);
+E('alexander','a1x',1,['living','hall'],'',
+'樓上傳來 Theo 的笑聲，隔著兩層樓還是很響。\nAlexander 站在樓梯口，手裡拿著一卷捲尺，好像已經站了一陣子。\n「他總是找你說話。」他說，「你笑起來的聲音，也傳得很遠。」',
+['邀他下次一起聊','「我不擅長那種熱鬧。」他把捲尺收回去，喀的一聲。「……但可以在旁邊。」'],
+['那又怎樣','「沒怎樣。」他轉身上樓，腳步一階一階，數得很清楚，比平常重了一點。'],
+['「你在吃醋？」','「我在測量。」他說。你問他測量什麼，他沉默了很久：「距離。」']);
+E('alexander','a1y',1,['roof'],'n',
+'夜裡的頂樓，Alexander 坐在折疊椅上畫素描。你走近才看清楚，他畫的是這棟公寓——每一扇窗都是暗的，只有一扇亮著。\n那是你房間的窗。\n「我畫的是整棟樓。」他說，沒有抬頭。',
+['問他為什麼是那一扇','「因為那是我每天最後確認的一盞燈。」他把素描本闔上，「它熄了，我才睡。」'],
+['說該睡了','他點頭，把鉛筆插回本子的線圈裡。「晚安。」那扇亮著的窗，他沒有擦掉。'],
+['替那扇窗多畫幾道光','你接過鉛筆，在那扇窗周圍添了幾筆。他看著你的手，「……多了三條線，」他說，「但我不會改。」']);
+E('alexander','a2x',2,['kitchen','living'],'n',
+'餐桌上有一碗用保鮮膜封好的湯，便條紙上寫著「給 {n}——Liam」，旁邊還畫了個笑臉。\nAlexander 站在桌邊，手裡端著一個盤子，上面是一份三明治，切得非常整齊。\n「我不會煮，」他說，「只會切直線。」',
+['兩個都吃','你先吃了他的三明治。他一直看著你，直到你吃完最後一口，才說：「湯冷了。」語氣裡有一點藏不住的滿意。'],
+['我喝湯就好','「合理。」他把三明治包回保鮮膜，放進冰箱最上層。「明天的早餐。」他說，聽不出來是給誰的。'],
+['「你特地做的？」','「剛好有麵包。」他頓了頓，「和火腿，和起司，和刀。」你笑出聲，他也沒忍住，嘴角動了一下。']);
+E('alexander','a2y',2,['hero'],'',
+'Alexander 跪在你房間的地板上，替你修那張一直晃的書桌。他量了三次桌腳，才拿出螺絲起子。\n「你房間裡的東西，每一件我都記得位置。」他低著頭說，「除了你。你每次都站在不同的地方。」',
+['蹲到他旁邊','你蹲下來替他扶著桌腳。他的肩膀碰到你，沒有移開。螺絲鎖緊的時候，他輕聲說：「好了。」卻沒有站起來。'],
+['謝謝，我自己來就好','他把螺絲起子放進你手裡，起身，把衣角拉平。「順時針，」他說，「四分之三圈。」然後離開了。'],
+['「那我站哪裡比較好？」','他抬頭看你，想了很久。「這裡。」他指了指自己身邊的地板。說完，他先別開了臉。']);
+E('alexander','a3x',3,['hero'],'n',
+'Alexander 站在你房門口，手上拿著一張照片——是 Jasper 拍的你，原本貼在冰箱上。\n「我把它拿下來了。」他說，「我不確定，我有沒有權利這樣做。」\n他沒有把照片遞給你，也沒有離開。',
+['「你想留著它嗎？」','他看著照片，又看著你。「我不需要照片。」他把它放到你桌上，一步跨進門裡，吻你——比他畫過的任何一條線都不精準。\n……門關上了。'],
+['把照片貼回去','他把照片交給你，指節有點白。「明白。」他說，在門口站了一秒，才轉身。'],
+['把照片收進抽屜','你把照片收進抽屜，關上。他看著那個抽屜，像看著一個終於解決的問題。「謝謝。」他說，第一次聽起來不像客套。']);
+E('alexander','a3y',3,['hero'],'n',
+'Alexander 把一卷藍圖攤在你房間的地板上。是一棟小房子，他自己設計的。\n「這間，」他的手指停在一個空白的房間上，「我一直不知道它該做什麼用。」\n他沒有抬頭。「現在我知道了。但我需要你同意。」',
+['在空白處寫上自己的名字','他看著那幾個字，呼吸停了一下。然後他放下鉛筆，捧住你的臉，吻得很慢，像在確認每一個尺寸。\n……門關上了。'],
+['捲起藍圖還給他','他接過藍圖，用橡皮筋繞了兩圈。「空白也是一種設計。」他說，聲音很平，平得太刻意。'],
+['「先告訴我你想用它做什麼。」','「放一張你會坐的椅子，」他說，「一盞你會開的燈。就這樣。」他終於抬頭，耳朵是紅的。']);
+
+/* —— Jasper —— */
+E('jasper','j0x',0,['kitchen'],'',
+'Jasper 蹲在調味料架前，把 Alexander 排得整整齊齊的罐子，一個一個轉了十五度。\n「噓——」他對你豎起食指，「實驗。看他幾分鐘會發現。」',
+['加入他的實驗','你也轉了一罐鹽。三分鐘後，樓梯傳來腳步聲，Jasper 拉著你躲到冰箱後面，笑得肩膀一直抖。你聽見 Alexander 很長、很長的一聲嘆氣。'],
+['我不想被罵','「膽小鬼。」他笑著把罐子轉回去，只留一罐歪的。「留一個給他，不然他會寂寞。」'],
+['「你為什麼老愛惹他？」','「因為他生氣的時候，」Jasper 想了想，「是整棟房子裡最像人類的時候。」']);
+E('jasper','j0y',0,['living'],'',
+'Jasper 盤腿坐在客廳地板上，抱著一整箱沒標日期的舊底片。\n「來，挑一捲。」他把箱子推到你面前，「我幫你看看，你挑到什麼樣的人生。」',
+['隨手挑一捲','他把底片對著燈看，「海邊、陌生人、一隻沒對焦的貓。」他笑了，「你的人生不錯，有貓。」'],
+['我不信這個','「我也不信。」他把箱子推開，「我只是想找個理由，跟你一起坐在地板上。」'],
+['反過來替他挑一捲','你挑了最底下那捲。他看了很久，表情慢慢安靜下來。「這捲，」他說，「我還沒準備好沖。」']);
+E('jasper','j1x',1,['living','hall'],'',
+'Jasper 一手搭上你的肩，對著樓梯上的 Samuel 喊：「Sam！你看我們像不像情侶照？」\nSamuel 的筆電差點從手上滑下去。\nJasper 湊到你耳邊，小聲說：「配合一下嘛。他的反應，比任何底片都值得。」',
+['配合他擺姿勢','你靠著他比了個 V。Samuel 紅著臉逃走了。Jasper 笑完，手卻沒從你肩上拿開。「……其實，」他說，「剛剛那張，我是真的想拍。」'],
+['把他的手拿開','「好啦好啦。」他舉手投降，朝樓上喊：「Sam，安全了，她不要我！」語氣很誇張，眼神卻有一秒沒在笑。'],
+['「欺負他很好玩嗎？」','「非常好玩。」他眨眨眼，「但你有沒有注意到——他每次逃走之前，都會先看你一眼？」']);
+E('jasper','j1y',1,['roof'],'m',
+'清晨的頂樓，Jasper 裹著一條毯子坐在欄杆邊，眼睛底下有黑眼圈。\n「我在等日出。」他看見你，笑了，「你來得比太陽早。這對太陽很失禮。」',
+['鑽進毯子另一邊','他把毯子展開一半，罩住你，兩個人裹成一團。太陽出來的時候，他沒有看太陽。'],
+['我只是來收衣服','「收衣服也很好，」他說，「晨光加晾衣夾，很有生活感。」他用手指框住你，沒有按下任何東西。'],
+['「你一整晚沒睡？」','「修了四百張照片，」他打了個呵欠，「其中三百九十九張是別人。」他沒說最後一張是誰。']);
+E('jasper','j2x',2,['living'],'n',
+'客廳只開著電視。Theo 睡在沙發上，頭枕著 Jasper 的腿，嘴巴微微張著。\nJasper 對你比了個「噓」，然後拍拍自己另一邊的空位。\n「這小子考完試就這樣，」他小聲說，「你要坐的話，我另一條腿還空著。」',
+['坐到他另一邊','你坐下，他把毯子的一角分給你。電視的光在三個人臉上閃。過了一會兒，你感覺他的頭輕輕靠上你的肩。「別動，」他說，「兩邊都不准動，我好幸福。」'],
+['不吵你們了','「晚安。」他揮揮手。你走到樓梯口回頭，他還在看你。Theo 在他腿上翻了個身，嘟囔了一聲你的名字。'],
+['幫 Theo 蓋上外套','你把外套蓋到 Theo 身上。Jasper 看著你，眼神突然變得很柔。「你知道嗎，」他說，「這一幕我會記很久。不用相機。」']);
+E('jasper','j2y',2,['hero'],'',
+'Jasper 坐在你房間的地板上，把一捲剛沖好的底片一格一格對著窗戶舉起來。\n全部是你。有些你甚至不記得他什麼時候拍的。\n「我想問你，」他說，難得沒有在笑，「這些，我能留著嗎？」',
+['讓他留著','他鬆了一口氣，把底片收進一個小鐵盒，在蓋子上寫了你的名字。「這是第一次，」他說，「我替一個人準備專屬的盒子。」'],
+['請他銷毀','他沉默了一會兒，點頭，當著你的面把底片封進信封。「我不會再看了。」他說。你知道他會守信。'],
+['挑一張讓他留下','你挑了一張你在笑的。他把那一格剪下來，其餘的全交給你。「一張就夠了，」他說，「剩下的，我用記的。」']);
+E('jasper','j3x',3,['hero'],'n',
+'Jasper 把相機交到你手上。\n「今天換你拍，」他說，「我不擺姿勢，也不開玩笑。」\n他靠在你房間的牆上，第一次在鏡頭前那麼安靜。「拍你看到的那個我。」',
+['放下相機，走向他','你沒有按快門，把相機放到床上。他看著你走近，喉結動了一下。「這個角度，」他低聲說，「我從來沒被拍過。」他吻你，吻得很認真，一點也不像在開玩笑。\n……門關上了。'],
+['拍一張就還給他','快門響了。你把相機還給他，他盯著螢幕看了很久。「……原來我在你眼裡是這樣。」他道了晚安，走之前把那張照片設成了鎖定。'],
+['「你也會緊張？」','「現在？非常。」他笑了，那個笑終於有點不穩。「這是秘密，不准告訴 Marcus。」']);
+E('jasper','j3y',3,['hall','hero'],'n',
+'你從 Marcus 的錄音室出來，Jasper 靠在走廊的牆上，像是等了很久。\n「他終於讓你進去了？」他的語氣很輕鬆，手卻插在口袋裡握得很緊。\n「我只是想說……我也有一間暗房。也很安靜。也只放得下兩個人。」',
+['牽起他的手','他低頭看著你們交握的手，過了好一會兒才笑出聲，像是鬆了一口氣。「那我就不用跟一個吉他手比賽了。」他把你拉近，先吻在額頭，然後是唇。\n……門關上了。'],
+['「Jasper，別這樣。」','「好。」他立刻站直，又是那個漂亮的笑。「我只是吃醋吃得比較優雅。」他走了，口哨吹到一半就停了。'],
+['「你在等我？」','「等了四十分鐘，」他說，「中間假裝路過三次。」他自嘲地笑，「很不像我吧。」']);
+
+/* —— Liam —— */
+E('liam','l0x',0,['kitchen'],'m',
+'早上的廚房是奶油和麵糊的味道。Liam 一邊翻鬆餅，一邊小聲數著：\n「Theo 兩片，Samuel 一片半，Marcus 說不吃但要留，Alexander 要切成正方形……」\n他抬頭看見你，笑了。「你呢？」',
+['跟他說想要幾片','你說三片。他笑出酒窩，「終於有人跟我一樣誠實。」第三片他煎成了心形，好像是不小心的。'],
+['我早上不吃','「不行。」他難得堅持，把一片鬆餅包進紙巾塞給你，「路上吃。至少半片。」'],
+['「那你自己吃幾片？」','他愣住，好像從來沒想過。「……剩下的？」你把盤子推到他面前，他笑著搖頭，耳朵卻有點紅。']);
+E('liam','l0y',0,['kitchen','living'],'',
+'Liam 在整理冰箱。每個保鮮盒上都貼了名字——有一盒寫著 Theo，另一盒寫著你的名字，旁邊多畫了一個笑臉。\n「Theo 那盒是宵夜，」他說，「你那盒……」他把它往後藏了藏，「是實驗品。」',
+['打開來看','是一小盒醃梅子。你只提過一次，小時候家裡會做。他抓抓頭髮，「我照網路上試的，不知道對不對。」'],
+['留著晚點吃','「好。」他把盒子放回冰箱最好拿的那一格，「不急，放越久越好吃。」'],
+['「為什麼 Theo 的沒有笑臉？」','「他的有，在背面。」Liam 笑出酒窩，「你的在正面。」']);
+E('liam','l1x',1,['kitchen'],'n',
+'深夜的廚房，Liam 煮了兩碗麵。Marcus 靠在門邊抽菸，被他用鍋鏟指著趕到門外。\n「他每次說不吃，最後都會吃。」Liam 說。\n門外傳來 Marcus 的聲音：「我聽得到。」\nLiam 把其中一碗推到你面前：「這碗給你，蔥比較多。」',
+['坐下來吃','你吃著麵，門外的 Marcus 哼了一聲走開了。Liam 壓低聲音：「其實我只煮了兩碗。」他看著你，笑容裡有一點點壞。'],
+['把麵讓給 Marcus','你端著麵走到門口。Liam 的笑停了一下，又重新掛回去。「也好，」他說，「他今天錄到現在。」轉身拆了第三包麵。'],
+['「你們感情很好？」','「他是我見過最難餵的人。」Liam 說，「你是第二難的——因為你從來不說餓。」']);
+E('liam','l1y',1,['roof'],'',
+'Liam 蹲在露臺上種香草，袖子捲到手肘，指甲縫裡都是土。\n「這盆羅勒，這盆迷迭香，」他指著最小的一盆空盆，「這盆還沒種，我還沒決定種什麼。」',
+['替他決定','你說薄荷，你喜歡薄荷茶。他把種子小心埋進土裡，「那它就叫你的名字了。」'],
+['我不太會照顧植物','「不用你照顧，」他笑，「你只要偶爾來看看它就好。植物也需要被看見。」'],
+['幫他澆水','你澆太多了，水從盆底溢出來。他慌忙拿抹布，兩個人的手撞在一起。他沒有抽開。']);
+E('liam','l2x',2,['living'],'nl',
+'你一個人坐在沒開燈的客廳。Liam 經過，什麼都沒問，坐到你旁邊，把一顆剝好的橘子放進你手心。\n「一瓣一瓣吃，」他說，「難過的事，也一件一件想。」',
+['靠在他肩上','他僵了一秒，然後很慢地放鬆，讓你靠著。他沒說話，只是又剝了一顆，一瓣一瓣遞給你。'],
+['我沒事','「好。」他沒有拆穿你，把剩下的橘子放在茶几上，「我在廚房，燈會一直亮著。」'],
+['也剝一顆給他','你剝得歪七扭八，他吃得很認真。「這是今天，」他說，「最好吃的一顆。」']);
+E('liam','l2y',2,['kitchen'],'',
+'Liam 在幫 Theo 打包便當，Theo 整個人掛在他背上撒嬌。你一走進廚房，Liam 就把 Theo 推開：「去換衣服，要遲到了。」\nTheo 不情不願地走了，經過你身邊時瞪了你一眼。\nLiam 嘆了口氣，從冰箱拿出另一個便當盒遞給你。「你的。不准跟他說，你的有炸蝦。」',
+['收下便當','你接過便當，他的手指在盒子底下碰了你一下。「中午記得吃，」他說，「我會問。」'],
+['給 Theo 吧','「他已經有了。」Liam 把便當塞進你的包包，「這個是只做給你的。只做給你的，懂嗎？」'],
+['「他好像在吃醋。」','「他什麼都吃，」Liam 說，「醋也吃。」他頓了頓，「……我也是。」']);
+E('liam','l3x',3,['kitchen'],'n',
+'深夜的廚房只點著一根蠟燭，插在一個小小的杯子蛋糕上。Liam 一個人坐在餐桌邊。\n「今天是我第一次當上主廚的週年，」他看見你，有點不好意思，「我不喜歡大家為我忙。」\n他把蛋糕往你那邊推了一點。「但你在，就很好。」',
+['替他唱一首歌','你小聲地唱，他看著燭光，眼眶有點紅。吹熄之後，他在黑暗裡吻你，帶著奶油的甜和一點點鹹。他牽著你上樓。\n……門關上了。'],
+['跟他說恭喜就走','「謝謝。」他笑著把蛋糕切成兩半，一半包好放進冰箱，貼上你的名字。'],
+['問他許了什麼願','「說出來就不靈了。」他看著你，「……不過，好像已經實現一半了。」']);
+E('liam','l3y',3,['hero'],'n',
+'Liam 端著宵夜來敲門。門邊的小桌上放著別人留給你的東西——一張 Jasper 拍的照片，一張 Alexander 的設計草圖。\n他看了一眼，把托盤握得緊了一點。\n「我不是來比的，」他說，「我只是想讓你知道，有一個人，每天都在等你回來吃飯。」',
+['拉他進來','他把托盤放在桌上，雙手不知道往哪裡擺。你抱住他，他才敢回抱，然後低頭吻你，很輕、很慢，像在試一道新菜的味道。\n……門關上了。'],
+['收下宵夜，跟他說晚安','「晚安。」他把托盤交給你，笑得很好看，只是轉身的時候，肩膀垂下來一點。'],
+['「你在意那些東西？」','他又看了一眼那張照片，誠實地點頭。「很在意，」他說，「但我更在意你今天有沒有吃飯。」']);
+
+/* —— Marcus —— */
+E('marcus','m0x',0,['kitchen'],'n',
+'Marcus 在翻冰箱，翻出一個保鮮盒，上面貼著 Liam 的字：「Marcus，別說你不吃。」\n他盯著那張紙條看了很久。\n「……他寫錯字了。」他說。\n其實沒有。',
+['陪他一起熱來吃','微波爐嗡嗡響，你們站著等。他吃了兩口，說「太淡」，然後全部吃完了。'],
+['不打擾他','你轉身要走，他說：「你也還沒吃。」把保鮮盒推過來一半。'],
+['「你明明很感動。」','他瞥你一眼，把紙條折好，放進口袋。「閉嘴。」語氣一點也不兇。']);
+E('marcus','m0y',0,['living'],'',
+'Theo 的音樂從樓上轟下來，震得茶几上的杯子都在抖。\nMarcus 拿著耳機站在客廳中間，臉色很沉。他看了你一眼。\n「你也受不了？」',
+['跟他一起去敲 Theo 的門','你們站在 Theo 門口。Marcus 敲了兩下，門一開，Theo 看見是你，音樂立刻關小。Marcus 冷冷看你一眼：「下次你來敲就好。」'],
+['我覺得還好','他沉默了一會兒，把一邊耳機遞給你。「那聽這個，」他說，「比較好。」'],
+['「你也可以放你的。」','「我的音樂，」他說，「不是用來蓋過別人的。」他上樓了。十分鐘後，Theo 的音樂真的停了。']);
+E('marcus','m1x',1,['hall'],'n',
+'你很晚才回家。Marcus 坐在玄關的樓梯上，懷裡抱著一把沒插電的吉他。\n「回來了。」他說，好像只是剛好在這裡。\n「……我寫了一段，」他撥了一下弦，「剛好缺一個人聽。」',
+['坐到他下一階','他彈得很輕，怕吵醒別人。那段曲子沒有結尾。「還沒寫完，」他說，「結尾要看你。」'],
+['太晚了','他點頭，把吉他抱回懷裡。「門我鎖了。」他說。等你上了樓，他才起身。'],
+['「你在等我？」','「在等靈感。」他撥了一個和弦，「……剛到。」']);
+E('marcus','m1y',1,['roof'],'',
+'Jasper 在頂樓替你拍照，Marcus 走上來，看了一眼，站到你身後的欄杆邊。\n「Marcus，」Jasper 從觀景窗後面抬頭，「你擋到我的光了。」\n「我知道。」Marcus 說。',
+['拉 Marcus 一起入鏡','Marcus 皺眉，但沒有走。Jasper 按下快門。照片裡 Marcus 沒有笑，卻站得離你很近。Jasper 看著螢幕嘖了一聲：「這張比我想要的好。」'],
+['請 Marcus 讓一下','他沒說話，往旁邊退了一步，點了一根菸，又熄掉。他沒下樓，就站在鏡頭外看著你。'],
+['「你們兩個在幹嘛？」','Jasper 笑著聳肩，Marcus 什麼都沒說。過了一會兒，Marcus 把外套丟給你：「風大，穿上。」Jasper 罵了一句義大利文。']);
+E('marcus','m2x',2,['living'],'n',
+'客廳沒開燈，只有唱盤的小燈亮著。Marcus 坐在地上，聽一張很舊的爵士黑膠。\n他沒看你。「這張是我爸的。」\n那是你第一次聽他提起家人。',
+['坐下來一起聽','你坐到他旁邊的地板上。B 面播完，他才開口，說了很多——關於一個很會彈琴、很早就離開的人。你一直聽著，直到唱針空轉。'],
+['讓他一個人聽','「嗯。」他沒挽留。你上樓時，聽見他把音量轉小了，像是怕吵到你。'],
+['問他會不會彈這首','他拿起吉他，彈了開頭四小節就停下。「……後面忘了。」他說。你知道他沒有忘。']);
+E('marcus','m2y',2,['hero'],'',
+'Marcus 拿著一副耳機站在你房門口。\n「你那副，」他說，「低音是糊的。這副給你。」\n你認得那副耳機。是他自己每天戴的那副。',
+['戴上試聽','他把耳機掛到你脖子上，替你調好位置，指尖擦過你的耳垂。裡面放的是一首你沒聽過的歌。「這首，」他說，「還沒給任何人聽過。」'],
+['我習慣原本的','「隨便你。」他把耳機收回去，轉身又停住，「糊的低音，會讓你錯過很多東西。」'],
+['「那你戴什麼？」','「舊的。」他說，「我不需要聽清楚。我知道它們在哪裡。」']);
+E('marcus','m3x',3,['roof'],'n',
+'下雨了。頂樓的屋簷下，Marcus 抽完最後一根菸，看見你，把菸盒捏扁丟進垃圾桶。\n「戒了，」他說，「剛剛決定的。」\n雨聲很大。「因為你說過，你不喜歡那個味道。」',
+['走過雨裡，走向他','你走到屋簷下，頭髮滴著水。他用拇指擦掉你臉上的雨，然後吻你，像一首終於找到結尾的歌。他牽著你下樓，一路沒放手。\n……門關上了。'],
+['「不用為了我。」','「不是為了你，」他說，「是為了我自己能靠近一點。」他把外套蓋在你頭上，自己淋著雨下樓了。'],
+['「我什麼時候說過？」','「上個月，在玄關。」他說，「你皺了一下鼻子。」他頓了頓，「我記性不好。只記得你的事。」']);
+E('marcus','m3y',3,['hero'],'n',
+'Marcus 敲了你的門，手撐在門框上，沒有進來。\n「那小子，」他說，「這禮拜第三次在你門口晃。」他指的是 Theo。\n「我沒有權利問。」他停了一下，「但我想問。」',
+['讓他進來，關上門','他走進來，背靠著門。「我不擅長說，」他說，「所以我只做一件事。」他吻你，很低、很深，像大提琴最低的那根弦。\n……門關上了。'],
+['「我們只是朋友。」','他看了你很久，點頭。「我信。」他說，「但我今晚還是會睡不著。」他走了，腳步很重。'],
+['「你在吃醋？」','「對。」他回答得太乾脆，讓你一時說不出話。「很難看，」他說，「我知道。」']);
+
+/* —— Samuel —— */
+E('samuel','s0x',0,['office'],'',
+'會議室的投影機壞了，大家手忙腳亂，有人把 Samuel 叫了過來。\n他抱著一捆線走進來，看見你坐在第一排，手一抖，接錯了兩條線。',
+['過去幫他遞線','你把 HDMI 遞給他。他接過時碰到你的手指，整個人彈了一下。投影機亮了，同事拍手，他小聲說：「……謝謝你。不、不是謝大家。」'],
+['在座位上等','他修好後逃也似地離開，經過你身邊時小聲說了一句「加油」，不知道是對你說，還是對他自己。'],
+['小聲跟他說「慢慢來」','他深吸一口氣，這次接對了。走之前，他在你筆記本的角落畫了一個很小的笑臉。']);
+E('samuel','s0y',0,['kitchen','living'],'m',
+'早上，Samuel 在廚房泡茶。桌上放著一張列印出來的地鐵時刻表，有兩班車被螢光筆畫了起來。\n「這、這班七點四十二，」他說，「如果你……要搭的話，人比較少。」',
+['說好，一起搭','他點頭點得太用力，眼鏡滑下來。出門前，他又看了三次手錶。'],
+['我今天晚點出門','「啊、好。」他把時刻表折起來，「那、那第二班也畫了，八點零五。」原來那第二條線，是為了這個。'],
+['「你為我查的？」','「沒、沒有！我自己也要搭……」他越說越小聲，「……順、順便。」']);
+E('samuel','s1x',1,['living'],'',
+'Jasper 勾著 Samuel 的脖子把他拖過來：「Sam 有話要對你說！」說完把他往你面前一推，自己跑了。\nSamuel 站在你面前，臉漲得通紅。\n「我、我沒有……他、他亂說……」',
+['耐心等他說','他沉默了很久，最後擠出一句：「……你、你今天的頭髮很好看。」說完他自己先蹲下去抱住頭。你聽見樓上 Jasper 在笑。'],
+['笑著放過他','「謝、謝謝。」他鬆了一口氣，又好像有點可惜。走到樓梯口，他回頭瞪了 Jasper 的房門一眼——那是你第一次看見他瞪人。'],
+['「那我有話對你說。」','他整個人僵住。你說「早點睡」，他愣了兩秒，笑了出來，第一次笑得那麼放鬆。']);
+E('samuel','s1y',1,['office'],'',
+'下班時間早就過了，辦公室裡只剩你，和隔壁部門的一盞燈。是 Samuel。\n你走過去，他手忙腳亂地動了動滑鼠——螢幕一直是黑的。\n「我、我也在加班，」他說，「剛好。」',
+['一起下班','你們走到地鐵站，他一路走在靠馬路的那一側。上了車，他才小聲說：「其實……我在等你。」'],
+['我還要一陣子','「那、那我也還要一陣子。」他坐回去，盯著黑掉的螢幕，一直等到你關燈。'],
+['指指他黑掉的螢幕','他的臉一下子紅到耳根。「……被、被發現了。」他小聲承認。']);
+E('samuel','s2x',2,['hero'],'',
+'Samuel 來幫你修電腦。桌面上有一個 Marcus 傳給你的錄音檔，他看見了，手停了一下，又繼續。\n「修、修好了。」他說，「還有……我做了一個播放清單。如果你喜歡聽歌的話。」',
+['聽他的播放清單','第一首，是你們第一次一起搭地鐵時，車廂裡放的那首歌。你轉頭看他，他推了推眼鏡，假裝在看窗外。'],
+['謝謝，我晚點聽','「好、好。」他收拾工具，在門口停了一下，「第一首……可以先聽。」'],
+['「你在意那個錄音？」','他沉默了一會兒，難得沒有結巴：「我在意你喜歡什麼。」說完，他自己先愣住了。']);
+E('samuel','s2y',2,['kitchen'],'n',
+'深夜的廚房飄出一股焦味。Samuel 站在爐子前，鍋裡是一顆煎得很黑的蛋。\n「Liam 不在，」他看見你，慌得把鍋鏟藏到背後，「我、我想試試看……」',
+['吃掉那顆焦掉的蛋','你吃了一口，說「還不錯」。他知道你在說謊，卻笑得很開心。「……那、那下次我會進步。」'],
+['陪他重煮一份','你們擠在爐子前，他負責打蛋，打到蛋殼掉進去。兩個人笑到樓上的 Liam 喊：「誰在燒廚房？」'],
+['「為什麼不等 Liam？」','「因為，」他低頭看著鍋子，「我、我也想做一次……可以讓你吃的東西。」']);
+E('samuel','s3x',3,['hero'],'n',
+'晚上十一點整，你的電腦右下角跳出一個小視窗：「你今天也辛苦了。」\n門外傳來很輕的敲門聲。Samuel 站在走廊上，臉紅得厲害。\n「那、那是我寫的。」他說，「我想每天都跟你說，可是……我說不出口。」',
+['走過去吻他','他的眼鏡撞到你，歪了。他手忙腳亂地摘下來，然後笨拙地、很認真地回吻你。\n……門關上了。'],
+['「謝謝，我很喜歡。」','「嗯。」他笑了，有點失落，又很滿足。「那……明天十一點，也、也會跳。」'],
+['「那你現在說一次。」','他深吸一口氣，「你今、今天也辛苦了。」說完他捂住臉，「……原來說出來，是這種感覺。」']);
+E('samuel','s3y',3,['hall','hero'],'n',
+'走廊上，Alexander 剛跟你道完晚安上樓。隔壁的門開了一條縫，Samuel 探出頭來。\n「我、我一直在想，」他的聲音很小，「要是我再勇敢一點……就好了。」\n他把門又拉開了一點。',
+['牽起他的手','他的手很冰，抖得厲害，卻握得很緊。「我、我可以嗎？」你點頭。他吻你，生澀得像是第一次——也許真的是。他沒有放開你的手。\n……門關上了。'],
+['「Samuel，晚安。」','「晚、晚安。」他把門關到只剩一條縫，「……我、我還是會努力的。」'],
+['「你一直在等？」','「從他上樓開始……」他低下頭，「一百二十七秒。」他頓了頓，「我、我數了。」']);
+
+/* —— Theo —— */
+E('theo','t0x',0,['living'],'',
+'Theo 在客廳地板上貼了一排膠帶，對著它來回練台步。\n「{n}！」他一個轉身停在你面前，「幫我看，我走路會不會外八？」',
+['認真幫他看','你說有一點。他哀嚎著倒進沙發，三秒後又爬起來重走。走到第十趟，他轉身對你拋了一個很專業的媚眼，然後自己先笑場。'],
+['我不懂這個','「不用懂，」他走到你面前，擺了一個姿勢，「你只要說帥就好。」'],
+['跟他一起走','你走得歪七扭八，他笑到趴在地上：「{n}，你走路好像企鵝，好可愛。」']);
+E('theo','t0y',0,['kitchen'],'n',
+'半夜的廚房，冰箱的燈亮著。Theo 蹲在冰箱前，嘴裡塞得鼓鼓的，手上拿著一個保鮮盒。\n「噓！」他含糊地說，「Liam 說這是我的……大概。」\n盒子上寫的是你的名字。',
+['分他一半','他眼睛一亮：「{n} 你是天使！」吃完又小聲嘀咕：「……可是 Liam 寫的是你的名字耶，他好偏心。」'],
+['那是我的','他乖乖把盒子還給你，嘴巴撅得老高。「Liam 從來不在我的盒子上畫愛心。」他說，聲音有點酸。'],
+['「你知道那是我的？」','「知道，」他理直氣壯，「因為我想吃你的東西。」說完他自己先臉紅了。']);
+E('theo','t1x',1,['hall'],'',
+'你一回家，Theo 就從玄關的鞋櫃旁邊跳出來，手上捏著兩張電影票。\n「同學給的！」他說，「剛好兩張，剛好你在。」\n票上的日期是今天。',
+['跟他去','他一路講個不停，電影開演後卻突然安靜下來。散場時他說：「其實我沒看懂。我一直在看你。」'],
+['我今天很累','「那我把票送給 Samuel 跟 Jasper！」他說，又小聲補了一句，「……騙你的。我要留著，下次。」'],
+['「同學給的？」','他眼神飄走，「……好啦，我自己買的。」他抓抓頭，「我怕你說不要，所以先騙你。」']);
+E('theo','t1y',1,['living'],'',
+'Jasper 在客廳替 Theo 拍照。Theo 一看見你，就不專心了。\n「Theo，看鏡頭。」Jasper 說。\n「我在看我想看的啊。」Theo 說，眼睛一直盯著你。',
+['走過去入鏡','Theo 一把把你拉過去，整個人掛到你身上。Jasper 嘆氣，按下快門：「好吧，今天的主題改成無尾熊。」'],
+['不打擾你們工作','Theo 拉住你的衣角：「不要走啦，你在我才拍得好。」Jasper 在一旁笑：「他說的是真的，你一走他就一臉死魚。」'],
+['幫他整理衣領','你替他把歪掉的衣領翻好。他突然一動也不動，臉紅到耳朵。Jasper 默默按下快門：「這張，」他說，「是今天最好的一張。」']);
+E('theo','t2x',2,['hero'],'n',
+'Theo 抱著枕頭和一疊筆記，站在你房門口。\n「我明天考試，」他說，「可是我睡不著……可以在你房間讀書嗎？我保證很安靜。」',
+['讓他進來','他坐在地板上讀書，真的很安靜。半小時後，他靠著你的床邊睡著了，筆記蓋在臉上。你替他蓋上毯子，他迷迷糊糊地拉住你的手指。'],
+['你回房間比較好','「好吧……」他抱著枕頭站在門口，「那你跟我說一句加油。」你說了，他笑得像拿到滿分。'],
+['陪他去客廳讀','你們在客廳開了一盞小燈。他每背完一頁，就要你獎勵一顆軟糖。背到第二十頁，軟糖吃完了。']);
+E('theo','t2y',2,['kitchen','living'],'',
+'Marcus 剛跟你說完話上樓，Theo 就從角落冒出來，臉悶悶的。\n「你跟他聊什麼？」他問，「他從來不跟我講超過三個字。」',
+['抱抱他','他先是愣住，然後把整張臉埋進你的肩膀。「好吧，」他悶悶地說，「那你也要跟我講超過三個字。很多很多個。」'],
+['那是我的事','他咬著嘴唇，眼眶有點紅，還是逞強地笑：「對，我知道。」他轉身跑上樓，音樂又開得很大聲。'],
+['「你在吃醋？」','「才沒有！」他說得太快，然後自己洩了氣，「……有一點點。」他比出一個很小的距離，又慢慢把手指拉開，「好啦，這麼多。」']);
+E('theo','t3x',3,['roof'],'n',
+'深夜的頂樓，Theo 躺在地上看星星，拍拍身邊的位置。\n「{n}，」他說，「你知道我們現在看到的光，都是好幾年前的嗎？」\n他轉過頭，眼睛很亮。「所以我不想等。我不想等到很多年以後，才讓你看到我現在的樣子。」',
+['躺到他身邊','你躺下來，他的手指找到你的手指。他撐起身子，緊張得手在抖，吻你的時候卻很堅定。之後他拉著你下樓，一路都在笑。\n……門關上了。'],
+['「Theo，你還年輕。」','「我知道，」他看著星星，聲音很輕，「可是喜歡一個人，好像跟年紀沒有關係。」'],
+['陪他數星星','你們數到第五十三顆，他睡著了，頭靠在你的肩膀上。你沒有叫醒他。']);
+E('theo','t3y',3,['hero'],'n',
+'房門被推開一條縫，Theo 探頭進來，眼睛紅紅的。\n「你最近，好像都跟別人在一起。」他走進來，背抵著門，「我知道我沒資格生氣。」\n他吸了吸鼻子。「可是我好想當那個陪你的人。」',
+['把他拉過來','他整個人撲進你懷裡，抱得很緊。「不要只把我當弟弟，」他小聲說，然後抬起頭吻你，莽撞又認真。\n……門關上了。'],
+['「你先回去睡。」','「……好。」他走到門口又回頭，「明天早餐我要坐你旁邊。這個你不能拒絕。」'],
+['「那下次你陪我。」','他的眼睛一下子亮起來：「真的？說好了！」他伸出小指，非要你勾了才肯走。']);
 
 </script>
 <script>
@@ -2067,8 +2396,20 @@ function cxClean(o){
     label, icon: cxClip(o.icon, 2), who, place, dur: cxNum(o.dur, 5, 240, 30),
     minAff: cxNum(o.minAff, 0, 100, 0), minDes: cxNum(o.minDes, 0, 100, 0),
     dAff: cxNum(o.dAff, -20, 20, 2), dDes: cxNum(o.dDes, -20, 20, 0), dMood: cxNum(o.dMood, -20, 20, 0),
-    status: cxClip(o.status, 24), line: cxClip(o.line, 80), wit: CX_WIT[o.wit] ? o.wit : 'none', after: !!o.after };
+    status: cxClip(o.status, 24), line: cxClip(o.line, 80), wit: CX_WIT[o.wit] ? o.wit : 'none', after: !!o.after,
+    ok: cxClip(o.ok, 80), no: cxClip(o.no, 80), diary: cxClip(o.diary, 120), per: cxPer(o.per),
+    s1: cxClip(o.s1, 120), s2: cxClip(o.s2, 120), s3: cxClip(o.s3, 120) };
 }
+// 對象是「所有室友」時，可以分別幫每位室友寫他的回應（空白＝沿用共同的、再沒有就用他個性的預設台詞）
+const CX_TXT = ['ok', 'no', 'line', 'diary'], CX_TXT_N = {ok:80, no:80, line:80, diary:120};
+function cxPer(p){
+  const out = {}; if (!p || typeof p !== 'object') return out;
+  for (const id of Object.keys(p)){ if (typeof CHAR === 'undefined' || !CHAR[id] || !p[id] || typeof p[id] !== 'object') continue;
+    const o = {}; CX_TXT.forEach(k => { const v = cxClip(p[id][k], CX_TXT_N[k]); if (v) o[k] = v; }); if (Object.keys(o).length) out[id] = o; }
+  return out;
+}
+// 玩家寫的文字：先看這位室友專屬的、再看共同的；{h} 換成女主角的名字
+function cxText(c, id, k){ const t = (c.per && c.per[id] && c.per[id][k]) || c[k] || ''; return t ? fill(t, {h:S.hero.name, n:S.hero.name, x:c.label}) : ''; }
 const cxStatus = c => c.status || `${c.label}中`;
 // 把存檔裡的自訂互動同步成 H_INTER 的項目（和內建互動同一套流程）
 function syncCustom(){
@@ -2078,7 +2419,14 @@ function syncCustom(){
 }
 const cxLocked = (id, d) => !!(d.cx && (S.aff[id].h < d.cx.minAff || S.des[id].h < d.cx.minDes));
 const cxNeed = d => `需要 好感 ${d.cx.minAff}・情慾 ${d.cx.minDes}`;
-const cxPlaceOf = (c, id) => c.place === 'here' || c.place === 'his' || c.place === 'h_room' ? c.place : (G.rooms[c.place] && !G.rooms[c.place].owner ? c.place : 'here');
+const cxBath = c => /洗澡|淋浴|泡澡|浴室|浴缸|shower|bath/i.test(`${c.label}|${c.status}`);
+// 地點；洗澡類的自訂互動一定在有淋浴的地方（獨立衛浴格局：他的房間的浴室，除非選了「我的房間」；共用浴室格局：浴室）
+function cxPlaceOf(c, id){
+  const p = c.place === 'here' || c.place === 'his' || c.place === 'h_room' ? c.place : (G.rooms[c.place] && !G.rooms[c.place].owner ? c.place : 'here');
+  if (!cxBath(c)) return p;
+  if (G.L.ensuite) return p === 'h_room' ? 'h_room' : (p === 'here' && S.ents.h.room === 'r_h') ? 'h_room' : 'his';
+  return G.rooms.bath ? 'bath' : p;
+}
 // 室友的回應（依他的個性；自訂互動沒有專屬台詞時用）
 const CX_LINES = {
   alexander:['他放下手上的東西，「好。」', '他看了你一眼，「現在不行。」'],
@@ -2087,7 +2435,8 @@ const CX_LINES = {
   marcus:['他挑眉，「行啊。」', '他哼了一聲，「沒興趣。」'],
   samuel:['他愣了一下，耳根紅了，輕輕點頭。', '他低下頭，「……對不起，現在不行。」'],
   theo:['他整個人跳起來，「好好好！」', '他嘟起嘴，「現在不行啦～」'] };
-function cxLine(id, def, ok){ const L = (def.cx.wit !== 'none' && STAGE_LINES[id] && STAGE_LINES[id][def.cx.wit === 'flirt' ? 1 : def.cx.wit === 'hug' ? 2 : 3]) || CX_LINES[id] || ['他點點頭。', '他搖搖頭。'];
+function cxLine(id, def, ok){ const own = cxText(def.cx, id, ok ? 'ok' : 'no'); if (own) return own;
+  const L = (def.cx.wit !== 'none' && STAGE_LINES[id] && STAGE_LINES[id][def.cx.wit === 'flirt' ? 1 : def.cx.wit === 'hug' ? 2 : 3]) || CX_LINES[id] || ['他點點頭。', '他搖搖頭。'];
   return fill(L[ok ? 0 : 1] || '', {n:S.hero.name}); }
 function cxStart(id, def){
   const c = def.cx;
@@ -2100,9 +2449,11 @@ function cxOutcome(I, frac){
   if (c.dMood) addMood(c.dMood * frac);
   if (c.dAff > 0) addJeal(id, -3 * frac);
   log(`${c.icon || '✨'} 你和 ${C.name}「${c.label}」${frac < 1 ? '（提早結束）' : '結束了'}。`, ['h', id], c.wit === 'intimate' ? 'heart' : '');
-  hMem(id, c.wit === 'intimate' ? 'close' : c.wit === 'none' ? 'together' : 'flirt', c.label, I.room, c.line ? fill(c.line, {h:hn, n:hn, x:c.label}) : null);
+  hMem(id, c.wit === 'intimate' ? 'close' : c.wit === 'none' ? 'together' : 'flirt', c.label, I.room, cxText(c, id, 'line') || null);
   const ev = {none:'together', flirt:'flirt', hug:'hug', intimate:'hug'}[c.wit];
-  dayEv(id, ev, c.label); dayEv('h', ev, id + '|' + c.label);
+  const dl = cxText(c, id, 'diary') || cxText(c, id, 'line');
+  if (dl) dayEv(id, 'cxd', dl); else dayEv(id, ev, c.label); dayEv('h', ev, id + '|' + c.label);
+  if (frac >= 1) S.cxDone = (S.cxDone || 0) + 1;
   const fk = id + ':' + c.id; if (!S.firsts[fk]){ S.firsts[fk] = S.t; addMem('h', `第一次和 ${C.name}「${c.label}」。`); }
   if (c.wit !== 'none') witness(id, c.wit);
   const da = S.aff[id].h - a0, dd = S.des[id].h - d0;
@@ -2112,7 +2463,7 @@ function cxOutcome(I, frac){
 /* 表單 */
 function openCxForm(id, cxId){
   const old = cxId ? (S.custom || []).find(c => c.id === cxId) : null;
-  const c = old || {label:'', icon:'', who:id, place:'here', dur:30, minAff:0, minDes:0, dAff:3, dDes:0, dMood:0, status:'', line:'', wit:'none', after:false};
+  const c = old || {label:'', icon:'', who:id, place:'here', dur:30, minAff:0, minDes:0, dAff:3, dDes:0, dMood:0, status:'', line:'', wit:'none', after:false, ok:'', no:'', diary:'', per:{}, s1:'', s2:'', s3:''};
   openSheet(() => {
     const opt = (v, n, cur) => `<option value="${esc(v)}" ${String(cur) === String(v) ? 'selected' : ''}>${esc(n)}</option>`;
     $('#sheet').innerHTML = `<div class="grab"></div><h3>${old ? '編輯自訂互動' : '＋ 新增自訂互動'}</h3>
@@ -2131,7 +2482,16 @@ function openCxForm(id, cxId){
           <label class="cxf"><span>情慾 <output>${fmtD(c.dDes)}</output></span><input name="dDes" type="range" min="-20" max="20" value="${c.dDes}"></label>
           <label class="cxf"><span>你的心情 <output>${fmtD(c.dMood)}</output></span><input name="dMood" type="range" min="-20" max="20" value="${c.dMood}"></label></div>
         <label class="cxf"><span>平面圖上的狀態（可空白，預設「名稱中」）</span><input name="status" maxlength="24" value="${esc(c.status)}" placeholder="${esc(cxStatus(c))}"></label>
-        <label class="cxf"><span>他的回憶裡寫的一句話（可空白；{h} 會換成你的名字）</span><input name="line" maxlength="80" value="${esc(c.line)}" placeholder="例如：和 {h} 一起做的蛋糕有點焦，可是很好吃。"></label>
+        <div class="cxsec">他的回應（可空白，空白就用他個性的預設說法；{h} 會換成你的名字）</div>
+        <label class="cxf"><span>他答應時說的話</span><input name="ok" maxlength="80" value="${esc(c.ok || '')}" placeholder="例如：「好啊，{h}，我去拿圍裙。」"></label>
+        <label class="cxf"><span>他拒絕時說的話</span><input name="no" maxlength="80" value="${esc(c.no || '')}" placeholder="例如：「今天不行，改天好嗎？」"></label>
+        <label class="cxf"><span>他的回憶裡寫的一句話</span><input name="line" maxlength="80" value="${esc(c.line)}" placeholder="例如：和 {h} 一起做的蛋糕有點焦，可是很好吃。"></label>
+        <label class="cxf"><span>他的日記裡寫的一句話（空白就用上面那句回憶）</span><input name="diary" maxlength="120" value="${esc(c.diary || '')}" placeholder="例如：今天和 {h} 做了蛋糕，廚房到現在還是甜的。"></label>
+        <div class="cxsec">點頭上泡泡時看到的小故事（三段都選填，會隨機挑一段已填的；都空白就用預設的一句；{h} 會換成你的名字）</div>
+        ${[1, 2, 3].map(i => `<label class="cxf"><span>小故事 ${i}（選填）</span><textarea name="s${i}" rows="2" maxlength="120" placeholder="${i === 1 ? '例如：他把麵粉弄到 {h} 的鼻尖上，自己先笑出聲。' : ''}">${esc(c['s' + i] || '')}</textarea></label>`).join('')}
+        <details class="cxper" id="cxPer" ${c.who === 'all' ? '' : 'hidden'} ${Object.keys(c.per || {}).length ? 'open' : ''}><summary>分別幫每位室友寫（可空白，沿用上面）</summary>
+          ${S.residents.map(rid => `<div class="cxperone"><div class="cxpern">${esc(nm(rid))}</div>${CX_TXT.map(k => `<label class="cxf"><span>${{ok:'答應時', no:'拒絕時', line:'回憶', diary:'日記'}[k]}</span><input name="p_${rid}_${k}" maxlength="${CX_TXT_N[k]}" value="${esc(((c.per || {})[rid] || {})[k] || '')}" placeholder="${esc(c[k] || '（沿用上面）')}"></label>`).join('')}</div>`).join('')}
+        </details>
         <label class="cxf"><span>被別的室友看到會不會吃醋</span><select name="wit">${Object.entries(CX_WIT).map(([v, n]) => opt(v, n, c.wit)).join('')}</select></label>
         <label class="cxchk"><input type="checkbox" name="after" ${c.after ? 'checked' : ''}> 結束後接著 aftercare（事後照顧）</label>
         <div class="cxerr hidden" id="cxErr"></div>
@@ -2139,6 +2499,7 @@ function openCxForm(id, cxId){
       </form>`;
     const f = $('#cxForm');
     f.querySelectorAll('input[type=range]').forEach(r => r.oninput = () => { const o = r.parentElement.querySelector('output'); o.textContent = r.name.startsWith('min') ? r.value : fmtD(+r.value); });
+    f.who.onchange = () => { $('#cxPer').hidden = f.who.value !== 'all'; };
     f.label.oninput = () => { f.status.placeholder = `${cxClip(f.label.value, 20) || '名稱'}中`; };
     $('#cxCancel').onclick = () => openChar(id);
     const del = $('#cxDel');
@@ -2146,6 +2507,8 @@ function openCxForm(id, cxId){
       else { del.dataset.sure = 1; del.textContent = '確定刪除？'; } };
     f.onsubmit = ev => { ev.preventDefault();
       const d = Object.fromEntries(new FormData(f).entries()); d.after = f.after.checked; d.id = old ? old.id : undefined;
+      d.per = {}; if (d.who === 'all') for (const k of Object.keys(d)){ const m = /^p_([a-z]+)_(ok|no|line|diary)$/.exec(k); if (m){ (d.per[m[1]] = d.per[m[1]] || {})[m[2]] = d[k]; } }
+      for (const k of Object.keys(d)) if (k.startsWith('p_')) delete d[k];
       const cl = cxClean(d), er = $('#cxErr');
       if (!cl){ er.textContent = '請先填互動的名稱。'; er.classList.remove('hidden'); f.label.focus(); return; }
       S.custom = S.custom || [];
@@ -2298,7 +2661,7 @@ function interSpot(o, roomId){
   const t = `${o.kind || ''}|${o.K || ''}|${o.act || ''}|${o.ik || ''}|${o.reqId || ''}|${o.label || ''}`, bed = r.type === 'bed';
   let want;
   if (o.after && AFTERCARE[o.who]) want = AFTERCARE[o.who].place === 'ensuite' ? 'ensuite' : AFTERCARE[o.who].place === 'kitchen' ? 'stove' : 'bed';
-  else if (/shower|洗澡/.test(t)) want = 'ensuite';
+  else if (/shower|洗澡|淋浴|泡澡|浴室|浴缸/.test(t)) want = 'ensuite';
   else if (o.type === 'intimate' || o.ik || /night|sleep|morning|過夜|共度|晨間|纏綿|愛撫/.test(t)) want = 'bed';
   else if (/coop|game|電動|電腦|設計圖|plan|listen|錄|耳機|選照片|code|study|念書|sketch|畫|shoot|照片|studio/.test(t)) want = 'desk';
   else if (/movie|電影|黑膠|relax|沙發|quiz|抽考|吉他|guitar/.test(t)) want = 'sofa';
@@ -2350,6 +2713,8 @@ function roomOccupants(roomId, exceptIds, over){
   }
   return out;
 }
+// 臥室獨立衛浴的範圍（平面圖座標）
+function ensuiteRect(r){ const f = r.furn && r.furn.find(x => x[0] === 'ensuite'); return f ? [f[1], f[2], f[1] + f[3], f[2] + f[4]] : null; }
 function seatAnchor(r, spot){ if (spot && r.spots && r.spots[spot]) return [r.spots[spot][0], r.spots[spot][1]]; return [r.cx, r.cy]; }
 // 找位置：ids＝一個人 [id] 或並肩的兩人 [左, 右]
 function findSeat(roomId, ids, anchor, exceptIds, pack, over, extra, noFallback){
@@ -2414,6 +2779,7 @@ function assignPos(e, roomId, slot){
   if (slot && typeof slot === 'object'){ e.slot = 'pair'; e.seat = {side:slot.pair, with:slot.with}; return slot.p; }
   e.seat = null;
   const spot = typeof slot === 'string' && r.spots && r.spots[slot] ? slot : null;
+  if (spot === 'ensuite' && ensuiteRect(r)){ e.slot = spot; const q = [r.spots.ensuite[0], r.spots.ensuite[1]]; q.ok = true; return q; }   // 洗澡：進浴室、站在淋浴間旁
   e.slot = spot || 'free';
   SEAT_BATH = spot === 'ensuite';
   try { const q = findSeat(roomId, [e.id], seatAnchor(r, spot), [e.id]);
@@ -2435,6 +2801,8 @@ function reseatAll(){
 // 一起互動的兩人：找一個能並肩坐下（左＝女主角、右＝他）、旁邊不會有人插進來的位置
 function seatPair(roomId, a, b, spot){
   const r = G.rooms[roomId]; const sp = spot && r.spots && r.spots[spot] ? spot : resolveSpot(roomId, r.type === 'bed' ? 'floor' : 'sofa');
+  const E = sp === 'ensuite' && ensuiteRect(r);
+  if (E){ const p = [(E[0] + E[2]) / 2, E[1] + 13]; p.ok = true; return [{pair:'l', with:b, p}, {pair:'r', with:a, p}]; }   // 一起洗澡：兩人都在浴室裡（頭像貼在一起，名字可以超出浴室的牆）
   const anchor = seatAnchor(r, sp); SEAT_BATH = sp === 'ensuite';
   try {
   let p = findSeat(roomId, [a, b], anchor, [a, b]);
@@ -2608,7 +2976,7 @@ function curBlock(id, t = S.t){
   if (h < 0){ h += 24; dow = (dow + 6) % 7; } if (h >= 24) h -= 24;
   const blocks = SCHEDULES[id](dow);
   const b = blocks.find(b => h >= b[0] && h < b[1]) || blocks[blocks.length-1];
-  return [b[0], b[1], b[2], b[4] || ACTS[b[2]].label, b[3] === 'out' ? 'out' : roomOf(id, b[3])];
+  return [b[0], b[1], b[2], schedLbl(id, b[4] || ACTS[b[2]].label), b[3] === 'out' ? 'out' : roomOf(id, b[3])];
 }
 function bathBusy(exceptId){
   if (!G.rooms.bath) return false;
@@ -2700,6 +3068,12 @@ function migrate(s){
   (s.residents || []).forEach(id => { if (s.tierSeen[id] == null){ const a = s.aff[id].h, d = s.des[id].h; let m = 0; REL_TIERS.forEach((t, i) => { if (a >= t.aff && d >= t.des) m = i; }); s.tierSeen[id] = m; } });
   s.custom = Array.isArray(s.custom) ? s.custom.map(cxClean).filter(Boolean) : [];
   if (s.inter && s.inter.cx){ const c = cxClean(s.inter.cx); if (c){ s.inter.cx = c; s.inter.label = cxStatus(c); } else { ['h', s.inter.who].forEach(id => { const e = s.ents[id]; if (e){ e.busy = false; e.act = 'idle'; e.label = '閒著'; } }); s.inter = null; } }
+  // 作弊模式、成就、文字修改（從外部匯入的存檔也要清乾淨）
+  s.cheat = !!s.cheat; s.ach = s.ach && typeof s.ach === 'object' && !Array.isArray(s.ach) ? s.ach : {};
+  s.achCustom = Array.isArray(s.achCustom) ? s.achCustom.map(achClean).filter(Boolean).slice(0, 50) : [];
+  const ov = s.textOv && typeof s.textOv === 'object' && !Array.isArray(s.textOv) ? s.textOv : {}; s.textOv = {};
+  for (const [k, v] of Object.entries(ov)) if (typeof v === 'string' && v.trim() && k.length < 200) s.textOv[k] = txClean(v);
+  s.npcMods = Array.isArray(s.npcMods) ? s.npcMods.map(nmClean).filter(Boolean).slice(0, 100) : [];
   return s;
 }
 function checkUnlock(id){
@@ -2759,7 +3133,9 @@ function stepMinute(){
   const hr = hourOf(S.t);
   for (const id of S.residents) npcThink(S.ents[id]);
   heroThink();
+  groupTick();
   interThink();
+  for (const e of allEnts()) if (e.act !== e.actP){ e.actP = e.act; e.actT = S.t; }   // 這段活動從什麼時候開始（泡泡故事固定挑同一段）
   allEnts().forEach(tickNeeds);
   moodTick();
   socialThink();
@@ -2767,6 +3143,7 @@ function stepMinute(){
   heroWarnings();
   recHist();
   if (S.pending && !S.autoPause && S.t - S.pending.at > 30){ const id = S.pending.who; releasePending(); addAff(id, 'h', -0.5); log(`${nm(id)} 等不到你的回應，自己走開了。`, [id]); }
+  if (S.t % 10 === 0) achThink();
   if (S.t - S.lastSave >= 60){ save(); }
 }
 function npcThink(e){
@@ -2785,6 +3162,7 @@ function npcThink(e){
     log(`🔒 ${nm(e.id)} 在房間獨處（自我取悅中），房門關著。`, [e.id]); }
   if (e.ov && (S.t >= e.ov.until || act === 'sleep' || target === 'out' || ['work','class'].includes(act))){ if (e.ov.knock) log(`${nm(e.id)} 在你門外站了一會兒，又走了。`, [e.id]); e.ov = null; }
   if (!e.ov && SOCIAL_ACTS.includes(act) && target !== 'out' && Math.random() < 0.0015){ const f = friendToJoin(e); if (f) e.ov = {room:f.room, act:'chat', label:`找 ${nm(f.id)} 聊天`, until:S.t + 30 + Math.floor(Math.random() * 30)}; }
+  if (!e.ov && typeof nmThink === 'function') nmThink(e, act, target);   // 自訂的室友行為
   if (e.ov){ target = e.ov.room; act = e.ov.act; label = e.ov.label; }
   route(e, target, target === 'out' ? undefined : spotKey(act, target));
   if (walking(e) && e.ov && e.ov.solo){ e.act = 'solo'; e.label = e.ov.label; }
@@ -2849,8 +3227,9 @@ function heroThink(){
   e.act = A.act; e.label = A.lbl || A.label;
   const done = S.t >= A.until || (A.id === 'sleep' && !A.fixed && e.needs.energy >= 100 && S.t - (A.until - A.dur) > 240);
   if (done){
-    if (A.id !== 'stay' && !A.auto) log(`你結束了「${A.lbl || A.label}」。`, ['h']);
-    if (A.id === 'cook') cookShare(e); else if (A.id === 'snack') addMood(2); else if (A.id === 'solo') heroSoloDone();
+    if (A.gid && S.group && S.group.id === A.gid) endGroup(true);
+    else if (A.id !== 'stay' && !A.auto) log(`你結束了「${A.lbl || A.label}」。`, ['h']);
+    if (A.id === 'cook' && !A.gid) cookShare(e); else if (A.id === 'snack') addMood(2); else if (A.id === 'solo') heroSoloDone();
     S.autoNext = S.t + 2 + Math.floor(Math.random() * 6);
     if (A.room === 'out'){ S.hAction = null; route(e, 'living'); e.act = 'walk'; e.label = '回家'; }
     else { S.hAction = null; e.act = 'idle'; e.label = '閒著'; }
@@ -3179,6 +3558,7 @@ function requestThink(){
       if (r){ S.lastReq[L.who] = S.t; S.lastAnyReq = S.t; S.pending = {who:L.who, reqId:r.id, at:S.t, again:true}; o.busy = true; bubble(L.who, '💭', 60); showRequest(); return; } } }
   if (S.t - S.lastAnyReq < 50) return;
   const free = S.residents.filter(id => { const e = S.ents[id]; return !e.busy && home(e) && !walking(e) && e.act !== 'sleep' && !e.ov && (S.reqCd[id] || 0) <= S.t; });
+  if (groupInviteThink(free)) return;          // 偶爾有人約大家一起
   const here = walking(h) ? [] : free.filter(id => S.ents[id].room === h.room);
   // 撞車：兩個人同時來找你
   const keen = here.filter(id => S.aff[id].h >= 25 && SOCIAL_ACTS.concat(['chat']).includes(S.ents[id].act));
@@ -3266,6 +3646,7 @@ function resolveEvent(P, ch){
     if (T === 3) startInter({who:id, place:'r_h', dur:40, label:opt[0].replace(/[「」]/g, '').slice(0, 10), type:'chat', aff:2, des:1, src:'ev', quiet:true});
     dayEv(id, 'chat', opt[0]); dayEv('h', 'chat', id);
   }
+  if (ev.nm) nmEventFx(id, ev, ch);
   S.evSeen[ev.id] = (S.evSeen[ev.id] || 0) + 1; S.evLast[id] = ev.id;
   log(`【${C.name}・${REL_TIERS[T].n}】${firstLine(ev.text)}——你選擇「${opt[0]}」。${txt.replace(/\n/g, '')}${extra}`, ['h', id], T === 3 && ch === 'a' ? 'heart' : 'ev');
   checkTier(id);
@@ -3302,6 +3683,7 @@ function answerRequest(choice, fromUi){
   if (P.ev) res = resolveEvent(P, ch);
   else if (P.collide) res = resolveCollide(P, ch);
   else if (P.test) res = resolveTest(P, ch);
+  else if (P.grp) res = resolveGrpInvite(P, ch);
   else res = resolveRequest(P, ch);
   if (fromUi && res && res.txt) showResult(res);
   renderAll(true);
@@ -3424,13 +3806,14 @@ function endOfDay(){
   log(`—— 第 ${d} 天結束。每個人都寫了今天的日記。——`, [], 'day');
   toast(`📔 第 ${d} 天的日記寫好了`);
 }
-const EV_PRI = ['sex','caress','night','morning','photo','studio','intimate','after','act','solo','laugh','jealous','flirt','hug','care','together','office','rejected','refused','chat','npc'];
+const EV_PRI = ['sex','caress','night','morning','photo','studio','intimate','after','cxd','group','act','solo','laugh','jealous','flirt','hug','care','together','office','rejected','refused','chat','npc'];
 function writeDiary(id){
   const D = DIARY[id], hn = S.hero.name, ev = S.dayEv[id];
   const out = [rnd(D.open)];
   const seen = new Set(); const sorted = [...ev].sort((a, b) => EV_PRI.indexOf(a.type) - EV_PRI.indexOf(b.type));
   let n = 0;
   for (const e of sorted){ const k = e.type; if (seen.has(k) || n >= 3) continue; seen.add(k);
+    if (k === 'cxd' || k === 'group'){ out.push(String(e.x || '').replace(/[。！？!?…」]?$/, m => m || '。')); n++; continue; }   // 玩家自訂的日記句子、一起做事
     const tpl = D.ev[e.type]; if (!tpl) continue; out.push(fill(tpl, {h:hn, x:e.x || ''})); n++; }
   if (n === 0){ const top = topAct(id); if (top) out.push(`今天大部分時間在${top}。`); }
   const a = S.aff[id].h; out.push(fill(D.close[a < 25 ? 0 : a < 55 ? 1 : 2], {h:hn}));
@@ -3534,8 +3917,9 @@ function showAwaySummary(A){
 let lastFrame = 0, acc = 0, running = false;
 function startGame(){
   $('#start').classList.add('hidden'); $('#game').classList.remove('hidden');
-  S.custom = S.custom || []; syncCustom(); reseatAll(); for (const k in VIS) delete VIS[k]; ui.follow = true; ui.floor = G.floors ? (S.ents.h.f || 0) : 0; $('#tokens').innerHTML = ''; buildPlan(); ui.ff = null; ffUi(); setSpeed(SPEEDS.includes(S.speed) ? S.speed : DEFAULT_SPEED); switchView('home');
+  S.custom = S.custom || []; S.textOv = S.textOv || {}; applyTextOv(); syncCustom(); S.npcMods = S.npcMods || []; syncNpcMods(); reseatAll(); for (const k in VIS) delete VIS[k]; ui.follow = true; ui.floor = G.floors ? (S.ents.h.f || 0) : 0; $('#tokens').innerHTML = ''; buildPlan(); ui.ff = null; ffUi(); setSpeed(SPEEDS.includes(S.speed) ? S.speed : DEFAULT_SPEED); switchView('home');
   if (S.pending) showRequest();
+  $('#cheatChk').onchange = ev => setCheat(ev.target.checked); $('#cheatBtn').onclick = openCheat; cheatSync();
   if (!running){ running = true; lastFrame = performance.now(); requestAnimationFrame(frame); }
 }
 function frame(now){
@@ -3607,6 +3991,8 @@ function buildPlan(){
       const t = el('div', 'token' + (id === 'h' ? ' hero' : '')); t.id = 'tk-' + id;
       t.innerHTML = `${avOf(id)}<span class="tn">${esc(nm(id))}</span><span class="ti"></span><span class="tb hidden"></span><span class="tag hidden"></span>`;
       t.onclick = ev => { ev.stopPropagation(); id === 'h' ? openHero() : openChar(id); };
+      // 頭上的泡泡（活動圖示、狀態、對話泡泡）：點了看一小段故事
+      t.querySelectorAll('.ti,.tag,.tb').forEach(b => { b.setAttribute('role', 'button'); b.title = '點一下看看在做什麼'; b.onclick = ev => { ev.stopPropagation(); openSnippet(id, b); }; });
       $('#tokens').appendChild(t);
     });
   }
@@ -3693,6 +4079,7 @@ function renderAll(force){
   if (ui.view === 'home'){ if (G.floors && Math.floor(now / 1000) !== ui.lastFT){ ui.lastFT = Math.floor(now / 1000); renderFloorTabs(); } renderTokenDecor(); renderOut(); if (!ui.touching || force) renderHero(); renderTicker(); }
   else if (force || (ui.view === 'people' && !ui.touching && performance.now() - (ui.lastPeople || 0) > 1000)){ ui.lastPeople = performance.now(); renderView(ui.view); }
   if (ui.sheet && !ui.touching && (force || (ui.sheet.live && now - (ui.lastSheet || 0) > 1000))){ ui.lastSheet = now; ui.sheet.render(); }
+  cheatSync();
 }
 function renderOut(){
   const outs = allEnts().filter(e => e.hidden);
@@ -3851,6 +4238,7 @@ function renderSaveView(){
    <label class="res-row" style="border:none"><input type="checkbox" id="auto2" ${S.heroAuto !== false ? 'checked' : ''}><span class="nm">女主角自動生活（沒下指令時照自己的作息）</span></label>
    <label class="res-row" style="border:none"><input type="checkbox" id="apChk" ${S.autoPause ? 'checked' : ''}><span class="nm">室友來邀約時自動暫停</span></label>
    <button class="btn danger wide" id="sv4">重新開始（新存檔）</button></div>`;
+  achSection(box);
   $('#sv1').onclick = () => { save(); toast('已存檔'); };
   $('#sv2').onclick = exportSave;
   $('#sv3').onclick = () => $('#importFile').click();
@@ -3868,7 +4256,7 @@ function openChar(id, tab){
   openSheet(() => {
     const C = CHAR[id], e = S.ents[id]; const where = home(e) ? roomName(e.room) : '外面';
     const rels = S.residents.filter(o => o !== id).map(o => ({o, v:pairV(id, o)})).sort((a, b) => b.v - a.v);
-    const sched = SCHEDULES[id](dowOf(S.t)).map(b => `${pad(Math.floor(b[0]))}:${pad(Math.round((b[0]%1)*60))} ${b[4] || ACTS[b[2]].label}`).join('・');
+    const sched = SCHEDULES[id](dowOf(S.t)).map(b => `${pad(Math.floor(b[0]))}:${pad(Math.round((b[0]%1)*60))} ${schedLbl(id, b[4] || ACTS[b[2]].label)}`).join('・');
     const myRoom = Object.keys(G.rooms).find(k => G.rooms[k].owner === id), m = moodOf(e);
     const moments = [...S.mem[id]].filter(x => x.h).reverse().slice(0, 5), mems = moments.length ? moments : [...S.mem[id]].reverse().slice(0, 4);
     const canAct = home(e) && home(S.ents.h) && !S.inter; const rt = relTier(id), tab = ui.charTab;
@@ -3924,12 +4312,13 @@ function openActions(){
       <div class="agrid">${H_ACTIONS.filter(a => !a.hobby || hasH(a.hobby)).map(a => `<button class="btn" data-a="${a.id}" ${busy ? 'disabled' : ''}><i>${a.icon}</i>${a.label}<small>${a.dur === 'work' ? '到 18:00' : a.dur >= 60 ? (a.dur/60) + ' 小時' : a.dur + ' 分'}</small></button>`).join('')}</div>
       <div class="field-title">去找室友</div><div class="agrid">${S.residents.map(id => { const o = S.ents[id]; return `<button class="btn" data-f="${id}" ${!home(o) || busy ? 'disabled' : ''}><span class="av" style="width:30px;height:30px">${avOf(id)}</span>${CHAR[id].name}<small>${home(o) ? esc(o.label) : '不在家'}</small></button>`; }).join('')}</div>
       <div class="small muted" style="margin-top:8px">也可以直接點平面圖上的房間走過去，或點室友的頭像跟他互動。</div>`;
-    $('#sheet').querySelectorAll('[data-a]').forEach(b => b.onclick = () => doAction(b.dataset.a));
+    $('#sheet').querySelectorAll('[data-a]').forEach(b => b.onclick = () => grpOk(b.dataset.a) ? openGroupPicker(b.dataset.a) : doAction(b.dataset.a));
     $('#sheet').querySelectorAll('[data-f]').forEach(b => b.onclick = () => openChar(b.dataset.f));
   }, false);
 }
-function doAction(aid){
+function doAction(aid, withIds){
   const a = H_ACTIONS.find(x => x.id === aid); const room = actRoom(a);
+  if (withIds && withIds.length && typeof grpOk === 'function' && grpOk(aid) && !S.inter){ startGroup(aid, withIds); closeSheet(); kickHero(); renderAll(true); return; }
   if (aid === 'solo' && allEnts().some(o => o.id !== 'h' && o.room === room && !o.hidden)){ toast('房間裡有人，不方便獨處。'); return; }
   S.hPending = null; S.hAction = {...a, room, until:null, auto:false};
   log(`你決定「${a.label}」。`, ['h']); closeSheet(); kickHero(); renderAll(true);
@@ -3947,7 +4336,7 @@ function openRoom(rid){
       ${r.owner && r.owner !== 'h' && S.residents.includes(r.owner) ? (S.ents[r.owner].room === rid && S.ents[r.owner].act !== 'sleep' ? `<button class="btn wide" id="knock">🚪 敲門找 ${CHAR[r.owner].name}</button>` : `<div class="small muted" style="margin-top:8px">這是 ${CHAR[r.owner].name} 的房間。${S.ents[r.owner].room === rid ? '他已經睡了。' : '他不在房間。'}</div>`) : ''}`;
     const kn = $('#knock'); if (kn) kn.onclick = () => { log(`你敲了敲 ${CHAR[r.owner].name} 的門。他${S.ents[r.owner].label}。`, ['h', r.owner]); openChar(r.owner); };
     const g = $('#goRoom'); if (g) g.onclick = () => { S.hPending = null; S.hAction = {id:'stay', label:'待著', icon:'👣', room:rid, act:'idle', dur:30, lbl:'待著'}; closeSheet(); kickHero(); renderAll(true); };
-    $('#sheet').querySelectorAll('[data-a]').forEach(b => b.onclick = () => doAction(b.dataset.a));
+    $('#sheet').querySelectorAll('[data-a]').forEach(b => b.onclick = () => grpOk(b.dataset.a) ? openGroupPicker(b.dataset.a) : doAction(b.dataset.a));
     $('#sheet').querySelectorAll('.chip[data-id]').forEach(c => c.onclick = () => c.dataset.id === 'h' ? openHero() : openChar(c.dataset.id));
   });
 }
@@ -3972,6 +4361,9 @@ function showRequest(){
   } else if (P.test){ const T = TEST_EV[id];
     html = `<div class="av">${avOf(id)}</div><div class="who">${CHAR[id].name}</div><div class="meta">${clockStr(S.t)}・😒 吃醋中（${Math.round(S.jeal[id] || 0)}）</div>${low}<div class="req prose"><p>${esc(fill(T[0], {x:nm(P.test)}))}</p></div>` +
       btns([['a', T[1][0], 'primary'], ['d', T[3][0]], ['r', T[2][0]]]);
+  } else if (P.grp){ const a = H_ACTIONS.find(x => x.id === P.grp.aid);
+    html = `<div class="av">${avOf(id)}</div><div class="who">${CHAR[id].name}</div><div class="meta">${clockStr(S.t)}・🎉 ${esc(a.label)}・和 ${P.grp.inv.map(x => esc(nm(x))).join('、')}</div>${low}<div class="req">${esc(grpInviteText(P))}</div>` +
+      btns([['a', '好啊，一起', 'primary'], ['d', '下次吧'], ['r', '不了']]);
   } else { const r = REQUESTS[id].find(x => x.id === P.reqId);
     const placeName = r.place === 'here' ? '就在這裡' : r.place === 'his' ? `${CHAR[id].name} 的房間` : r.place === 'h_room' ? '你的房間' : r.place === 'out' ? '出門' : G.rooms[r.place].name;
     html = `<div class="av">${avOf(id)}</div><div class="who">${CHAR[id].name}</div><div class="meta">${clockStr(S.t)}・${r.type === 'intimate' ? '💗 ' : ''}${r.lbl}・${placeName}・${r.def === 'night' ? '到早上' : `約 ${r.dur} 分鐘`}${P.again ? '・他又來問了' : ''}</div>${low}
@@ -4066,6 +4458,842 @@ function initStart(){
 function ff(mins, autoAnswer){ for (let i = 0; i < mins; i++){ stepMinute(); allEnts().forEach(e => moveEnt(e, 1)); if (S.pending && autoAnswer != null) answerRequest(autoAnswer); } snapVis(); drawTokens(); renderAll(true); }
 window.__imb = { get S(){ return S; }, socialThink, get form(){ return form; }, compatOf, cmul, heroAuto, ff, pickEvent, fireEvent, fireCollide, fireTest, witness, relTier, pairV, hMood, evById, showResult, migrate, heroInter, doAction, endOfDay, stepMinute, startInter, answerRequest, showRequest, openChar, closeSheet, switchView, setSpeed, save, renderAll, startFF, stopFF, hMem, syncCustom, openCxForm, cxClean, catchUp, get vis(){ return VIS; }, visSpeed, snapVis, route, resumeOffline, get lastAway(){ return ui.lastAway; }, openHist, recHist, pruneHist, caught, leaveSeen, interFromDef, soloOk, endSolo, startAftercare, interTxt, quipFits, interSpot, resolveSpot, spotKey, crowdedPairSeat, setSeatPx: v => { SEAT_PX = v; for (const k in SEAT_CACHE) delete SEAT_CACHE[k]; }, findSeat, seatPair, reseatAll, rectsAt, roomOccupants, npcThink, heroThink, endInter, onArrive, kickHero, goHomeIfForeign, nearestRoom, get ffState(){ return ui.ff; }, get ffLast(){ return ui.ffLast; } };
 Promise.race([loadAvatars(), new Promise(r => setTimeout(r, 2000))]).then(initStart);
+
+</script>
+<script>
+/* ---------- 一起做事（多人）：女主角選自己的行動時，可以順便邀幾位室友 ----------
+   只限非親密的日常活動；親密、獨處、洗澡、睡覺永遠只有一對一（或自己）。
+   被邀的人依個性、好感、心情、作息決定答不答應；答應的人走過去一起做，做完大家好感上升、
+   室友之間的交情也會變（彼此較勁的人湊在一起會有火藥味）。所有玩家看得到的字都用 esc()。 */
+const GRP = {
+  cook:   {v:'一起做了飯', p:.62, like:{liam:.25, theo:.08, samuel:.05}},
+  snack:  {v:'一起吃了點東西', p:.66, like:{theo:.15, liam:.1}},
+  relax:  {v:'一起看了電影', p:.62, like:{jasper:.15, theo:.12, marcus:.05}},
+  balcony:{v:'一起在陽台吹風', p:.55, like:{jasper:.12, marcus:.1, alexander:.05}},
+  shop:   {v:'一起出門逛街', p:.48, like:{jasper:.15, theo:.15, alexander:-.1, samuel:-.12}},
+  read:   {v:'一起窩著看書', p:.5, like:{alexander:.18, samuel:.08, theo:-.1}},
+  jog:    {v:'一起去慢跑', p:.45, like:{theo:.25, liam:.05, samuel:-.1}},
+  game:   {v:'一起打電動', p:.55, like:{samuel:.28, theo:.18, alexander:-.15}},
+  music:  {v:'一起聽歌', p:.5, like:{marcus:.25, jasper:.05}},
+  photo:  {v:'一起到露臺拍照', p:.5, like:{jasper:.3}},
+  draw:   {v:'一起在桌前畫圖', p:.45, like:{alexander:.2, jasper:.08}},
+  coffee: {v:'一起喝了咖啡', p:.66, like:{alexander:.15, samuel:.12, marcus:.08}},
+};
+// 室友主動找大家一起做的事（每個人偏好的）
+const GRP_HOST = {alexander:['coffee','read'], jasper:['relax','balcony','shop'], liam:['cook','snack'], marcus:['relax','balcony'], samuel:['game','snack'], theo:['snack','relax','game']};
+const GRP_LINES = {
+  alexander:['「好。」他闔上期刊站起來。', '「今天不了。」'],
+  jasper:['「這種場面怎麼能少了我？」', '「下次吧，我還有片子要修。」'],
+  liam:['「好啊！我順便帶點吃的。」', '「抱歉，我現在走不開……下次一定。」'],
+  marcus:['他點點頭，「行。」', '「我想一個人待著。」'],
+  samuel:['「我、我也可以去嗎……好。」', '「……我還是不要好了，對不起。」'],
+  theo:['「要要要！等我一下！」', '「蛤～我現在不行啦！」'] };
+const GRP_TENSE = ['{a} 和 {b} 整段時間都在暗暗較勁，你夾在中間有點尷尬。', '{a} 刻意坐到你旁邊，{b} 的臉色一下子沉了下來。', '{a} 和 {b} 誰也不讓誰，氣氛有點微妙。'];
+const GRP_WARM = ['{a} 和 {b} 也聊得很開心。', '{a} 跟 {b} 一搭一唱，你笑得停不下來。'];
+const grpOk = aid => !!GRP[aid];
+// 這位室友現在能不能找：[可以?, 說明]
+function grpAvail(id){
+  const o = S.ents[id]; if (!o) return [false, '不在'];
+  if (!home(o) || o.hidden || o.room === 'out' || (o.dest === 'out' && walking(o))) return [false, '不在家'];
+  if (o.act === 'sleep' || o.act === 'nap') return [false, '在睡覺'];
+  if (o.busy || o.grp || (S.inter && S.inter.who === id) || (S.pending && (S.pending.collide || [S.pending.who]).includes(id)) || (o.ov && o.ov.solo)) return [false, '在忙'];
+  if (o.act === 'shower') return [false, '在洗澡'];
+  return [true, o.label || '在家'];
+}
+function grpP(id, aid, inv){
+  const d = GRP[aid], o = S.ents[id], C = CHAR[id];
+  let p = d.p + S.aff[id].h / 200 + (moodOf(o) - 50) / 300 + compatOf(id) * 0.03 + (d.like[id] || 0) - (S.jeal[id] || 0) / 400;
+  if (['work','code','study','draw','music','photo','class'].includes(o.act)) p -= 0.15;
+  if (inv.length >= 2){ if (id === 'samuel') p -= 0.12; if (id === 'alexander') p -= 0.06; if (id === 'theo') p += 0.08; }   // 人多：Samuel 怕人多、Theo 喜歡熱鬧
+  for (const x of inv) if (x !== id && ((S.rival[pkey(id, x)] || 0) >= 8 || pairV(id, x) < -5)) p -= 0.08 + 0.1 * C.jealousy;
+  const h = hourOf(S.t); if (h >= 23.5 || h < 7) p -= 0.2;
+  return clamp(p, 0.05, 0.95);
+}
+// 開始一起做：先依序問每個人，答應的走過去
+function startGroup(aid, ids, opt = {}){
+  const a = H_ACTIONS.find(x => x.id === aid); if (!a || !grpOk(aid)) return;
+  const room = actRoom(a), hn = S.hero.name, gid = 'g' + S.t + '_' + Math.floor(Math.random() * 1000);
+  const yes = [], no = [];
+  for (const id of ids){ if (!S.residents.includes(id)) continue; const [ok, why] = grpAvail(id);
+    if (!ok){ no.push([id, `${nm(id)} ${why}。`]); continue; }
+    if (opt.pre || Math.random() < grpP(id, aid, ids)) yes.push(id); else no.push([id, `${nm(id)}：${GRP_LINES[id][1]}`]); }
+  S.hPending = null; S.hAction = {...a, room, until:null, auto:false, gid};
+  if (opt.host) log(`🎉 ${nm(opt.host)} 約你和 ${yes.filter(x => x !== opt.host).map(nm).join('、') || '大家'}「${a.label}」。`, ['h', ...yes]);
+  else log(`🎉 你約了 ${ids.map(nm).join('、')} 一起「${a.label}」。`, ['h', ...ids]);
+  yes.filter(id => id !== opt.host).forEach(id => log(`${nm(id)}：${GRP_LINES[id][0]}`, [id, 'h']));
+  no.forEach(([id, t]) => { log(t, [id, 'h']); dayEv(id, 'refused'); });
+  if (!yes.length){ toast('沒有人能來，你自己去。'); S.group = null; return; }
+  S.group = {id:gid, aid, room, v:GRP[aid].v, members:yes, host:opt.host || null, t0:S.t};
+  yes.forEach(id => { const e = S.ents[id]; e.busy = true; e.grp = gid; e.ov = null; e.dest = null;
+    route(e, room, room === 'out' ? undefined : spotKey(a.act, room)); e.act = walking(e) ? 'walk' : a.act; e.label = `要和 ${hn} ${GRP[aid].v.replace(/了/, '')}`; bubble(id, '🎉', 20); });
+  toast(`${yes.map(nm).join('、')} 會一起來`);
+}
+// 每分鐘：同伴跟著她一起做；她的行動結束或被打斷就散會
+function groupTick(){
+  const g = S.group; if (!g) return;
+  const A = S.hAction;
+  if (!A || A.gid !== g.id) return endGroup(false);
+  const hn = S.hero.name;
+  for (const id of g.members){ const e = S.ents[id]; if (!e) continue;
+    if (walking(e)) { e.act = 'walk'; continue; }
+    if (g.room !== 'out' && e.room !== g.room){ route(e, g.room, spotKey(A.act, g.room)); continue; }
+    e.act = A.act; e.label = `和 ${hn}${g.members.length > 1 ? '、' + g.members.filter(x => x !== id).map(nm).join('、') : ''} ${g.v.replace(/了/, '')}`; }
+}
+function endGroup(done){
+  const g = S.group; if (!g) return; S.group = null;
+  const A = S.hAction, hn = S.hero.name;
+  const start = A && A.gid === g.id && A.until != null ? A.until - (A.dur === 'work' ? 0 : A.dur) : null;
+  const frac = done ? 1 : start == null ? 0 : clamp((S.t - start) / Math.max(1, A.dur), 0, 1);
+  const here = g.members.filter(id => { const e = S.ents[id]; return e && (g.room === 'out' ? e.room === 'out' : e.room === g.room); });
+  g.members.forEach(id => { const e = S.ents[id]; if (!e) return; e.busy = false; e.grp = null; if (!walking(e)){ e.act = 'idle'; e.label = '閒著'; } });
+  if (frac < 0.25 || !here.length){ if (g.members.length) log(`大家還沒真的開始，就各自散了。`, ['h', ...g.members]); return; }
+  const names = here.map(nm), d = GRP[g.aid];
+  for (const id of here){
+    const others = here.filter(x => x !== id).map(nm), sent = `和 ${hn}${others.length ? '、' + others.join('、') : ''} ${d.v}。`;
+    gain(id, (2.5 + (d.like[id] > 0 ? 1 : 0)) * frac, 0); addAff('h', id, 1.5 * frac);
+    hMem(id, 'together', g.v, g.room === 'out' ? 'out' : g.room, sent);
+    dayEv(id, 'group', sent); dayEv('h', 'together', id + '|' + d.v.replace(/了/, ''));
+    checkTier(id);
+  }
+  addMood((2 + here.length) * frac);
+  const notes = []; let tense = false;
+  for (let i = 0; i < here.length; i++) for (let j = i + 1; j < here.length; j++){
+    const a = here[i], b = here[j], k = pkey(a, b), riv = S.rival[k] || 0;
+    const both = S.des[a].h >= 35 && S.des[b].h >= 35 && Math.max(CHAR[a].jealousy, CHAR[b].jealousy) >= 0.5;
+    if (riv >= 8 || pairV(a, b) < -5 || both){
+      const [x, y] = CHAR[a].jealousy >= CHAR[b].jealousy ? [b, a] : [a, b];        // y 比較會吃醋
+      addPair(a, b, -1.5 * frac); S.rival[k] = clamp(riv + 3 * frac, 0, 100); addJeal(y, 4 * frac); S.jealOf[y] = x;
+      notes.push(fill(rnd(GRP_TENSE), {a:nm(x), b:nm(y)})); dayEv(y, 'jealous', nm(x)); tense = true;
+    } else { addPair(a, b, 1.5 * frac); if (!notes.length && Math.random() < 0.5) notes.push(fill(rnd(GRP_WARM), {a:nm(a), b:nm(b)})); }
+  }
+  log(`🎉 你和 ${names.join('、')} ${d.v}${frac < 1 ? '（提早結束）' : ''}。${notes.join('')}`, ['h', ...here], tense ? 'rival' : '');
+  const fk = 'grp:' + g.aid; if (!S.firsts[fk]){ S.firsts[fk] = S.t; addMem('h', `第一次和 ${names.join('、')} ${d.v}。`); }
+  S.grpN = (S.grpN || 0) + 1; S.grpMax = Math.max(S.grpMax || 0, here.length);
+  toast(`🎉 和 ${names.join('、')} ${d.v}`);
+}
+// 室友偶爾主動約她和其他人一起（不常發生）
+function groupInviteThink(free){
+  const h = S.ents.h, hr = hourOf(S.t), day = dayOf(S.t);
+  if (S.group || S.away || walking(h) || h.busy || !home(h) || (S.hAction && !S.hAction.auto) || hr < 10 || hr >= 22.5) return false;
+  if (!['idle','phone','relax','read','meal','coffee','balcony','music','game'].includes(h.act)) return false;
+  if ((S.grpInv || {})[day] >= 1 || Math.random() > 0.0025) return false;
+  const hosts = free.filter(id => S.aff[id].h >= 20 && GRP_HOST[id] && S.t - (S.lastReq[id] || -999) >= 150); if (!hosts.length) return false;
+  const host = rnd(hosts), others = free.filter(id => id !== host && pairV(host, id) >= 10 && (S.rival[pkey(host, id)] || 0) < 8 && grpAvail(id)[0]).sort(() => Math.random() - 0.5).slice(0, 2);
+  if (!others.length) return false;
+  const aid = rnd(GRP_HOST[host].filter(x => H_ACTIONS.some(a => a.id === x))); if (!aid) return false;
+  S.grpInv = {[day]: 1}; S.lastReq[host] = S.t; S.lastAnyReq = S.t;
+  S.pending = {who:host, grp:{aid, inv:others}, at:S.t}; S.ents[host].busy = true; bubble(host, '🎉', 60);
+  showRequest(); return true;
+}
+function grpInviteText(P){ const a = H_ACTIONS.find(x => x.id === P.grp.aid); return `${nm(P.who)} 探頭進來：「我們要${GRP[P.grp.aid].v.replace(/^一起/, '一起').replace(/了/, '')}，${P.grp.inv.map(nm).join('、')} 也在，你要不要一起？」`; }
+function resolveGrpInvite(P, ch){
+  const host = P.who, g = P.grp; releasePending();
+  if (ch === 'a'){ log(`你答應了 ${nm(host)}：一起「${H_ACTIONS.find(x => x.id === g.aid).label}」。`, ['h', host]); startGroup(g.aid, [host, ...g.inv], {pre:true, host}); kickHero(); return null; }
+  if (ch === 'r') addAff(host, 'h', -0.3);
+  log(`你跟 ${nm(host)} 說這次先不了。${host === 'samuel' ? '他點點頭，「……嗯，沒關係。」' : '「好吧，下次喔。」'}`, ['h', host]);
+  return null;
+}
+// 行動面板：選了可以多人一起的行動後，下面出現「和誰一起？」
+function openGroupPicker(aid){
+  const a = H_ACTIONS.find(x => x.id === aid); const sel = new Set();
+  openSheet(() => {
+    $('#sheet').innerHTML = `<div class="grab"></div><h3>${esc(a.icon)} ${esc(a.label)}</h3>
+      <div class="field-title">和誰一起？<span class="muted small">（可以多選；灰色的人現在找不到）</span></div>
+      <div class="gchips">${S.residents.map(id => { const [ok, why] = grpAvail(id); return `<button type="button" class="gchip${sel.has(id) ? ' on' : ''}" data-g="${id}" ${ok ? '' : 'disabled'} aria-pressed="${sel.has(id)}"><span class="av">${avOf(id)}</span><span class="gn">${esc(nm(id))}<small>${esc(why)}</small></span></button>`; }).join('')}</div>
+      <div class="small muted" style="margin:6px 0 10px">他們會依自己的個性、心情和作息決定要不要來。親密的事永遠只有你們兩個人。</div>
+      <div class="acts2"><button class="btn" id="gBack">← 返回</button><button class="btn" id="gSolo">自己去</button><button class="btn primary" id="gGo" ${sel.size ? '' : 'disabled'}>${sel.size ? `邀 ${sel.size} 人一起` : '先選人'}</button></div>`;
+    $('#sheet').querySelectorAll('.gchip').forEach(b => b.onclick = () => { const id = b.dataset.g; sel.has(id) ? sel.delete(id) : sel.add(id); ui.sheet.render(); });
+    $('#gBack').onclick = openActions;
+    $('#gSolo').onclick = () => doAction(aid);
+    $('#gGo').onclick = () => doAction(aid, [...sel]);
+  }, false);
+}
+Object.assign(window.__imb, { startGroup, endGroup, groupTick, grpAvail, grpP, groupInviteThink, openGroupPicker, GRP });
+
+</script>
+<script>
+/* ---------- 點頭上的泡泡（活動圖示／狀態）看一小段故事 ----------
+   每種活動、每個人 2～3 段，2～4 句；同一段活動期間固定同一段。{h}＝女主角的名字，{o}＝一起的室友。
+   親密的只寫氛圍、點到為止（最多寫到一個吻），之後淡出。 */
+const SNIP = {
+ // 和女主角的互動
+ talk:{
+  alexander:['他把期刊翻面蓋在桌上，雙手交握，聽 {h} 說話時一次也沒打斷。偶爾問一句，總是問在最關鍵的地方。','他替 {h} 倒了半杯黑咖啡，自己那杯沒動。說到一半，他忽然說：「你剛才那句，再說一次。」'],
+  jasper:['Jasper 斜靠在沙發扶手上，手指比了個取景框對著 {h}。「繼續說，這個角度的你很好看。」','他聽得很認真，又一直笑，笑到 {h} 忘了自己本來要說什麼。他說：「沒關係，從你忘記的地方重來。」'],
+  liam:['Liam 一邊擦著杯子一邊聽，時不時「嗯」一聲。{h} 說完，他把一杯溫水推到她手邊。','他把椅子轉過來面向 {h}，手肘撐在膝上。「然後呢？」他問，像是真的很想知道。'],
+  marcus:['Marcus 話很少，只是把音響的音量轉小了。{h} 說的每一句，他都聽進去了。','他靠在窗邊，指節輕輕敲著窗框。等 {h} 說完，他才低聲說：「嗯，我懂。」'],
+  samuel:['Samuel 的眼神在 {h} 和地板之間來回。他想回話，嘴張了兩次，最後只說：「……我覺得你說得對。」','他抱著馬克杯，很小聲地講起最近寫的程式。講到一半發現 {h} 在笑，耳朵立刻紅了。'],
+  theo:['Theo 盤腿坐在地上，一口氣講了三件今天發生的事，中間還模仿了教授的口氣。{h} 笑到肩膀發抖。','他把下巴擱在椅背上看著 {h}：「你今天要聽我講完喔，不准偷偷滑手機。」']},
+ flirt:{
+  alexander:['他沒有回應那句玩笑，只是把袖口又捲高了一點，看著 {h} 的時間比平常長了兩秒。','「你知道你在做什麼嗎？」他問。語氣平靜，眼神卻沒有移開。'],
+  jasper:['「你這樣看我，我會當真喔。」Jasper 靠近了一點，聲音放輕。','他伸手把 {h} 耳邊的頭髮撥到後面，動作慢得像在對焦。'],
+  liam:['Liam 被逗得笑出酒窩，抬手揉了揉後頸。「你、你怎麼突然……」他說不下去了。','他低頭看著 {h}，笑意一點一點從眼角漫出來。「再說一次？我沒聽清楚。」'],
+  marcus:['Marcus 挑起一邊眉毛，嘴角動了一下。「小心點。」他說，聽起來不像警告。','他沒說話，只是往 {h} 這邊偏了偏頭，近得能聞到他身上的菸草和木頭味。'],
+  samuel:['Samuel 整個人僵住了，眼鏡後的眼睛睜得很大。過了好幾秒，他才小聲說：「……你、你是認真的嗎？」','他低著頭，手指無意識地在桌上敲著節奏，越敲越快。'],
+  theo:['「欸你剛剛是在撩我對不對？」Theo 整張臉亮起來，往 {h} 身上蹭了蹭。','他故意湊近 {h} 的臉，又在最後一刻退開，笑得一臉得意。']},
+ close:{
+  alexander:['他的手掌貼在 {h} 背上，很穩，像在確認一個結構是否牢固。他沒說話，呼吸放得很慢。','{h} 靠過去的時候，他停頓了一下，然後把她攬近。「……就這樣待一會。」'],
+  jasper:['Jasper 把 {h} 圈在懷裡，下巴抵著她的頭頂，輕輕哼著一首老歌。','他低頭在 {h} 額頭上落下一個很輕的吻。「這一幕，我不拍。」'],
+  liam:['Liam 的懷抱很暖，帶著淡淡的香草味。他輕拍著 {h} 的背，像在哄一個累壞的人。','他小心地抱著 {h}，好像怕抱太緊會弄疼她。「累了就靠著吧。」'],
+  marcus:['Marcus 讓 {h} 靠在他肩上，自己望著窗外。過了很久，他的手才輕輕覆上她的手。','他把外套披到 {h} 身上，順勢把她攬近，什麼也沒說。'],
+  samuel:['Samuel 抱得很僵硬，心跳快得 {h} 都聽得見。過了一會兒，他才慢慢放鬆下來。','他小心翼翼地回抱 {h}，在她耳邊說：「……謝謝你。」聲音輕得像怕被別人聽見。'],
+  theo:['Theo 整個人黏上來，把臉埋在 {h} 的肩窩裡。「再一下下就好。」他說了三次。','他抱著 {h} 左右晃，像抱著一隻大型玩偶，笑聲悶在她頸邊。']},
+ meal:{
+  alexander:['他切菜的刀工像在畫施工圖，每一片厚度都一樣。{h} 遞過去的盤子，他接得剛剛好。','他手沖的咖啡溫度精準，推到 {h} 面前時只說了一句：「這支豆子，你應該會喜歡。」'],
+  jasper:['Jasper 負責擺盤，擺完還拿手機拍了十幾張。「藝術品，」他說，「吃掉太可惜了。」','他偷吃了一口 {h} 碗裡的東西，被瞪了一眼也不在意，笑著說：「你做的比較好吃。」'],
+  liam:['Liam 握著 {h} 的手教她怎麼翻鍋，熱氣撲上來，兩個人都笑了。','他舀了一匙湯吹涼，遞到 {h} 嘴邊。「試試看，鹹不鹹？」'],
+  marcus:['Marcus 默默把碗洗了，又把 {h} 喜歡的那個杯子擦乾放回原位。','他吃得很慢，偶爾抬頭看 {h} 一眼。「好吃。」只有兩個字，卻說得很認真。'],
+  samuel:['Samuel 很認真地照著食譜量調味料，連鹽都用秤的。{h} 看得笑出聲，他困惑地抬頭。','他把最大塊的那一份默默推到 {h} 面前，自己低頭吃小的。'],
+  theo:['Theo 偷吃了一半的配料，被抓到時嘴裡還塞著東西，含糊地說：「我在幫你試毒！」','他把甜點分成兩半，給 {h} 大的那半，然後眼巴巴看著她吃。']},
+ screen:{
+  alexander:['他坐得筆直，看到某個鏡頭時忽然說：「這個空間的比例不對。」{h} 笑了，他才發現自己說出聲。','他把螢幕亮度調到最舒服的程度，順手把毯子推到 {h} 那邊。'],
+  jasper:['Jasper 一邊看一邊解說運鏡，說到興頭上還拉著 {h} 的手比劃構圖。','他看片時話很多，到了動人的那一幕卻安靜下來，偷偷看了 {h} 一眼。'],
+  liam:['Liam 抱著一大碗爆米花，每到緊張的地方就往 {h} 那邊靠一點。','他看到感人的地方眼眶紅了，被 {h} 發現，乾脆大方地拿她的袖子擦眼淚。'],
+  marcus:['Marcus 遞了一邊耳機給 {h}，兩人一起聽一張老黑膠的錄音，他輕輕跟著哼。','他調了調喇叭的角度，讓聲音剛好落在 {h} 坐的位置。「這樣聽，」他說，「才對。」'],
+  samuel:['Samuel 打電動時整個人都變了，眼神專注，手指飛快。贏了之後他轉頭看 {h}，難得笑得那麼開。','他小聲教 {h} 怎麼按連招，手不小心碰到她的，立刻縮回去，耳朵又紅了。'],
+  theo:['Theo 輸了一局就哀嚎著倒在 {h} 腿上，「再一局！最後一局！」已經是第五次最後一局。','他看恐怖片時嘴硬說不怕，手卻一直抓著 {h} 的衣角。']},
+ outing:{
+  alexander:['夜風吹得他襯衫的衣角輕輕翻動。他指著遠處一棟樓，說那是他學生時代最喜歡的建築。','他走在 {h} 外側，步伐不知不覺放慢，配合著她的速度。'],
+  jasper:['Jasper 舉起相機，對著夕陽下的 {h} 按了一次快門。「別動，就這樣。」','他拉著 {h} 走到欄杆邊，指著城市的燈火說：「你看，整座倫敦都在替你打光。」'],
+  liam:['Liam 遞給 {h} 一杯還溫著的熱可可，自己雙手插在口袋裡看著天空。','他走在路上會注意每家餐館的菜單，然後跟 {h} 說哪一家的湯其實最好喝。'],
+  marcus:['Marcus 靠著欄杆抽了一口菸，又把菸熄了，因為風往 {h} 那邊吹。','他望著遠方很久，忽然說：「以前我常一個人來這裡。現在不是了。」'],
+  samuel:['Samuel 走得有點拘謹，跟 {h} 保持半步距離。過了兩條街，那半步才慢慢消失。','他指著天上的一顆星，小聲說那其實是一顆衛星，然後不好意思地笑了。'],
+  theo:['Theo 跑在前面又倒退著走回來，「快點啦！」他朝 {h} 伸出手。','他把耳機分一邊給 {h}，放的歌吵得要命，他卻跟著唱得很大聲。']},
+ intimate:{
+  alexander:['他關上門，房間裡只剩檯燈的光。他俯身吻了 {h}，很慢，像在確認每一個細節。……之後的事，只屬於他們兩個人。','窗簾被拉上了。他低聲叫了 {h} 的名字，那是他今天說過最溫柔的一句話。……'],
+  jasper:['Jasper 把相機放到一邊，鏡頭朝下。「今晚不拍了。」他吻了 {h}，燈光暗了下來。……','他在 {h} 耳邊說了一句只有她聽得到的話，然後關掉了床頭燈。……'],
+  liam:['Liam 先問了一句「可以嗎？」，等 {h} 點頭，才輕輕吻了她。房間裡的燈慢慢暗了。……','他把 {h} 的手握在掌心，指腹很暖。門關上了，剩下的夜晚很長很靜。……'],
+  marcus:['唱機裡放著一張老靈魂樂，Marcus 低頭吻了 {h}。音樂聲蓋過了其他的一切。……','他沒有多說話，只是把燈調暗，然後回到 {h} 身邊。……'],
+  samuel:['Samuel 的手在發抖，他小聲問：「……我可以吻你嗎？」{h} 回答之前，他已經紅透了臉。……','他摘下眼鏡放在床頭，近得能看見彼此的睫毛。燈熄了。……'],
+  theo:['Theo 難得安靜下來，認真地看著 {h}，然後很輕很輕地吻了她。……','他把房間的燈關掉，只留一盞小夜燈，抱著 {h} 說：「今天不准走。」……']},
+ bath:{
+  alexander:['浴室裡蒸氣氤氳，鏡子很快就霧了。門後只傳出水聲，和他偶爾低沉的一句話。……','他把水溫調到剛好，然後替 {h} 把毛巾掛在伸手就拿得到的地方。……'],
+  jasper:['浴室門虛掩著，傳出 Jasper 的笑聲和水聲。熱氣從門縫飄了出來。……','他在起霧的鏡子上畫了一個笑臉，旁邊寫上 {h} 的名字。……'],
+  liam:['Liam 說好要幫 {h} 洗頭，動作溫柔得像在處理最嬌嫩的香草。蒸氣模糊了一切。……','水聲嘩嘩，他哼著歌，偶爾問一句：「水會太燙嗎？」……'],
+  marcus:['浴室裡只開了一盞小燈，水聲很穩。Marcus 的聲音低低的，聽不清在說什麼。……','蒸氣漫上鏡子，他替 {h} 擋住了從門縫透進來的冷風。……'],
+  samuel:['Samuel 緊張到把洗髮精當成沐浴乳，兩個人在蒸氣裡笑成一團。……','他的眼鏡一進浴室就整片起霧，只好摘下來，小聲說：「……我、我看不太清楚。」……'],
+  theo:['Theo 把泡泡堆在 {h} 頭上，自己笑得差點滑倒。熱氣把一切都暈開了。……','浴室裡傳出水聲和他吵吵鬧鬧的聲音，過了一會兒，忽然安靜下來。……']},
+ after:{
+  alexander:['他替 {h} 拉好被子，又倒了一杯水放在床頭。動作一絲不苟，眼神卻很軟。','他躺在 {h} 身邊，手臂枕在腦後，難得說了很多話。'],
+  jasper:['Jasper 裹著被單去泡了兩杯熱茶，回來時哼著歌。「早安，雖然還是晚上。」','他用手指輕輕描著 {h} 的眉毛，「我想記住這個表情。」'],
+  liam:['Liam 端來一碗溫熱的湯，一口一口吹涼了才遞給 {h}。','他把 {h} 圈在懷裡，輕聲問她冷不冷、渴不渴，問了好幾遍。'],
+  marcus:['Marcus 起身換了一張唱片，回到床上時把 {h} 攬進懷裡。','他點了一盞暖黃的小燈，靠著床頭，手指一下一下梳著 {h} 的頭髮。'],
+  samuel:['Samuel 把自己的帽T套到 {h} 身上，袖子長得蓋住了她的手。他看著，笑得有點傻。','他小聲問：「你……還好嗎？」得到肯定的答案後，才敢把臉埋進她的肩膀。'],
+  theo:['Theo 黏在 {h} 身上不肯放手，一直問「你明天也會在吧？」','他去廚房偷拿了兩根冰棒回來，分 {h} 一根，自己咬得喀滋作響。']},
+ group:{
+  alexander:['Alexander 坐在離大家最遠的位置，卻一直在聽。有人說錯了一個建築名稱，他忍不住糾正，全場都笑了。','他把每個人的杯子都排得整整齊齊，連 {h} 的那杯也轉到了把手朝她的方向。'],
+  jasper:['Jasper 讓大家擠在一起，舉高手機自拍。「{h} 再靠過來一點，對，就是這樣。」','他一下子就成了全場的中心，講的故事一個比一個誇張，{h} 笑得停不下來。'],
+  liam:['Liam 不知從哪變出一盤剛烤好的餅乾，先遞給 {h}，再分給其他人。','他坐在 {h} 旁邊，總是第一個發現誰的杯子空了。'],
+  marcus:['Marcus 話不多，只在大家吵起來時說一句「好了」，氣氛就安靜了下來。','他靠在角落，看著大家鬧，嘴角掛著一點點笑。'],
+  samuel:['人一多，Samuel 就悄悄縮到 {h} 身邊的位置，好像那裡最安全。','他整晚都很安靜，只有在 {h} 跟他說話時，才會笑出來。'],
+  theo:['Theo 搶到了 {h} 旁邊的位置，得意地朝其他人吐了吐舌頭。','他是全場最吵的那個，卻總在說完笑話後偷看 {h} 有沒有笑。']},
+ // 室友彼此（沒有女主角）
+ social:{
+  alexander:['Alexander 和 {o} 討論著什麼，他說話很慢，{o} 聽得很專心。','他遞了一杯黑咖啡給 {o}，兩人都沒說話，卻一點也不尷尬。'],
+  jasper:['Jasper 搭著 {o} 的肩膀，正在講一個聽起來九成是編的故事。','他拿手機給 {o} 看今天拍的照片，一張一張地講解。'],
+  liam:['Liam 正在問 {o} 晚餐想吃什麼，已經默默記下對方不吃的東西。','他笑著拍了拍 {o} 的背，好像剛聽到什麼很好笑的事。'],
+  marcus:['Marcus 和 {o} 隔著一張桌子，聊著某張老唱片。說到喜歡的段落，他用手指在桌上打起拍子。','他聽 {o} 抱怨了半天，最後只說：「嗯，下次我陪你去。」'],
+  samuel:['Samuel 被 {o} 拉著說話，看起來有點緊張，但沒有想逃走的意思。','他正跟 {o} 解釋一段程式，講到一半發現對方聽不懂，又從頭講了一次。'],
+  theo:['Theo 纏著 {o} 說今天的解剖課，講到一半自己先打了個冷顫。','他和 {o} 為了遙控器吵起來，最後兩個人笑成一團。']},
+ // 室友自己的活動
+ sleep:{
+  alexander:['他睡覺時也很規矩，平躺，被子拉到胸口，連呼吸都很均勻。','床頭的機械錶還在走，他睡得很沉。'],
+  jasper:['Jasper 睡得四仰八叉，一隻腳伸出被子外，手機還亮著。','他抱著枕頭睡著了，嘴角還帶著笑，不知道夢到了什麼。'],
+  liam:['Liam 睡前把明天要用的食材清單放在床頭，現在睡得很安穩。','他翻了個身，含糊地說了句「湯要小火……」，又睡沉了。'],
+  marcus:['Marcus 習慣晚睡，現在終於躺下，耳機還掛在脖子上。','房間裡很暗，只有唱機的指示燈亮著一點小小的紅光。'],
+  samuel:['Samuel 蜷成一團睡著了，眼鏡還歪歪地掛在臉上。','他睡前又檢查了一次鬧鐘，設了三個，現在睡得很熟。'],
+  theo:['Theo 睡著時終於安靜了，抱著被子縮成一團，看起來像個孩子。','他的課本攤在胸口，看到一半就睡著了。']},
+ work:{
+  alexander:['他在製圖桌前畫線，尺和鉛筆的角度分毫不差。桌上的咖啡已經涼了，他沒發現。','螢幕上是一張複雜的平面圖，他盯著其中一個轉角看了整整十分鐘。'],
+  jasper:['Jasper 在修照片，一張接一張，偶爾對著螢幕自言自語：「光再暖一點。」','他戴著耳機剪片，腳在桌下跟著節奏打拍子。'],
+  liam:['Liam 在筆記本上寫新菜單，旁邊畫滿了小小的盤子示意圖。','他對著電腦準備料理課的講義，時不時起身去廚房確認一個步驟。'],
+  marcus:['Marcus 戴著監聽耳機，同一段旋律反覆聽了二十次，眉頭越皺越緊。','他在混音台前調著推桿，整個人沉進聲音裡。'],
+  samuel:['Samuel 的雙螢幕上滿是程式碼，手指在鍵盤上飛快地敲，偶爾停下來喝一口咖啡。','他抓著頭髮盯著一個錯誤訊息，喃喃自語：「為什麼……明明昨天還可以……」'],
+  theo:['Theo 的書桌上攤著解剖學課本，螢光筆畫得滿頁都是，他一邊背一邊哀嚎。','他對著一張骨骼圖念念有詞，背不起來就拿筆敲自己的頭。']},
+ food:{
+  alexander:['他手沖咖啡時很安靜，注水的速度像在計時。整個廚房都是咖啡香。','他吃得很簡單，一份沙拉、一杯黑咖啡，餐具擺得整整齊齊。'],
+  jasper:['Jasper 吃到好吃的東西會先拍照，拍完才想起來要吃。','他站在冰箱前挑了很久，最後拿了一罐優格就走。'],
+  liam:['Liam 在爐台前忙碌，鍋裡的湯咕嘟咕嘟冒著泡，整間屋子都香了起來。','他試了一口醬汁，皺眉想了想，又加了一小撮鹽。'],
+  marcus:['Marcus 一手拿著黑咖啡，一手翻著樂譜，早餐只吃了一片吐司。','他煮了一碗麵，坐在窗邊慢慢吃，誰也沒打擾他。'],
+  samuel:['Samuel 一邊吃泡麵一邊看程式，麵都快泡爛了。','他小心地把咖啡倒進保溫瓶，好像那是今天最重要的事。'],
+  theo:['Theo 嘴裡塞滿零食，手上還拿著一盒布丁。','他站在冰箱前猶豫要不要吃第三塊蛋糕，最後還是吃了。']},
+ rest:{
+  alexander:['他坐在窗邊看建築期刊，翻頁的聲音很規律。','他什麼也沒做，只是看著窗外，好像在想一件很遠的事。'],
+  jasper:['Jasper 癱在沙發上滑手機，偶爾笑出聲，不知道又看到了什麼。','他靠在陽台欄杆上，看著底下的街道發呆。'],
+  liam:['Liam 窩在沙發上看料理節目，一邊看一邊做筆記。','他泡了一壺茶，坐在窗邊慢慢喝，看起來很放鬆。'],
+  marcus:['Marcus 閉著眼睛聽音樂，手指在膝蓋上輕輕打著拍子。','他靠在沙發上，手裡拿著一本破舊的詩集。'],
+  samuel:['Samuel 縮在角落看漫畫，看到好笑的地方會偷偷笑出來。','他躺著滑手機，看到一則好笑的貼文，忍不住又看了一遍。'],
+  theo:['Theo 躺在沙發上，腳翹在扶手上，正在跟朋友傳訊息，笑得很大聲。','他抱著抱枕看綜藝，笑到從沙發上滾下來。']},
+ hobby:{
+  alexander:['他在做一個小小的建築模型，用鑷子夾起一片比指甲還小的牆板。','他晨跑回來，額頭上還掛著汗，呼吸卻很平穩。'],
+  jasper:['Jasper 舉著底片相機對著窗外，等了很久，才按下一次快門。','他在整理一盒舊照片，每一張都看了很久。'],
+  liam:['Liam 在陽台照顧他的香草盆栽，一片一片葉子仔細看過。','他翻著一本舊食譜，在空白處寫下自己的改良做法。'],
+  marcus:['Marcus 抱著吉他，撥出一段低沉的旋律，又停下來，在本子上記了幾個音。','他在擦他的黑膠唱片，動作輕得像在照顧什麼珍貴的東西。'],
+  samuel:['Samuel 在打電動，螢幕的光映在他的眼鏡上，嘴裡念念有詞。','他在組一個小小的公仔，表情比寫程式時還專注。'],
+  theo:['Theo 在房間裡做伏地挺身，一邊數一邊喘：「四十八……四十九……」','他對著全身鏡擺姿勢，練習下週拍攝要用的表情。']},
+ shower:{
+  alexander:['浴室傳來規律的水聲，整整十分鐘，一秒不差。','浴室門關著，門縫下透出一點暖黃的光，和淡淡的雪松香。'],
+  jasper:['浴室裡傳出 Jasper 走音的歌聲。','水聲停了一下，傳來他對著鏡子說：「今天也很帥。」'],
+  liam:['浴室飄出淡淡的香草沐浴乳的味道。','水聲裡夾著他哼的一首老情歌，哼到副歌就忘詞了。'],
+  marcus:['浴室的水聲裡，夾雜著他低低哼著的旋律。','浴室門關著，水聲很久都沒有停。'],
+  samuel:['浴室裡很安靜，只有水聲。','水聲停了，過了好一會兒，他才頂著一頭濕亂的頭髮走出來。'],
+  theo:['浴室裡傳來 Theo 的歌聲，還有東西掉到地上的聲音。','「啊！冷水！」浴室裡傳來一聲慘叫，接著是他的笑聲。']},
+};
+// 女主角自己的活動
+const SNIP_H = {
+ sleep:['{h} 縮在被子裡，睡得很沉。窗外的倫敦還沒醒。','{h} 抱著枕頭睡著了，手機還亮著。'],
+ work:['{h} 對著筆電，手指在鍵盤上飛快地敲。桌上的茶已經涼了。','{h} 皺著眉頭看著一份文件，偶爾在便條紙上寫幾個字。'],
+ food:['{h} 在廚房裡忙著，鍋裡的東西冒出好聞的香氣。','{h} 坐在餐桌邊，慢慢吃著自己做的東西。'],
+ rest:['{h} 窩在沙發上，腳縮在身下，看著電視發呆。','{h} 滑著手機，偶爾笑出聲來。'],
+ hobby:['{h} 專心做著自己喜歡的事，完全沒注意到時間過了多久。','{h} 戴著耳機，跟著音樂輕輕點頭。'],
+ shower:['浴室傳來水聲，熱氣從門縫飄了出來。','浴室裡傳出 {h} 輕輕哼歌的聲音。'],
+ solo:['門關著。她需要一點只屬於自己的時間。','房門鎖上了。……'],
+ out:['{h} 出門了。','{h} 不在家。'],
+};
+const SNIP_CAT_ACT = {sleep:'sleep', nap:'sleep', work:'work', code:'work', study:'work', class:'work', cook:'food', meal:'food', coffee:'food',
+  relax:'rest', read:'rest', phone:'rest', balcony:'rest', idle:'rest', wait:'rest', walk:'rest', music:'hobby', photo:'hobby', draw:'hobby', game:'hobby', gym:'hobby', hobby:'hobby', shower:'shower', chat:'social', together:'social'};
+const SNIP_CX_GENERIC = ['{h} 和 {o} 正在「{x}」。兩個人都很投入，時間好像過得特別快。','{o} 認真地陪著 {h}「{x}」，偶爾抬頭對她笑一下。'];
+function snipInterCat(I){
+  const t = `${I.kind || ''}|${I.ik || ''}|${I.reqId || ''}|${I.label || ''}|${I.act || ''}`;
+  if (I.after) return 'after';
+  if (/shower|洗澡|淋浴|泡澡|浴/.test(t)) return 'bath';
+  if (I.ik || I.type === 'intimate' || /night|sex|caress|morning|過夜|共度|纏綿|愛撫/.test(t)) return 'intimate';
+  if (/hug|stay|kiss|吻|擁抱|靠|依偎|牽手|cuff|袖扣/.test(t)) return 'close';
+  if (/flirt|approach|tease|撩|調情/.test(t)) return 'flirt';
+  if (/cook|brew|feed|meal|coffee|做飯|咖啡|吃|湯|甜點|試菜|kitchen|泡麵|紅豆/.test(t)) return 'meal';
+  if (/movie|listen|music|coop|game|電影|電動|耳機|黑膠|錄|studio|quiz|吉他|plan|設計/.test(t)) return 'screen';
+  if (/walk|jog|terrace|balcony|shoot|photo|露臺|散步|跑步|拍照|out/.test(t)) return 'outing';
+  return 'talk';
+}
+// 數字雜湊：同一段活動固定挑同一段
+const snipHash = s => { let x = 0; for (const ch of s) x = (x * 31 + ch.codePointAt(0)) >>> 0; return x; };
+const snipPick = (arr, seed) => { const a = (arr || []).filter(Boolean); return a.length ? a[snipHash(seed) % a.length] : ''; };
+// 這個人現在頭上的泡泡，點了要看哪一段
+function snippetFor(id){
+  const e = S.ents[id]; if (!e || e.hidden) return null;
+  const hn = S.hero.name, I = S.inter, inI = I && I.start != null && (id === 'h' || id === I.who);
+  const f = (t, o) => fill(t, {h:hn, o:o || '', x:(I && I.label) || ''});
+  if (inI){
+    const who = I.who, seed = `${who}|${I.start}|${I.kind}`;
+    if (I.cx){ const own = [I.cx.s1, I.cx.s2, I.cx.s3].filter(Boolean); return {title:`${I.cx.icon || '✨'} ${hn} 和 ${nm(who)}：${I.label}`, text:fill(snipPick(own.length ? own : SNIP_CX_GENERIC, seed), {h:hn, o:nm(who), x:I.cx.label})}; }
+    const cat = snipInterCat(I);
+    return {title:interTxt(I), text:f(snipPick(SNIP[cat][who], seed)), cat};
+  }
+  const g = S.group;
+  if (g && (id === 'h' || g.members.includes(id)) && !walking(e)){
+    const pick = id === 'h' ? g.members[snipHash(g.id) % g.members.length] : id;
+    return {title:`🎉 ${[hn, ...g.members.map(nm)].join('、')}：${g.v.replace(/了/, '')}`, text:f(snipPick(SNIP.group[pick], g.id + id)), cat:'group'};
+  }
+  const seed = `${id}|${e.act}|${e.actT ?? dayOf(S.t)}`;
+  if (id === 'h'){
+    const cat = e.act === 'solo' ? 'solo' : e.act === 'shower' ? 'shower' : SNIP_CAT_ACT[e.act] === 'social' ? 'rest' : (SNIP_CAT_ACT[e.act] || 'rest');
+    return {title:`${ACTS[e.act]?.icon || '•'} ${hn}・${e.label}`, text:f(snipPick(SNIP_H[cat], seed)), cat};
+  }
+  if (e.ov && e.ov.nm && typeof nmSnippet === 'function'){ const r = nmSnippet(e); if (r) return r; }
+  if (e.act === 'solo') return {title:`🔒 ${nm(id)}・${e.label}`, text:'門關著。他需要一點自己的時間。', cat:'solo'};
+  let cat = SNIP_CAT_ACT[e.act] || 'rest';
+  if (cat === 'social'){ const o = S.residents.find(x => x !== id && S.ents[x].room === e.room && !S.ents[x].hidden && ['chat','together'].includes(S.ents[x].act));
+    if (!o) cat = 'rest'; else return {title:`${ACTS[e.act]?.icon || '💬'} ${nm(id)} 和 ${nm(o)}`, text:f(snipPick(SNIP.social[id], seed + o), nm(o)), cat}; }
+  return {title:`${ACTS[e.act]?.icon || '•'} ${nm(id)}・${e.label}`, text:f(snipPick(SNIP[cat][id], seed)), cat};
+}
+// 小視窗
+function openSnippet(id, anchor){
+  const sn = snippetFor(id); if (!sn || !sn.text) return;
+  let p = $('#snipPop'); if (!p){ p = el('div', 'snippop'); p.id = 'snipPop'; p.setAttribute('role', 'dialog'); document.body.appendChild(p); }
+  p.innerHTML = ''; const h = el('div', 'sph'); const av = el('span', 'av'); av.innerHTML = avOf(id); const tt = el('b'); tt.textContent = sn.title;
+  const x = el('button', 'spx'); x.type = 'button'; x.textContent = '✕'; x.setAttribute('aria-label', '關閉'); x.onclick = closeSnippet;
+  h.append(av, tt, x); const tx = el('p'); tx.textContent = sn.text; p.append(h, tx);
+  p.dataset.who = id; p.classList.remove('hidden');
+  const r = anchor && anchor.getBoundingClientRect ? anchor.getBoundingClientRect() : null, W = window.innerWidth, H = window.innerHeight;
+  const pw = Math.min(300, W - 24); p.style.width = pw + 'px';
+  const ph = p.offsetHeight || 120;
+  let left = r ? r.left + r.width / 2 - pw / 2 : (W - pw) / 2; left = Math.max(12, Math.min(W - pw - 12, left));
+  let top = r ? r.top - ph - 10 : H / 2 - ph / 2; if (top < 12) top = r ? Math.min(H - ph - 12, r.bottom + 10) : 12;
+  p.style.left = left + 'px'; p.style.top = top + 'px';
+}
+function closeSnippet(){ const p = $('#snipPop'); if (p) p.classList.add('hidden'); }
+document.addEventListener('click', ev => { const p = $('#snipPop'); if (p && !p.classList.contains('hidden') && !p.contains(ev.target) && !ev.target.closest('.ti,.tag,.tb')) closeSnippet(); });
+Object.assign(window.__imb, { snippetFor, openSnippet, closeSnippet, snipInterCat, SNIP });
+
+</script>
+<script>
+/* ---------- 作弊模式＋成就 ----------
+   作弊模式：主畫面左上角（時鐘下方）的小開關。打開＝可以在 🛠️ 面板改數值；關掉＝完全不能改（面板和所有編輯控制都隱藏）。
+   用過作弊模式的存檔會一直帶著 🛠️ 標記；之後達成的成就也會標 🛠️。
+   成就：一組基本的內建成就＋玩家自訂（名稱／圖示／說明＋條件）。可以分享成就清單、分享存檔檔案。
+   所有玩家寫的字都用 esc() 或 textContent 顯示。 */
+function cheatSync(){
+  const c = $('#cheatChk'), b = $('#cheatBtn'); if (!c || !S) return;
+  c.checked = !!S.cheat; b.classList.toggle('hidden', !S.cheat); $('#cheatSw').classList.toggle('on', !!S.cheat);
+}
+function setCheat(on){
+  S.cheat = !!on; if (on && !S.cheatUsed){ S.cheatUsed = S.t; log('🛠️ 打開了作弊模式。這個存檔之後會帶著 🛠️ 標記。', ['h']); }
+  cheatSync();
+  if (on) openCheat(); else { if (ui.sheet && ui.sheet.cheat) closeSheet(); document.querySelectorAll('[data-ck]').forEach(n => n.remove()); }
+  save(); toast(on ? '🛠️ 作弊模式：可以修改數值' : '作弊模式關閉：數值不能修改');
+  if (ui.view === 'save') renderView('save');
+}
+// 可以改的數值：[標籤, 取值, 設值, 最小, 最大]
+function cheatFields(){
+  const f = [];
+  for (const id of S.residents){
+    f.push([id, `${nm(id)} 對你的好感`, () => S.aff[id].h, v => { S.aff[id].h = v; }, -100, 100]);
+    f.push([id, `${nm(id)} 對你的情慾`, () => S.des[id].h, v => { S.des[id].h = v; }, 0, 100]);
+    f.push([id, `你對 ${nm(id)} 的好感`, () => S.aff.h[id], v => { S.aff.h[id] = v; }, -100, 100]);
+    f.push([id, `${nm(id)} 的醋意`, () => S.jeal[id] || 0, v => { S.jeal[id] = v; }, 0, 100]);
+  }
+  f.push(['h', '你的心情', () => hMood(), v => { S.hero.mood = v; }, 0, 100]);
+  for (const k of Object.keys(NEED_LBL)) f.push(['h', `你的${NEED_LBL[k]}`, () => S.ents.h.needs[k], v => { S.ents.h.needs[k] = v; }, 0, 100]);
+  return f;
+}
+function openCheat(){
+  if (!S || !S.cheat) return false;
+  openSheet(() => {
+    const F = cheatFields(); let last = null;
+    $('#sheet').innerHTML = `<div class="grab"></div><h3>🛠️ 修改數值 <span class="pill">作弊模式</span></h3>
+      <div class="small muted">拖動或輸入數字，馬上生效。關掉左上角的「作弊」開關就不能再改。</div>
+      <div class="cheatpanel">${F.map((x, i) => { const head = x[0] !== last ? `<div class="cksec">${x[0] === 'h' ? esc(S.hero.name) : esc(nm(x[0]))}</div>` : ''; last = x[0];
+        const v = Math.round(x[2]()); return head + `<label class="ckrow"><span>${esc(x[1])}</span><input type="range" min="${x[4]}" max="${x[5]}" value="${v}" data-ck="${i}"><input type="number" min="${x[4]}" max="${x[5]}" value="${v}" data-ck="${i}" inputmode="numeric"></label>`; }).join('')}</div>
+      <button class="btn wide" id="ckNpc">🧩 自訂室友行為（新活動、室友之間、來找你的事件）</button><button class="btn wide" id="ckText">📝 修改遊戲裡的文字（事件、台詞、日記…）</button><button class="btn wide" id="ckClose">完成</button>`;
+    const apply = (i, raw) => { if (!S.cheat) return; const x = F[i], v = clamp(Math.round(Number(raw)), x[4], x[5]); if (!Number.isFinite(v)) return; x[3](v);
+      $('#sheet').querySelectorAll(`[data-ck="${i}"]`).forEach(n => { if (+n.value !== v) n.value = v; });
+      if (x[0] !== 'h'){ S.tiers[x[0]] = S.tiers[x[0]] ?? tierIdx(x[0]); checkTier(x[0]); } achThink(); save(); };
+    $('#sheet').querySelectorAll('[data-ck]').forEach(n => { n.oninput = () => apply(+n.dataset.ck, n.value); n.onchange = () => { apply(+n.dataset.ck, n.value); renderAll(true); }; });
+    $('#ckClose').onclick = closeSheet;
+    $('#ckNpc').onclick = () => openNpcMods();
+    $('#ckText').onclick = () => { txUi.item = null; openTextEditor(); };
+  }, false);
+  ui.sheet.cheat = true; return true;
+}
+/* ---- 成就 ---- */
+const anyRes = f => S.residents.some(f), allRes = f => S.residents.length && S.residents.every(f);
+const ACH = [
+  {id:'day2', icon:'🌅', n:'第一天過去了', d:'在公寓度過第一天。', ok:() => dayOf(S.t) >= 2},
+  {id:'week', icon:'📅', n:'住滿一週', d:'在公寓住滿七天。', ok:() => dayOf(S.t) >= 8},
+  {id:'friend', icon:'🤝', n:'第一位朋友', d:'有一位室友對你的好感到 40。', ok:() => anyRes(id => S.aff[id].h >= 40)},
+  {id:'allknow', icon:'🏠', n:'大家都熟了', d:'每位室友對你的好感都到 20。', ok:() => allRes(id => S.aff[id].h >= 20)},
+  {id:'crush', icon:'💗', n:'心動', d:'和一位室友的關係走到「心動」。', ok:() => anyRes(id => relTier(id) >= 3)},
+  {id:'soul', icon:'💞', n:'非你不可', d:'有一位室友對你的好感到 80。', ok:() => anyRes(id => S.aff[id].h >= 80)},
+  {id:'group1', icon:'🎉', n:'一起比較熱鬧', d:'第一次和室友們一起做事。', ok:() => (S.grpN || 0) >= 1},
+  {id:'group5', icon:'🍿', n:'公寓的日常', d:'和室友們一起做事 5 次。', ok:() => (S.grpN || 0) >= 5},
+  {id:'crowd', icon:'👨‍👩‍👦', n:'全員集合', d:'一次約到 3 位以上的室友一起。', ok:() => (S.grpMax || 0) >= 3},
+  {id:'laugh', icon:'😆', n:'讓他笑了', d:'逗笑從來不笑的 Alexander。', ok:() => !!S.firsts.laugh},
+  {id:'custom', icon:'✨', n:'自己寫的劇本', d:'完成一次自訂互動。', ok:() => (S.cxDone || 0) >= 1},
+  {id:'diary7', icon:'📔', n:'七篇日記', d:'寫滿七天的日記。', ok:() => (S.diary.h || []).length >= 7},
+  {id:'rival', icon:'⚡', n:'修羅場', d:'兩位室友為你較勁到 20。', ok:() => Object.values(S.rival || {}).some(v => v >= 20)},
+];
+// 自訂成就的條件
+const ACH_COND = {
+  aff:{n:'好感達到', who:true, max:100, min:-100}, des:{n:'情慾達到', who:true, max:100, min:0}, tier:{n:'關係階段達到（0 日常～3 心動）', who:true, max:3, min:0},
+  day:{n:'住到第幾天', who:false, max:365, min:1}, group:{n:'一起做事的次數', who:false, max:999, min:1}, cx:{n:'完成自訂互動的次數', who:false, max:999, min:1}, mood:{n:'你的心情達到', who:false, max:100, min:0},
+};
+function achCondOk(c){
+  const n = c.n, w = c.who || 'any', f = id => c.type === 'aff' ? S.aff[id].h >= n : c.type === 'des' ? S.des[id].h >= n : relTier(id) >= n;
+  if (ACH_COND[c.type].who){ if (w === 'any') return anyRes(f); if (w === 'all') return allRes(f); return S.residents.includes(w) && f(w); }
+  return c.type === 'day' ? dayOf(S.t) >= n : c.type === 'group' ? (S.grpN || 0) >= n : c.type === 'cx' ? (S.cxDone || 0) >= n : hMood() >= n;
+}
+const achClean = o => { if (!o || typeof o !== 'object') return null; const n = cxClip(o.n, 20); if (!n) return null; const t = ACH_COND[o.type] ? o.type : 'aff', C = ACH_COND[t];
+  const who = o.who === 'all' || o.who === 'any' || (CHAR[o.who]) ? o.who : 'any';
+  return {id:/^ca_[a-z0-9]{4,16}$/.test(o.id || '') ? o.id : 'ca_' + Math.random().toString(36).slice(2, 10), n, icon:cxClip(o.icon, 2) || '🏅', d:cxClip(o.d, 60), type:t, who, num:cxNum(o.num, C.min, C.max, Math.min(C.max, 50))}; };
+function achList(){ return [...ACH, ...(S.achCustom || []).map(c => ({id:c.id, icon:c.icon, n:c.n, d:c.d || `${ACH_COND[c.type].n} ${c.num}${ACH_COND[c.type].who ? `（${c.who === 'any' ? '任一位室友' : c.who === 'all' ? '所有室友' : nm(c.who)}）` : ''}`, custom:true, ok:() => achCondOk({type:c.type, who:c.who, n:c.num})}))]; }
+function achThink(){
+  if (!S) return; S.ach = S.ach || {};
+  for (const a of achList()){ if (S.ach[a.id]) continue; let ok = false; try { ok = a.ok(); } catch(e){}
+    if (ok){ S.ach[a.id] = {t:S.t, cheat:!!S.cheatUsed}; log(`🏆 達成成就「${a.n}」${S.cheatUsed ? '（🛠️）' : ''}`, ['h'], 'big'); toast(`🏆 ${a.icon} ${a.n}`); } }
+}
+function achSection(box){
+  const L = achList(), got = S.ach || {}, nGot = L.filter(a => got[a.id]).length;
+  const card = el('div'); card.innerHTML = `<h3 class="sec">🏆 成就 <span class="muted small">${nGot} / ${L.length}</span>${S.cheatUsed ? ' <span class="pill cheatbadge" title="這個存檔用過作弊模式">🛠️ 用過作弊模式</span>' : ''}</h3>
+    <div class="card achlist">${L.map(a => { const g = got[a.id]; return `<div class="ach${g ? ' got' : ''}" data-ach="${esc(a.id)}"><span class="ai">${g ? esc(a.icon) : '🔒'}</span><span class="an"><b>${esc(a.n)}${g && g.cheat ? ' <span class="cheatbadge" title="在用過作弊模式之後達成">🛠️</span>' : ''}${a.custom ? ' <small class="pill">自訂</small>' : ''}</b><small>${esc(a.d)}${g ? `・第 ${dayOf(g.t)} 天達成` : ''}</small></span>${a.custom ? `<button class="btn sm" data-ace="${esc(a.id)}">編輯</button>` : ''}</div>`; }).join('')}
+      <button class="btn wide" id="achAdd">＋ 自訂成就</button>
+      <div class="acts2" style="margin-top:8px"><button class="btn" id="achShare">📤 分享成就</button><button class="btn" id="saveShare">📤 分享存檔檔案</button></div>
+      <textarea class="sharebox hidden" id="shareBox" rows="5" readonly></textarea></div>`;
+  box.appendChild(card);
+  $('#achAdd').onclick = () => openAchForm();
+  card.querySelectorAll('[data-ace]').forEach(b => b.onclick = () => openAchForm(b.dataset.ace));
+  $('#achShare').onclick = shareAch;
+  $('#saveShare').onclick = shareSave;
+}
+function achShareText(){
+  const L = achList(), got = S.ach || {}, g = L.filter(a => got[a.id]);
+  return `《失衡》${S.hero.name}・第 ${dayOf(S.t)} 天\n🏆 成就 ${g.length} / ${L.length}${S.cheatUsed ? '（🛠️ 這個存檔用過作弊模式）' : ''}\n` + g.map(a => `${a.icon} ${a.n}${got[a.id].cheat ? ' 🛠️' : ''}`).join('\n');
+}
+async function shareAch(){
+  const t = achShareText(), box = $('#shareBox');
+  try { if (navigator.share){ await navigator.share({title:'《失衡》成就', text:t}); return; } } catch(e){ if (e && e.name === 'AbortError') return; }
+  box.value = t; box.classList.remove('hidden'); box.select();
+  try { await navigator.clipboard.writeText(t); toast('已複製成就清單'); } catch(e){ toast('成就清單在下面，可以手動複製'); }
+}
+async function shareSave(){
+  save(); const name = `失衡存檔_${S.hero.name}_第${dayOf(S.t)}天${S.cheatUsed ? '_作弊' : ''}.json`;
+  try { const file = new File([JSON.stringify(S)], name, {type:'application/json'});
+    if (navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:'《失衡》存檔'}); return; } } catch(e){ if (e && e.name === 'AbortError') return; }
+  exportSave(); toast('這台裝置不能直接分享，已改成下載存檔檔案');
+}
+function openAchForm(aid){
+  const old = aid ? (S.achCustom || []).find(c => c.id === aid) : null;
+  const c = old || {n:'', icon:'', d:'', type:'aff', who:'any', num:50};
+  openSheet(() => {
+    const opt = (v, n, cur) => `<option value="${esc(v)}" ${String(cur) === String(v) ? 'selected' : ''}>${esc(n)}</option>`;
+    $('#sheet').innerHTML = `<div class="grab"></div><h3>${old ? '編輯自訂成就' : '＋ 自訂成就'}</h3>
+      <form id="achForm" class="cxform" autocomplete="off">
+        <label class="cxf"><span>名稱 <b class="req">必填</b></span><input name="n" maxlength="20" required value="${esc(c.n)}" placeholder="例如：Samuel 終於敢看我"></label>
+        <label class="cxf cx-s"><span>圖示（emoji）</span><input name="icon" maxlength="8" value="${esc(c.icon)}" placeholder="🏅"></label>
+        <label class="cxf"><span>說明（可空白）</span><input name="d" maxlength="60" value="${esc(c.d)}"></label>
+        <label class="cxf"><span>條件</span><select name="type">${Object.entries(ACH_COND).map(([k, v]) => opt(k, v.n, c.type)).join('')}</select></label>
+        <label class="cxf cx-s" id="achWho"><span>對象</span><select name="who">${opt('any', '任一位室友', c.who)}${opt('all', '所有室友', c.who)}${S.residents.map(id => opt(id, nm(id), c.who)).join('')}</select></label>
+        <label class="cxf cx-s"><span>數值</span><input name="num" type="number" inputmode="numeric" value="${c.num}"></label>
+        <div class="cxacts"><button type="button" class="btn" id="acCancel">取消</button>${old ? '<button type="button" class="btn danger" id="acDel">刪除</button>' : ''}<button type="submit" class="btn primary">儲存</button></div>
+      </form>`;
+    const f = $('#achForm'), sync = () => { $('#achWho').hidden = !ACH_COND[f.type.value].who; f.num.min = ACH_COND[f.type.value].min; f.num.max = ACH_COND[f.type.value].max; };
+    f.type.onchange = sync; sync();
+    $('#acCancel').onclick = () => { closeSheet(); switchView('save'); };
+    const del = $('#acDel'); if (del) del.onclick = () => { S.achCustom = S.achCustom.filter(x => x.id !== aid); delete (S.ach || {})[aid]; save(); closeSheet(); renderView('save'); toast('已刪除自訂成就'); };
+    f.onsubmit = ev => { ev.preventDefault(); const d = Object.fromEntries(new FormData(f).entries()); d.id = old ? old.id : undefined; const a = achClean(d);
+      if (!a){ toast('請先填成就的名稱'); return; }
+      S.achCustom = S.achCustom || []; if (old) S.achCustom[S.achCustom.findIndex(x => x.id === old.id)] = a; else S.achCustom.push(a);
+      if (old && S.ach) delete S.ach[a.id];   // 條件改了就重新判斷
+      achThink(); save(); closeSheet(); switchView('save'); toast(`已儲存「${a.n}」`); };
+  }, false);
+}
+Object.assign(window.__imb, { setCheat, openCheat, cheatFields, achThink, achList, achCondOk, achClean, achShareText, openAchForm, ACH });
+
+</script>
+<script>
+/* ---------- 作弊模式：修改遊戲裡的文字 ----------
+   每一句和角色有關、玩家看得到的文字（事件、邀約、回應、吃醋、撞見、日記、回憶、台詞、泡泡小故事、作息狀態……）
+   都可以改。修改存成「覆蓋」放在存檔裡（S.textOv），不動預設；可以單項／整個角色還原，也可以單獨匯出／匯入。
+   作弊模式關掉時：修改照樣生效，但不能再改。玩家寫的字一律用 textContent／esc() 顯示，並把 < > 換成全形。 */
+const TX_TABLES = {EVENTS, TEST_EV, COLLIDE_OPEN, COLLIDE_LOSE, WITNESS, WITNESS_FLOOR, REQUESTS, IK_REQ, STAGED_REQ, H_LINES, H_LINES_EXTRA, PERSONA_LINES, STAGE_LINES, CX_LINES, IK_LINES,
+  GRP_LINES, REJECT_LINES, REJ, ALT_LINES, ACCEPT_END, INTIMATE_START, INTIMATE_END, INTIMATE_SCENE, AFTERCARE, TALK, MEM_VOICE, DIARY, IK_DIARY, QUIPS, COOK_SHARE, NPC_SPECIAL, PAIR_NOTE, NPC_REL_NOTE,
+  SNIP, SNIP_H, H_DIARY, TRAIT_VOICE, NPC_CHAT_LINES, NPC_BAD_LINES, RIVAL_LINES, GRP_TENSE, GRP_WARM, CAUGHT_LINES, LEAVE_LINES, SNIP_CX_GENERIC, ACTS, CHARS};
+const TX_CAT = {EVENTS:'事件', TEST_EV:'吃醋試探', COLLIDE_OPEN:'兩人同時找你', COLLIDE_LOSE:'兩人同時找你', WITNESS:'撞見・吃醋反應', WITNESS_FLOOR:'撞見・吃醋反應', CAUGHT_LINES:'撞見（共用）', LEAVE_LINES:'撞見（共用）',
+  REQUESTS:'他主動的邀約', IK_REQ:'他主動的邀約', STAGED_REQ:'他主動的邀約', H_LINES:'你邀他時的回應', H_LINES_EXTRA:'你邀他時的回應', PERSONA_LINES:'你邀他時的回應', STAGE_LINES:'你邀他時的回應', CX_LINES:'你邀他時的回應', IK_LINES:'你邀他時的回應',
+  GRP_LINES:'一起做事的回應', REJECT_LINES:'被拒絕・冷卻', REJ:'被拒絕・冷卻', ALT_LINES:'被拒絕・冷卻', ACCEPT_END:'互動開始與結束', INTIMATE_START:'互動開始與結束', INTIMATE_END:'互動開始與結束', INTIMATE_SCENE:'互動開始與結束', AFTERCARE:'互動開始與結束',
+  TALK:'聊天敘述', MEM_VOICE:'回憶', DIARY:'日記', IK_DIARY:'日記', H_DIARY:'日記', QUIPS:'台詞（同房間時）', COOK_SHARE:'分享料理', NPC_SPECIAL:'室友之間', PAIR_NOTE:'室友之間', NPC_REL_NOTE:'室友之間',
+  SNIP:'泡泡小故事', SNIP_H:'泡泡小故事', SNIP_CX_GENERIC:'泡泡小故事', SCHED:'作息・狀態', ACTS:'作息・狀態', CHARS:'角色簡介', TRAIT_VOICE:'你的語氣',
+  NPC_CHAT_LINES:'室友之間（共用）', NPC_BAD_LINES:'室友之間（共用）', RIVAL_LINES:'室友之間（共用）', GRP_TENSE:'一起做事（共用）', GRP_WARM:'一起做事（共用）'};
+const TX_HERO = new Set(['SNIP_H', 'H_DIARY', 'TRAIT_VOICE']);
+const TX_FIELD = {text:'內容', a:'接受', r:'拒絕', d:'第三種回應', 0:'①', 1:'②', 2:'③', 3:'④', lbl:'名稱', label:'名稱', txt:'冷卻時的反應', look:'外貌', persona:'個性', open:'開頭', close:'結尾', ev:'事件句'};
+const hasCJK = s => typeof s === 'string' && /[\u3400-\u9fff\uff00-\uffef「」……]/.test(s);
+const TX = {items:[], orig:new Map(), ready:false};
+const txKey = p => p.join('|');
+function txGet(p){ let o = TX_TABLES[p[0]]; for (let i = 1; i < p.length; i++){ if (o == null) return undefined; o = o[p[i]]; } return o; }
+function txSet(p, v){ let o = TX_TABLES[p[0]]; for (let i = 1; i < p.length - 1; i++){ if (o == null) return false; o = o[p[i]]; } if (o == null || typeof o[p[p.length - 1]] !== 'string') return false; o[p[p.length - 1]] = v; return true; }
+// 所有可以改的文字：每一項＝{who, cat, title, fields:[{key, path, label}]}
+function txBuild(){
+  if (TX.ready) return; TX.ready = true;
+  const ids = CHARS.map(c => c.id);
+  const leaves = (node, path, out) => { if (typeof node === 'string'){ if (hasCJK(node)) out.push(path); return; }
+    if (!node || typeof node !== 'object' || typeof node === 'function') return;
+    for (const k of Object.keys(node)){ if (['id','c','rooms','type','place','spot','cond','icon','K','T','act','ik','dk','wk','def','hobby','only','avatar','color','hair','skin','eye','hairStyle'].includes(k)) continue; leaves(node[k], [...path, k], out); } };
+  const add = (who, tname, path, title) => { const ps = []; leaves(txGet(path), path, ps); if (!ps.length) return;
+    // 太大的一項再往下拆
+    const node = txGet(path);
+    if (ps.length > 8 && node && typeof node === 'object'){ for (const k of Object.keys(node)) add(who, tname, [...path, k], `${title}・${k}`); return; }
+    const fields = ps.map(p => { const key = txKey(p); if (!TX.orig.has(key)) TX.orig.set(key, txGet(p)); return {key, path:p, label:p.slice(path.length).map(x => TX_FIELD[x] ?? x).join('・') || '內容'}; });
+    TX.items.push({who, cat:TX_CAT[tname] || tname, table:tname, title, fields}); };
+  for (const [tn, T] of Object.entries(TX_TABLES)){
+    if (tn === 'SNIP'){ for (const cat of Object.keys(T)) for (const id of Object.keys(T[cat])) add(id, tn, [tn, cat, id], `${cat}`); continue; }
+    if (tn === 'CHARS'){ T.forEach((c, i) => add(c.id, tn, [tn, i], c.name)); continue; }
+    if (tn === 'ACTS'){ for (const k of Object.keys(T)) if (!k.startsWith('nm_')) add('all', tn, [tn, k, 'label'], `活動名稱：${k}`); continue; }
+    if (TX_HERO.has(tn)){ add('h', tn, [tn], tn === 'SNIP_H' ? '泡泡' : tn === 'H_DIARY' ? '你的日記' : '你的語氣'); continue; }
+    if (Array.isArray(T)){ add('all', tn, [tn], TX_CAT[tn] || tn); continue; }
+    for (const k of Object.keys(T)){
+      const pair = k.includes('|') ? k.split('|') : null, who = pair ? pair : [k];
+      if (!who.every(x => ids.includes(x))) continue;
+      const node = T[k];
+      if (tn === 'EVENTS'){ node.forEach((e, i) => !e.nm && add(k, tn, [tn, k, i], `${e.id}・${REL_TIERS[e.t].n}・${firstLine(e.text).slice(0, 14)}`)); continue; }
+      if (tn === 'REQUESTS' || tn === 'STAGED_REQ' || tn === 'IK_REQ'){ if (Array.isArray(node)) node.forEach((r, i) => add(k, tn, [tn, k, i], r.lbl || r.def || r.id || String(i))); else add(k, tn, [tn, k], '邀約'); continue; }
+      who.forEach(w => add(w, tn, [tn, k], pair ? `和 ${nm(who.find(x => x !== w))}` : (TX_CAT[tn] || tn)));
+    }
+  }
+  // 作息裡的活動名稱（每位室友一週會出現的狀態）
+  for (const id of ids){ const set = new Set(); for (let d = 0; d < 7; d++) (SCHEDULES[id] ? SCHEDULES[id](d) : []).forEach(b => set.add(b[4] || ACTS[b[2]].label));
+    const fields = [...set].map(l => { const key = `SCHED|${id}|${l}`; TX.orig.set(key, l); return {key, path:null, label:l}; });
+    if (fields.length) TX.items.push({who:id, cat:'作息・狀態', table:'SCHED', title:'作息裡的活動名稱（平面圖上顯示的狀態）', fields}); }
+}
+const txClean = v => [...String(v ?? '').replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g, '').replace(/</g, '＜').replace(/>/g, '＞')].slice(0, 1000).join('');
+// 作息狀態的覆蓋（curBlock 用）
+const schedLbl = (id, l) => (S && S.textOv && S.textOv[`SCHED|${id}|${l}`]) || l;
+// 讀檔／開新遊戲時：先全部還原成預設，再套用這個存檔的修改
+function applyTextOv(){
+  txBuild();
+  for (const [k, v] of TX.orig) if (!k.startsWith('SCHED|')) txSet(k.split('|').map(x => /^\d+$/.test(x) ? +x : x), v);
+  const ov = (S && S.textOv) || {};
+  for (let [k, v] of Object.entries(ov)){ if (!TX.orig.has(k) || typeof v !== 'string' || !v.trim()){ delete ov[k]; continue; } v = ov[k] = txClean(v); if (!k.startsWith('SCHED|')) txSet(k.split('|').map(x => /^\d+$/.test(x) ? +x : x), v); }
+}
+function txSetOv(key, v){
+  if (!S.cheat) return false; S.textOv = S.textOv || {};
+  v = txClean(v); const o = TX.orig.get(key); if (o === undefined) return false;
+  if (!v.trim() || v === o) delete S.textOv[key]; else S.textOv[key] = v;
+  applyTextOv(); return true;
+}
+function txResetWho(who){ if (!S.cheat) return false; txBuild(); TX.items.filter(it => it.who === who).forEach(it => it.fields.forEach(f => delete S.textOv[f.key])); applyTextOv(); save(); return true; }
+const txCur = key => (S.textOv && S.textOv[key]) ?? TX.orig.get(key);
+const txEdited = it => it.fields.some(f => S.textOv && S.textOv[f.key] != null);
+function txExport(){
+  const blob = new Blob([JSON.stringify({format:'imb-text-v1', ov:S.textOv || {}}, null, 1)], {type:'application/json'});
+  const a = el('a'); a.href = URL.createObjectURL(blob); a.download = `失衡_文字修改_${S.hero.name}.json`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  toast(`已匯出 ${Object.keys(S.textOv || {}).length} 筆文字修改`);
+}
+function txImport(json){
+  if (!S.cheat) return 0; txBuild(); let n = 0;
+  try { const d = typeof json === 'string' ? JSON.parse(json) : json; const ov = d && (d.ov || d.textOv); if (!ov || typeof ov !== 'object') throw 0;
+    S.textOv = S.textOv || {}; for (const [k, v] of Object.entries(ov)){ if (TX.orig.has(k) && typeof v === 'string' && v.trim()){ S.textOv[k] = txClean(v); n++; } }
+  } catch(e){ toast('這不是有效的文字修改檔'); return 0; }
+  applyTextOv(); save(); toast(`已匯入 ${n} 筆文字修改`); return n;
+}
+// 編輯器
+const txUi = {who:'alexander', cat:'', q:'', item:null};
+function openTextEditor(){
+  if (!S || !S.cheat) return false; txBuild();
+  openSheet(() => {
+    if (!S.cheat){ closeSheet(); return; }
+    const sh = $('#sheet'); sh.innerHTML = '';
+    if (txUi.item != null) return txItemView(sh, TX.items[txUi.item]);
+    const whos = [['h', S.hero.name], ...CHARS.map(c => [c.id, c.name]), ['all', '共用']];
+    const list = TX.items.filter(it => it.who === txUi.who);
+    const cats = [...new Set(list.map(it => it.cat))];
+    if (txUi.cat && !cats.includes(txUi.cat)) txUi.cat = '';
+    const q = txUi.q.trim();
+    const shown = TX.items.map((it, i) => [it, i]).filter(([it]) => q ? it.fields.some(f => String(txCur(f.key)).includes(q) || String(TX.orig.get(f.key)).includes(q)) || it.title.includes(q) : (it.who === txUi.who && (!txUi.cat || it.cat === txUi.cat)));
+    sh.innerHTML = `<div class="grab"></div><h3>📝 修改文字 <span class="pill">作弊模式</span></h3>
+      <div class="small muted">改的是這個存檔裡的文字（不會動到遊戲預設），匯出存檔時會一起帶走。作弊模式關掉後，改過的文字照樣生效，但不能再改。</div>
+      <input class="txq" id="txQ" type="search" placeholder="🔍 搜尋所有文字…" value="">
+      <div class="txwho">${whos.map(([id, n]) => `<button type="button" class="chip${txUi.who === id && !q ? ' on' : ''}" data-txw="${id}"></button>`).join('')}</div>
+      <select class="txcat" id="txCat" ${q ? 'disabled' : ''}><option value="">全部分類（${list.length} 項）</option>${cats.map(c => `<option value="${esc(c)}" ${c === txUi.cat ? 'selected' : ''}>${esc(c)}（${list.filter(it => it.cat === c).length}）</option>`).join('')}</select>
+      <div class="txlist" id="txList"></div>
+      <div class="acts2 txacts"><button class="btn" id="txResetWho">還原 <span id="txWhoN"></span> 的全部文字</button><button class="btn" id="txExp">⬇️ 匯出文字修改</button><label class="btn filebtn">⬆️ 匯入文字修改<input type="file" accept=".json,application/json" id="txImp"></label></div>
+      <button class="btn wide" id="txBack">← 回到修改數值</button>`;
+    sh.querySelectorAll('[data-txw]').forEach(b => { b.textContent = whos.find(w => w[0] === b.dataset.txw)[1]; b.onclick = () => { txUi.who = b.dataset.txw; txUi.cat = ''; txUi.q = ''; ui.sheet.render(); }; });
+    const qi = $('#txQ'); qi.value = txUi.q; qi.oninput = () => { txUi.q = qi.value; clearTimeout(txUi.tm); txUi.tm = setTimeout(() => { ui.sheet.render(); const n = $('#txQ'); n.focus(); n.setSelectionRange(n.value.length, n.value.length); }, 250); };
+    $('#txCat').onchange = ev => { txUi.cat = ev.target.value; ui.sheet.render(); };
+    const L = $('#txList');
+    shown.slice(0, 200).forEach(([it, i]) => { const b = el('button', 'txitem' + (txEdited(it) ? ' edited' : '')); b.type = 'button'; b.dataset.txi = i;
+      const t = el('b'); t.textContent = (q ? `${it.who === 'h' ? S.hero.name : it.who === 'all' ? '共用' : nm(it.who)}・` : '') + `${it.cat}・${it.title}`; const p = el('small'); p.textContent = String(txCur(it.fields[0].key)).replace(/\n/g, ' ').slice(0, 60);
+      b.append(t, p); if (txEdited(it)){ const m = el('span', 'txmark'); m.textContent = '已修改'; b.append(m); } b.onclick = () => { txUi.item = i; ui.sheet.render(); }; L.append(b); });
+    if (!shown.length){ const m = el('div', 'muted small'); m.textContent = '沒有符合的文字。'; L.append(m); }
+    if (shown.length > 200){ const m = el('div', 'muted small'); m.textContent = `只顯示前 200 項（共 ${shown.length} 項），請用搜尋縮小範圍。`; L.append(m); }
+    $('#txWhoN').textContent = whos.find(w => w[0] === txUi.who)[1];
+    $('#txResetWho').onclick = ev => { const b = ev.currentTarget; if (!b.dataset.sure){ b.dataset.sure = 1; b.textContent = '確定還原？'; return; } txResetWho(txUi.who); toast('已還原'); ui.sheet.render(); };
+    $('#txExp').onclick = txExport;
+    $('#txImp').onchange = ev => { const f = ev.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { txImport(r.result); ui.sheet.render(); }; r.readAsText(f); };
+    $('#txBack').onclick = () => openCheat();
+  }, false);
+  ui.sheet.cheat = true; return true;
+}
+function txItemView(sh, it){
+  sh.innerHTML = `<div class="grab"></div><h3 id="txTitle"></h3><div class="small muted">{h} 會換成女主角的名字，{x}／{y}／{o}／{room} 會換成當時的人或地點。留空＝用原本的文字。</div><div id="txFields"></div>
+    <div class="acts2"><button class="btn" id="txIBack">← 返回</button><button class="btn" id="txIReset">還原這一項</button><button class="btn primary" id="txISave">儲存</button></div>`;
+  $('#txTitle').textContent = `${it.who === 'h' ? S.hero.name : it.who === 'all' ? '共用' : nm(it.who)}・${it.cat}・${it.title}`;
+  const F = $('#txFields');
+  it.fields.forEach((f, j) => { const lb = el('label', 'cxf txf'); const sp = el('span'); sp.textContent = f.label + (S.textOv && S.textOv[f.key] != null ? '（已修改）' : '');
+    const ta = el('textarea'); ta.rows = Math.min(6, Math.max(2, Math.ceil(String(txCur(f.key)).length / 28))); ta.maxLength = 1000; ta.value = txCur(f.key); ta.dataset.txk = f.key;
+    const o = el('small', 'txorig'); o.textContent = '原本：' + TX.orig.get(f.key); lb.append(sp, ta, o); F.append(lb); });
+  $('#txIBack').onclick = () => { txUi.item = null; ui.sheet.render(); };
+  $('#txIReset').onclick = () => { it.fields.forEach(f => { if (S.textOv) delete S.textOv[f.key]; }); applyTextOv(); save(); toast('已還原這一項'); ui.sheet.render(); };
+  $('#txISave').onclick = () => { if (!S.cheat) return; F.querySelectorAll('textarea').forEach(ta => txSetOv(ta.dataset.txk, ta.value)); save(); toast('已儲存文字修改'); txUi.item = null; ui.sheet.render(); };
+}
+Object.assign(window.__imb, { txBuild, applyTextOv, txSetOv, txResetWho, txExport, txImport, openTextEditor, get TX(){ return TX; }, txCur, schedLbl });
+
+</script>
+<script>
+/* ---------- 作弊模式：自己加室友的自主行為 ----------
+   三種：① 他一個人做的事（自己的活動）② 室友和室友之間的活動（只限日常，沒有任何親密或戀愛的選項）
+   ③ 他主動來找你的事件（和內建事件同一套：關係階段、地點、時間、三個選項）。
+   只能在作弊模式打開時新增／編輯／停用／刪除；作弊模式關掉後照樣會發生。存在存檔裡，也可以單獨匯出／匯入成 JSON 包。
+   玩家寫的字一律經過 txClean（< > 換成全形）並用 textContent／esc() 顯示。 */
+const NM_KIND = {solo:'他自己的活動', social:'室友之間的活動', event:'他來找你的事件'};
+const NM_ICON = {solo:'✨', social:'💬', event:'💌'};
+const NM_SOLO_ROOMS = {own:'他的房間', living:'客廳', kitchen:'廚房', balcony:'露臺', bath:'浴室'};
+const NM_SOC_ROOMS = {here:'他當時在的地方', living:'客廳', kitchen:'廚房', balcony:'露臺'};
+const NM_SPOTS = {'':'自動', desk:'書桌', bed:'床', sofa:'沙發', table:'餐桌', stove:'爐台', floor:'地上'};
+const NM_EV_ROOMS = {living:'客廳', kitchen:'廚房', entry:'玄關', balcony:'露臺', r_h:'你的房間（他來敲門）', office:'公司（只有 Samuel）'};
+// 室友之間不會有親密或戀愛的互動：這些字出現在室友之間的活動裡就不收
+const NM_ROMANCE = /吻|親親|親吻|親熱|愛撫|纏綿|做愛|上床|曖昧|約會|擁抱|抱著|牽手|調情|告白|戀|情侶|性|裸|摸|撫|共度|過夜|同床/;
+const nmT = (v, n) => [...txClean(cxClip(v, n))].slice(0, n).join('');
+function nmClean(o){
+  if (!o || typeof o !== 'object' || !NM_KIND[o.kind]) return null;
+  const k = o.kind, label = nmT(o.label, 20); if (!label) return null;
+  const ids = CHARS.map(c => c.id), num = (v, lo, hi, d) => cxNum(v, lo, hi, d);
+  const m = {id:/^nm_[a-z0-9]{4,16}$/.test(o.id || '') ? o.id : 'nm_' + Math.random().toString(36).slice(2, 10), kind:k, on:o.on !== false, label, icon:cxClip(o.icon, 2) || NM_ICON[k]};
+  if (k === 'event'){
+    m.who = ids.includes(o.who) ? o.who : ids[0]; m.t = num(o.t, 0, 3, 0);
+    m.rooms = (Array.isArray(o.rooms) ? o.rooms : [o.rooms]).filter(r => NM_EV_ROOMS[r] && (r !== 'office' || m.who === 'samuel')); if (!m.rooms.length) m.rooms = ['living'];
+    m.night = !!o.night; m.morning = !!o.morning && !m.night; m.low = !!o.low;
+    m.text = nmT(o.text, 600); if (!m.text) return null;
+    const dflt = {a:['好啊', ''], r:['下次吧', ''], d:['「怎麼了？」', '']};
+    for (const c of ['a', 'r', 'd']){ const x = Array.isArray(o[c]) ? o[c] : []; m[c] = [nmT(x[0], 20) || dflt[c][0], nmT(x[1], 300)]; }
+    m.fx = {}; for (const c of ['a', 'r', 'd']){ const f = (o.fx && o.fx[c]) || {}; m.fx[c] = {aff:num(f.aff, -10, 10, 0), des:num(f.des, -10, 10, 0), mood:num(f.mood, -10, 10, 0)}; }
+    return m;
+  }
+  m.who = o.who === 'any' || ids.includes(o.who) ? o.who : 'any';
+  m.dur = num(o.dur, 5, 240, 30); m.from = num(o.from, 0, 23, 10); m.to = num(o.to, 1, 24, 22); m.w = num(o.w, 1, 10, 5);
+  m.dMood = num(o.dMood, -10, 10, 2); m.status = nmT(o.status, 24); m.line = nmT(o.line, 80);
+  m.s1 = nmT(o.s1, 160); m.s2 = nmT(o.s2, 160); m.s3 = nmT(o.s3, 160);
+  if (k === 'solo'){ m.room = NM_SOLO_ROOMS[o.room] ? o.room : 'own'; m.spot = o.spot in NM_SPOTS ? o.spot : ''; m.dDes = num(o.dDes, -10, 10, 0); }
+  else { m.with = o.with === 'any' || ids.includes(o.with) ? o.with : 'any'; if (m.with !== 'any' && m.with === m.who) m.with = 'any';
+    m.room = NM_SOC_ROOMS[o.room] ? o.room : 'here'; m.minPair = num(o.minPair, -100, 100, 0); m.dPair = num(o.dPair, -10, 10, 2);
+    if (nmRomance(m)) return null; }
+  return m;
+}
+const nmRomance = m => NM_ROMANCE.test([m.label, m.status, m.line, m.s1, m.s2, m.s3].join('|'));
+// 把存檔裡的自訂行為接上遊戲：活動名稱／圖示、家具位置、事件池
+function syncNpcMods(){
+  for (const c in EVENTS) for (let i = EVENTS[c].length - 1; i >= 0; i--) if (EVENTS[c][i].nm) EVENTS[c].splice(i, 1);
+  for (const k of Object.keys(ACTS)) if (k.startsWith('nm_')){ delete ACTS[k]; delete SPOT_OF[k]; }
+  if (!S) return; S.npcMods = (S.npcMods || []).map(nmClean).filter(Boolean); S.nmLast = S.nmLast || {};
+  for (const m of S.npcMods){
+    if (m.kind === 'event'){ if (!m.on) continue; const h2n = t => t.replace(/\{h\}/g, '{n}');
+      (EVENTS[m.who] = EVENTS[m.who] || []).push({c:m.who, id:m.id, t:m.t, rooms:[...m.rooms], night:m.night, morning:m.morning, low:m.low, text:h2n(m.text), a:[m.a[0], h2n(m.a[1] || '他笑了笑。')], r:[m.r[0], h2n(m.r[1] || '他點點頭，沒再說什麼。')], d:[m.d[0], h2n(m.d[1] || '他看了你一會兒。')], nm:true, fx:m.fx}); continue; }
+    ACTS[m.id] = {label:m.status || m.label, icon:m.icon}; if (m.kind === 'solo' && m.spot) SPOT_OF[m.id] = m.spot;
+  }
+  for (const id of S.residents || []){ const e = S.ents[id]; if (e && e.ov && e.ov.nm && !S.npcMods.some(m => m.id === e.ov.nm && m.on)){ e.ov = null; } }
+}
+const nmHourOk = m => { const h = hourOf(S.t); return m.from < m.to ? h >= m.from && h < m.to : h >= m.from || h < m.to; };
+const nmFree = o => o && home(o) && !o.hidden && !walking(o) && !o.busy && !o.ov && !o.grp && !['sleep','nap','shower','work','class','wait','solo'].includes(o.act) && !(S.pending && S.pending.who === o.id);
+// 每分鐘：沒事做的室友偶爾挑一件自訂行為來做（npcThink 呼叫）
+function nmThink(e, act, target){
+  if (!S.npcMods || !S.npcMods.length || target === 'out' || ['sleep','nap','work','class','shower'].includes(act) || walking(e) || e.ov) return false;
+  const L = S.npcMods.filter(m => m.on && m.kind !== 'event' && (m.who === 'any' || m.who === e.id) && nmHourOk(m) && S.t - (S.nmLast[m.id + '|' + e.id] ?? -99999) >= m.dur * 2 + 90);
+  for (const m of L){
+    if (Math.random() >= 0.0007 * m.w) continue;
+    if (m.kind === 'solo'){
+      const room = m.room === 'own' ? roomOf(e.id, 'own') : m.room === 'bath' ? roomOf(e.id, 'bath') : m.room; if (!G.rooms[room]) continue;
+      e.ov = {room, act:m.id, label:m.status || m.label, until:S.t + m.dur, nm:m.id, t0:S.t};
+      S.nmLast[m.id + '|' + e.id] = S.t; e.buff = clamp((e.buff || 0) + m.dMood, -30, 30); if (m.dDes) addDes(e.id, 'h', m.dDes);
+      if (m.line) log(`${m.icon} ${fill(m.line, {a:nm(e.id), h:S.hero.name, x:m.label})}`, [e.id]);
+      dayEv(e.id, 'act', m.label); return true;
+    }
+    const cand = S.residents.filter(id => id !== e.id && (m.with === 'any' || m.with === id) && nmFree(S.ents[id]) && pairV(e.id, id) >= m.minPair && (S.rival[pkey(e.id, id)] || 0) < 15);
+    if (!cand.length) continue;
+    const o = S.ents[rnd(cand)], room = m.room === 'here' ? (e.room && G.rooms[e.room] && !G.rooms[e.room].owner ? e.room : 'living') : m.room; if (!G.rooms[room]) continue;
+    const lbl = x => `和 ${nm(x)} ${m.status || m.label}`;
+    e.ov = {room, act:m.id, label:lbl(o.id), until:S.t + m.dur, nm:m.id, with:o.id, t0:S.t};
+    o.ov = {room, act:m.id, label:lbl(e.id), until:S.t + m.dur, nm:m.id, with:e.id, t0:S.t};
+    S.nmLast[m.id + '|' + e.id] = S.nmLast[m.id + '|' + o.id] = S.t;
+    addPair(e.id, o.id, m.dPair); [e, o].forEach(x => { x.buff = clamp((x.buff || 0) + m.dMood, -30, 30); });
+    log(`${m.icon} ${fill(m.line || '{a} 和 {b} 一起「{x}」。', {a:nm(e.id), b:nm(o.id), h:S.hero.name, x:m.label})}`, [e.id, o.id]);
+    dayEv(e.id, 'npc', nm(o.id)); dayEv(o.id, 'npc', nm(e.id)); return true;
+  }
+  return false;
+}
+// 泡泡小故事（自訂行為）
+function nmSnippet(e){
+  const m = (S.npcMods || []).find(x => x.id === e.ov.nm); if (!m) return null;
+  const own = [m.s1, m.s2, m.s3].filter(Boolean), o = e.ov.with;
+  const gen = m.kind === 'solo' ? ['{a} 專心地「{x}」，好像整個世界只剩下這件事。'] : ['{a} 和 {b} 一起「{x}」，偶爾交換一兩句話。'];
+  const t = snipPick(own.length ? own : gen, `${m.id}|${e.id}|${e.ov.t0}`);
+  return {title:`${m.icon} ${nm(e.id)}${o ? ' 和 ' + nm(o) : ''}・${m.label}`, text:fill(t, {a:nm(e.id), b:o ? nm(o) : '', o:o ? nm(o) : '', h:S.hero.name, x:m.label}), cat:'custom'};
+}
+// 事件的額外效果（resolveEvent 呼叫）
+function nmEventFx(id, ev, ch){ const f = ev && ev.fx && ev.fx[ch]; if (!f) return; if (f.aff) addAff(id, 'h', f.aff); if (f.des) addDes(id, 'h', f.des); if (f.mood) addMood(f.mood); }
+/* ---- 編輯器（只有作弊模式） ---- */
+function nmExport(){
+  const blob = new Blob([JSON.stringify({format:'imb-npc-v1', mods:S.npcMods || []}, null, 1)], {type:'application/json'});
+  const a = el('a'); a.href = URL.createObjectURL(blob); a.download = `失衡_自訂室友行為_${S.hero.name}.json`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  toast(`已匯出 ${(S.npcMods || []).length} 個自訂行為`);
+}
+function nmImport(json){
+  if (!S.cheat) return 0; let n = 0;
+  try { const d = typeof json === 'string' ? JSON.parse(json) : json; const L = Array.isArray(d) ? d : d && d.mods; if (!Array.isArray(L)) throw 0;
+    S.npcMods = S.npcMods || [];
+    for (const o of L.slice(0, 100)){ const m = nmClean(o); if (!m) continue; if (S.npcMods.some(x => x.id === m.id)) m.id = 'nm_' + Math.random().toString(36).slice(2, 10); S.npcMods.push(m); n++; }
+  } catch(e){ toast('這不是有效的自訂行為檔'); return 0; }
+  syncNpcMods(); save(); toast(`已匯入 ${n} 個自訂行為`); return n;
+}
+function nmSave(o){ if (!S.cheat) return null; const m = nmClean(o); if (!m) return null; S.npcMods = S.npcMods || []; const i = S.npcMods.findIndex(x => x.id === m.id); if (i >= 0) S.npcMods[i] = m; else S.npcMods.push(m); syncNpcMods(); save(); return m; }
+function nmDelete(id){ if (!S.cheat) return false; S.npcMods = (S.npcMods || []).filter(x => x.id !== id); syncNpcMods(); save(); return true; }
+function nmToggle(id, on){ if (!S.cheat) return false; const m = (S.npcMods || []).find(x => x.id === id); if (!m) return false; m.on = !!on; syncNpcMods(); save(); return true; }
+const nmWho = w => w === 'any' ? '任何一位室友' : nm(w);
+function nmDesc(m){
+  if (m.kind === 'event') return `${nm(m.who)}・${REL_TIERS[m.t].n}・${m.rooms.map(r => NM_EV_ROOMS[r].replace(/（.*）/, '')).join('／')}${m.night ? '・晚上' : m.morning ? '・早上' : ''}`;
+  if (m.kind === 'solo') return `${nmWho(m.who)}・${NM_SOLO_ROOMS[m.room]}・${m.dur} 分・${m.from}:00–${m.to}:00`;
+  return `${nmWho(m.who)} ＋ ${nmWho(m.with)}・${NM_SOC_ROOMS[m.room]}・${m.dur} 分`;
+}
+function openNpcMods(){
+  if (!S || !S.cheat) return false;
+  openSheet(() => {
+    if (!S.cheat){ closeSheet(); return; }
+    const sh = $('#sheet'); sh.innerHTML = `<div class="grab"></div><h3>🧩 自訂室友行為 <span class="pill">作弊模式</span></h3>
+      <div class="small muted">新增室友自己會去做的事。作弊模式關掉後，這些行為照樣會發生，但不能再修改。室友之間的活動只限日常，不會有親密或戀愛的互動。</div>
+      <div class="acts3 nmadd"><button class="btn" data-nmadd="solo">＋ 他自己的活動</button><button class="btn" data-nmadd="social">＋ 室友之間</button><button class="btn" data-nmadd="event">＋ 他來找你</button></div>
+      <div class="nmlist" id="nmList"></div>
+      <div class="acts2"><button class="btn" id="nmExp">⬇️ 匯出 JSON 包</button><label class="btn filebtn">⬆️ 匯入 JSON 包<input type="file" accept=".json,application/json" id="nmImp"></label></div>
+      <button class="btn wide" id="nmBack">← 回到修改數值</button>`;
+    const L = $('#nmList');
+    if (!(S.npcMods || []).length){ const d = el('div', 'muted small'); d.textContent = '還沒有自訂行為。'; L.append(d); }
+    for (const m of S.npcMods || []){
+      const row = el('div', 'nmrow' + (m.on ? '' : ' off')); row.dataset.nm = m.id;
+      const i = el('span', 'ni'); i.textContent = m.icon; const t = el('span', 'nt'); const b = el('b'); b.textContent = `${NM_KIND[m.kind]}：${m.label}`; const s = el('small'); s.textContent = nmDesc(m); t.append(b, s);
+      const sw = el('label', 'nmon'); const cb = el('input'); cb.type = 'checkbox'; cb.checked = m.on; cb.onchange = () => { nmToggle(m.id, cb.checked); ui.sheet.render(); }; const st = el('span'); st.textContent = m.on ? '啟用' : '停用'; sw.append(cb, st);
+      const ed = el('button', 'btn sm'); ed.type = 'button'; ed.textContent = '編輯'; ed.onclick = () => openNmForm(m.kind, m.id);
+      row.append(i, t, sw, ed); L.append(row);
+    }
+    sh.querySelectorAll('[data-nmadd]').forEach(b => b.onclick = () => openNmForm(b.dataset.nmadd));
+    $('#nmExp').onclick = nmExport;
+    $('#nmImp').onchange = ev => { const f = ev.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { nmImport(r.result); ui.sheet.render(); }; r.readAsText(f); };
+    $('#nmBack').onclick = () => openCheat();
+  }, false);
+  ui.sheet.cheat = true; return true;
+}
+function openNmForm(kind, mid){
+  if (!S.cheat) return false;
+  const old = mid ? (S.npcMods || []).find(x => x.id === mid) : null;
+  const m = old ? JSON.parse(JSON.stringify(old)) : nmClean({kind, label:'新行為', text:'……', who:kind === 'event' ? S.residents[0] : 'any'});
+  m.label = old ? m.label : ''; if (!old && kind === 'event') m.text = '';
+  const ids = S.residents, whoOpts = (any) => [...(any ? [['any', '任何一位室友']] : []), ...ids.map(id => [id, nm(id)])];
+  const F = [];   // [name, label, type, opts]
+  F.push(['label', kind === 'event' ? '標題（只在清單裡看得到） 必填' : '名稱 必填', 'text', 20], ['icon', '圖示（emoji）', 'text', 8]);
+  if (kind === 'event'){
+    F.push(['who', '誰來找你', 'select', whoOpts(false)], ['t', '關係階段', 'select', REL_TIERS.map((t, i) => [i, t.n])], ['rooms', '在哪裡發生（可多選）', 'checks', Object.entries(NM_EV_ROOMS)],
+      ['time', '時間', 'select', [['', '不限'], ['night', '只在晚上 20:00–03:00'], ['morning', '只在早上 07:00–10:00']]], ['low', '只在你心情不好時', 'check'],
+      ['text', '事件內容（{h} 會換成你的名字） 必填', 'area', 600]);
+    for (const [c, n] of [['a', '接受'], ['r', '拒絕'], ['d', '第三種回應']]) F.push([c + '0', `${n}：按鈕文字`, 'text', 20], [c + '1', `${n}：結果`, 'area', 300], [c + 'fx', `${n}：額外效果`, 'fx']);
+  } else {
+    F.push(['who', '誰會做', 'select', whoOpts(true)]);
+    if (kind === 'social') F.push(['with', '和誰（不能是同一個人）', 'select', whoOpts(true)], ['minPair', '需要兩人交情至少', 'num', [-100, 100]], ['dPair', '做完兩人交情變化', 'num', [-10, 10]]);
+    F.push(['room', '地點', 'select', Object.entries(kind === 'solo' ? NM_SOLO_ROOMS : NM_SOC_ROOMS)]);
+    if (kind === 'solo') F.push(['spot', '在哪件家具旁', 'select', Object.entries(NM_SPOTS)]);
+    F.push(['dur', '多久（分鐘）', 'num', [5, 240]], ['from', '最早幾點開始', 'num', [0, 23]], ['to', '最晚幾點前', 'num', [1, 24]], ['w', '多常發生（1 很少～10 常常）', 'num', [1, 10]],
+      ['dMood', '他的心情變化', 'num', [-10, 10]]);
+    if (kind === 'solo') F.push(['dDes', '他對你的情慾變化', 'num', [-10, 10]]);
+    F.push(['status', '平面圖上的狀態（空白＝用名稱）', 'text', 24], ['line', kind === 'solo' ? '紀錄裡的一句話（選填，{a}＝他）' : '紀錄裡的一句話（選填，{a}、{b}＝兩位室友）', 'text', 80],
+      ['s1', '泡泡小故事 1（選填）', 'area', 160], ['s2', '泡泡小故事 2（選填）', 'area', 160], ['s3', '泡泡小故事 3（選填）', 'area', 160]);
+  }
+  openSheet(() => {
+    if (!S.cheat){ closeSheet(); return; }
+    const sh = $('#sheet'); sh.innerHTML = `<div class="grab"></div><h3 id="nmfT"></h3>${kind === 'social' ? '<div class="small muted">室友之間只有日常活動（聊天、做飯、打電動……），不會有親密或戀愛的內容。</div>' : ''}<form id="nmForm" class="cxform" autocomplete="off"></form>`;
+    $('#nmfT').textContent = `${old ? '編輯' : '＋ 新增'}：${NM_KIND[kind]}`;
+    const f = $('#nmForm');
+    for (const [name, label, type, opt] of F){
+      const lb = el(type === 'checks' || type === 'fx' ? 'div' : 'label', 'cxf' + (type === 'num' || name === 'icon' ? ' cx-s' : '')); const sp = el('span'); sp.textContent = label; lb.append(sp);
+      let inp;
+      if (type === 'select'){ inp = el('select'); for (const [v, n] of opt){ const o = el('option'); o.value = v; o.textContent = n; inp.append(o); } inp.value = String(name === 'time' ? (m.night ? 'night' : m.morning ? 'morning' : '') : m[name] ?? ''); }
+      else if (type === 'area'){ inp = el('textarea'); inp.rows = 3; inp.maxLength = opt; inp.value = name.length === 2 && /[ard]1/.test(name) ? m[name[0]][1] : (m[name] || ''); }
+      else if (type === 'num'){ inp = el('input'); inp.type = 'number'; inp.inputMode = 'numeric'; inp.min = opt[0]; inp.max = opt[1]; inp.value = m[name]; }
+      else if (type === 'check'){ inp = el('input'); inp.type = 'checkbox'; inp.checked = !!m[name]; }
+      else if (type === 'checks'){ const box = el('div', 'nmchecks'); for (const [v, n] of opt){ if (v === 'office' && m.who !== 'samuel' && !(kind === 'event')) continue; const l2 = el('label'); const c = el('input'); c.type = 'checkbox'; c.name = 'rooms'; c.value = v; c.checked = m.rooms.includes(v); const s2 = el('span'); s2.textContent = n; l2.append(c, s2); box.append(l2); } lb.append(box); f.append(lb); continue; }
+      else if (type === 'fx'){ const box = el('div', 'nmfx'); const c = name[0]; for (const [k, n] of [['aff', '好感'], ['des', '情慾'], ['mood', '你的心情']]){ const l2 = el('label'); const s2 = el('span'); s2.textContent = n; const i2 = el('input'); i2.type = 'number'; i2.min = -10; i2.max = 10; i2.name = `fx_${c}_${k}`; i2.value = m.fx[c][k]; l2.append(s2, i2); box.append(l2); } lb.append(box); f.append(lb); continue; }
+      else { inp = el('input'); inp.maxLength = opt; inp.value = name.length === 2 && /[ard]0/.test(name) ? m[name[0]][0] : (m[name] || ''); }
+      inp.name = name; lb.append(inp); f.append(lb);
+    }
+    const acts = el('div', 'cxacts'); acts.innerHTML = `<button type="button" class="btn" id="nmCancel">取消</button>${old ? '<button type="button" class="btn danger" id="nmDel">刪除</button>' : ''}<button type="submit" class="btn primary">儲存</button>`; f.append(acts);
+    $('#nmCancel').onclick = () => openNpcMods();
+    const del = $('#nmDel'); if (del) del.onclick = ev => { const b = ev.currentTarget; if (!b.dataset.sure){ b.dataset.sure = 1; b.textContent = '確定刪除？'; return; } nmDelete(old.id); toast('已刪除'); openNpcMods(); };
+    f.onsubmit = ev => { ev.preventDefault(); if (!S.cheat) return;
+      const v = n => f.elements[n] ? f.elements[n].value : undefined, o = {kind, id:old ? old.id : undefined, on:old ? old.on : true};
+      for (const [name, , type] of F){ if (type === 'checks' || type === 'fx' || /^[ard][01]$/.test(name) || name === 'time') continue; o[name] = type === 'check' ? f.elements[name].checked : v(name); }
+      if (kind === 'event'){ o.rooms = [...f.querySelectorAll('[name=rooms]:checked')].map(x => x.value); o.night = v('time') === 'night'; o.morning = v('time') === 'morning';
+        for (const c of ['a', 'r', 'd']){ o[c] = [v(c + '0'), v(c + '1')]; } o.fx = {}; for (const c of ['a', 'r', 'd']) o.fx[c] = {aff:v(`fx_${c}_aff`), des:v(`fx_${c}_des`), mood:v(`fx_${c}_mood`)}; }
+      if (kind === 'social' && nmRomance({label:o.label || '', status:o.status || '', line:o.line || '', s1:o.s1 || '', s2:o.s2 || '', s3:o.s3 || ''})){ toast('室友之間只能是日常活動，不能有親密或戀愛的內容'); return; }
+      const r = nmSave(o); if (!r){ toast(kind === 'event' ? '請填標題和事件內容' : '請先填名稱'); return; }
+      toast(`已儲存「${r.label}」`); openNpcMods(); };
+  }, false);
+  ui.sheet.cheat = true; return true;
+}
+Object.assign(window.__imb, { nmClean, syncNpcMods, nmThink, nmSnippet, nmSave, nmDelete, nmToggle, nmImport, nmExport, openNpcMods, openNmForm, nmRomance });
 
 </script>
 </body>
