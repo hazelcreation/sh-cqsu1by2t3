@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f7f1e8">
 <title>失衡・公寓觀察</title>
+<meta name="imb-build" content="2026-11-10 10:36 (台北)">
 <style>
 :root{
   --bg:#f7f1e8; --card:#fffaf3; --line:#e8dccb; --ink:#4a3f35; --muted:#9a8b7b; --accent:#c9876b; --accent2:#e7b9a3;
@@ -354,6 +355,35 @@ span.av,div.av{display:inline-block;border-radius:50%}
 .tkt.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
 .tkhead{border:none!important}
 .cpane .igrp,.cpane .field-title{scroll-margin-top:60px}
+/* 自訂互動 */
+.cxform{display:grid;grid-template-columns:1fr 1fr;gap:10px 10px;margin-top:10px}
+.cxf{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--muted);grid-column:1/-1;min-width:0}
+.cxf.cx-s{grid-column:auto}
+.cxf input:not([type=range]):not([type=checkbox]),.cxf select{width:100%;box-sizing:border-box;font-size:16px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink,#3b2f25);min-width:0}
+.cxf input[type=range]{width:100%;accent-color:var(--accent)}
+.cxf output{font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+.cxf .req{font-size:10.5px;color:#fff;background:var(--accent);border-radius:6px;padding:0 5px;font-weight:600}
+.cxsec{grid-column:1/-1;font-size:12px;font-weight:700;color:var(--ink,#3b2f25);margin-top:4px;border-top:1px dashed var(--line);padding-top:8px}
+.cxrow{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px 12px}
+.cxchk{grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:13.5px;min-height:36px}
+.cxchk input{width:20px;height:20px;accent-color:var(--accent)}
+.cxerr{grid-column:1/-1;color:#b4474f;font-size:13px}
+.cxacts{grid-column:1/-1;display:flex;gap:8px;justify-content:flex-end;position:sticky;bottom:-1px;background:var(--card,#fffaf3);padding:8px 0}
+.cxacts .btn{min-height:40px;padding:0 16px}
+.btn.danger{color:#b4474f;border-color:#e6b9bd}
+.cxlist{display:flex;flex-direction:column;gap:6px;margin:6px 0 4px}
+.cxitem{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:12px;padding:6px 8px;background:var(--card,#fffaf3);min-width:0}
+.cxitem .cxi{font-size:20px;flex:0 0 auto}
+.cxitem .cxn{flex:1;min-width:0;display:flex;flex-direction:column;overflow-wrap:anywhere}
+.cxitem .cxn small{color:var(--muted);font-size:11px}
+.cxitem .btn{flex:0 0 auto;min-height:32px}
+.cxadd{border-style:dashed;min-height:42px}
+.btn{overflow-wrap:anywhere}
+.ccard-h{align-items:flex-start}.ccard-m{flex:1;min-width:0}
+.ctags{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}.ctags .pill{margin:0}
+.iconbtn{flex:0 0 auto;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--card,#fffaf3);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.cnow{display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 4px;margin:10px 0 2px;padding:10px 12px;border-radius:12px;background:var(--soft);font-size:15.5px;font-weight:700;line-height:1.4;overflow-wrap:anywhere}
+.cnow .cn-i{font-size:18px}.cnow .cn-p{font-weight:500;color:var(--muted);font-size:14px}
 
 </style>
 </head>
@@ -632,7 +662,7 @@ const H_INTER = [   // grp：選單分組；tier：需要的關係階段（REL_T
   {id:'stay',label:'靠在他身邊',icon:'🛋️',dur:30,aff:4,des:4,place:'here',lbl:'靠在一起',grp:'close',tier:2},
   {id:'intimate',label:'邀請共度',icon:'💗',dur:90,aff:8,des:4,place:'his',lbl:'共度中',grp:'close',tier:3},
 ];
-const H_INTER_GRP = {talk:'說話（2 小時內重複聊，不會再加分）', invite:'邀約（一起走過去，在平面圖上即時進行）', close:'親近（依關係階段解鎖）'};
+const H_INTER_GRP = {talk:'說話（30 分鐘內重複聊，不會再加分）', invite:'邀約（一起走過去，在平面圖上即時進行）', close:'親近（依關係階段解鎖）'};
 
 
 // 主角主動時，各角色的 [接受, 拒絕] 回應
@@ -1883,6 +1913,123 @@ const MEM_VOICE = {
 
 </script>
 <script>
+/* ---------- 玩家自訂互動 ----------
+   玩家可以自己寫互動：名稱、圖示、對象（這位室友／所有室友）、地點、時間、
+   解鎖門檻（好感／情慾）、效果（好感／情慾／心情）、平面圖上的狀態、回憶的一句話、
+   會不會被撞見吃醋、之後有沒有 aftercare。只在女主角和室友之間，室友彼此不會用。
+   所有玩家寫的字都只用 textContent 或 esc() 顯示。 */
+H_INTER_GRP.custom = '✨ 自訂互動';
+const CX_WIT = {none:'不會（就算被看到也沒事）', flirt:'調情程度', hug:'擁抱程度', intimate:'親密程度（最容易引發修羅場）'};
+const CX_P = {none:.72, flirt:.52, hug:.44, intimate:.32};          // 室友答應的基本機率，再依個性、好感、情慾、心情調整
+const cxClip = (s, n) => [...String(s ?? '').replace(/[\u0000-\u001f\u007f]/g, ' ').trim()].slice(0, n).join('');
+const cxNum = (v, lo, hi, d) => { const n = Math.round(Number(v)); return Number.isFinite(n) ? clamp(n, lo, hi) : d; };
+function cxPlaces(){
+  const pub = Object.values(G.rooms).filter(r => !r.owner && r.type !== 'entry').map(r => [r.id, roomName(r.id)]);
+  return [['here', '就在這裡（你們現在的位置）'], ['his', '他的房間'], ['h_room', '我的房間'], ...pub];
+}
+function cxClean(o){
+  if (!o || typeof o !== 'object') return null;
+  const label = cxClip(o.label, 20); if (!label) return null;
+  const who = o.who === 'all' || (typeof CHAR !== 'undefined' && CHAR[o.who]) ? o.who : 'all';
+  const place = /^[a-z][a-z0-9_]{0,23}$/.test(o.place || '') ? o.place : 'here';
+  return { id: /^cx_[a-z0-9]{4,16}$/.test(o.id || '') ? o.id : 'cx_' + Math.random().toString(36).slice(2, 10),
+    label, icon: cxClip(o.icon, 2), who, place, dur: cxNum(o.dur, 5, 240, 30),
+    minAff: cxNum(o.minAff, 0, 100, 0), minDes: cxNum(o.minDes, 0, 100, 0),
+    dAff: cxNum(o.dAff, -20, 20, 2), dDes: cxNum(o.dDes, -20, 20, 0), dMood: cxNum(o.dMood, -20, 20, 0),
+    status: cxClip(o.status, 24), line: cxClip(o.line, 80), wit: CX_WIT[o.wit] ? o.wit : 'none', after: !!o.after };
+}
+const cxStatus = c => c.status || `${c.label}中`;
+// 把存檔裡的自訂互動同步成 H_INTER 的項目（和內建互動同一套流程）
+function syncCustom(){
+  for (let i = H_INTER.length - 1; i >= 0; i--) if (H_INTER[i].grp === 'custom') H_INTER.splice(i, 1);
+  if (!S) return; S.custom = (S.custom || []).map(cxClean).filter(Boolean);
+  for (const c of S.custom) H_INTER.push({id:c.id, label:c.label, icon:c.icon || '✨', dur:c.dur, place:c.place, lbl:cxStatus(c), grp:'custom', only:c.who === 'all' ? undefined : c.who, p:CX_P[c.wit], cx:c, tier:0});
+}
+const cxLocked = (id, d) => !!(d.cx && (S.aff[id].h < d.cx.minAff || S.des[id].h < d.cx.minDes));
+const cxNeed = d => `需要 好感 ${d.cx.minAff}・情慾 ${d.cx.minDes}`;
+const cxPlaceOf = (c, id) => c.place === 'here' || c.place === 'his' || c.place === 'h_room' ? c.place : (G.rooms[c.place] && !G.rooms[c.place].owner ? c.place : 'here');
+// 室友的回應（依他的個性；自訂互動沒有專屬台詞時用）
+const CX_LINES = {
+  alexander:['他放下手上的東西，「好。」', '他看了你一眼，「現在不行。」'],
+  jasper:['他揚起嘴角，「求之不得。」', '他笑著搖頭，「下次吧，寶貝。」'],
+  liam:['他眼睛一亮，「好啊！」', '他有點為難，「抱歉，現在不太方便……」'],
+  marcus:['他挑眉，「行啊。」', '他哼了一聲，「沒興趣。」'],
+  samuel:['他愣了一下，耳根紅了，輕輕點頭。', '他低下頭，「……對不起，現在不行。」'],
+  theo:['他整個人跳起來，「好好好！」', '他嘟起嘴，「現在不行啦～」'] };
+function cxLine(id, def, ok){ const L = (def.cx.wit !== 'none' && STAGE_LINES[id] && STAGE_LINES[id][def.cx.wit === 'flirt' ? 1 : def.cx.wit === 'hug' ? 2 : 3]) || CX_LINES[id] || ['他點點頭。', '他搖搖頭。'];
+  return fill(L[ok ? 0 : 1] || '', {n:S.hero.name}); }
+function cxStart(id, def){
+  const c = def.cx;
+  startInter({who:id, place:cxPlaceOf(c, id), dur:c.dur, label:cxStatus(c), type:'cx', kind:c.id, cx:{...c}, src:'h', reqId:c.id});
+}
+function cxOutcome(I, frac){
+  const id = I.who, C = CHAR[id], c = I.cx, hn = S.hero.name, a0 = S.aff[id].h, d0 = S.des[id].h;
+  addAff(id, 'h', c.dAff * frac); addAff('h', id, c.dAff * 0.8 * frac);
+  addDes(id, 'h', c.dDes * frac); addDes('h', id, c.dDes * 0.8 * frac);
+  if (c.dMood) addMood(c.dMood * frac);
+  if (c.dAff > 0) addJeal(id, -3 * frac);
+  log(`${c.icon || '✨'} 你和 ${C.name}「${c.label}」${frac < 1 ? '（提早結束）' : '結束了'}。`, ['h', id], c.wit === 'intimate' ? 'heart' : '');
+  hMem(id, c.wit === 'intimate' ? 'close' : c.wit === 'none' ? 'together' : 'flirt', c.label, I.room, c.line ? fill(c.line, {h:hn, n:hn, x:c.label}) : null);
+  const ev = {none:'together', flirt:'flirt', hug:'hug', intimate:'hug'}[c.wit];
+  dayEv(id, ev, c.label); dayEv('h', ev, id + '|' + c.label);
+  const fk = id + ':' + c.id; if (!S.firsts[fk]){ S.firsts[fk] = S.t; addMem('h', `第一次和 ${C.name}「${c.label}」。`); }
+  if (c.wit !== 'none') witness(id, c.wit);
+  const da = S.aff[id].h - a0, dd = S.des[id].h - d0;
+  toast(`${C.name}　好感 ${fmtD(da)}・情慾 ${fmtD(dd)}`);
+  checkTier(id);
+}
+/* 表單 */
+function openCxForm(id, cxId){
+  const old = cxId ? (S.custom || []).find(c => c.id === cxId) : null;
+  const c = old || {label:'', icon:'', who:id, place:'here', dur:30, minAff:0, minDes:0, dAff:3, dDes:0, dMood:0, status:'', line:'', wit:'none', after:false};
+  openSheet(() => {
+    const opt = (v, n, cur) => `<option value="${esc(v)}" ${String(cur) === String(v) ? 'selected' : ''}>${esc(n)}</option>`;
+    $('#sheet').innerHTML = `<div class="grab"></div><h3>${old ? '編輯自訂互動' : '＋ 新增自訂互動'}</h3>
+      <div class="small muted">自己寫一個互動。室友會照他的個性和你設的門檻決定答不答應。只在你和室友之間。</div>
+      <form id="cxForm" class="cxform" autocomplete="off">
+        <label class="cxf"><span>名稱 <b class="req">必填</b></span><input name="label" maxlength="20" required value="${esc(c.label)}" placeholder="例如：一起做蛋糕"></label>
+        <label class="cxf cx-s"><span>圖示（emoji，可空白）</span><input name="icon" maxlength="8" value="${esc(c.icon)}" placeholder="✨"></label>
+        <label class="cxf"><span>對象</span><select name="who">${opt(id, `只有 ${nm(id)}`, c.who)}${opt('all', '所有室友', c.who)}</select></label>
+        <label class="cxf"><span>地點</span><select name="place">${cxPlaces().map(([v, n]) => opt(v, n, c.place)).join('')}</select></label>
+        <label class="cxf cx-s"><span>時間（分鐘）</span><input name="dur" type="number" inputmode="numeric" min="5" max="240" step="5" value="${c.dur}"></label>
+        <div class="cxsec">解鎖門檻（他對你的數值要到這裡才會出現）</div>
+        <div class="cxrow"><label class="cxf"><span>最低好感 <output>${c.minAff}</output></span><input name="minAff" type="range" min="0" max="100" value="${c.minAff}"></label>
+          <label class="cxf"><span>最低情慾 <output>${c.minDes}</output></span><input name="minDes" type="range" min="0" max="100" value="${c.minDes}"></label></div>
+        <div class="cxsec">效果（完整做完時；提早結束會照比例）</div>
+        <div class="cxrow"><label class="cxf"><span>好感 <output>${fmtD(c.dAff)}</output></span><input name="dAff" type="range" min="-20" max="20" value="${c.dAff}"></label>
+          <label class="cxf"><span>情慾 <output>${fmtD(c.dDes)}</output></span><input name="dDes" type="range" min="-20" max="20" value="${c.dDes}"></label>
+          <label class="cxf"><span>你的心情 <output>${fmtD(c.dMood)}</output></span><input name="dMood" type="range" min="-20" max="20" value="${c.dMood}"></label></div>
+        <label class="cxf"><span>平面圖上的狀態（可空白，預設「名稱中」）</span><input name="status" maxlength="24" value="${esc(c.status)}" placeholder="${esc(cxStatus(c))}"></label>
+        <label class="cxf"><span>他的回憶裡寫的一句話（可空白；{h} 會換成你的名字）</span><input name="line" maxlength="80" value="${esc(c.line)}" placeholder="例如：和 {h} 一起做的蛋糕有點焦，可是很好吃。"></label>
+        <label class="cxf"><span>被別的室友看到會不會吃醋</span><select name="wit">${Object.entries(CX_WIT).map(([v, n]) => opt(v, n, c.wit)).join('')}</select></label>
+        <label class="cxchk"><input type="checkbox" name="after" ${c.after ? 'checked' : ''}> 結束後接著 aftercare（事後照顧）</label>
+        <div class="cxerr hidden" id="cxErr"></div>
+        <div class="cxacts"><button type="button" class="btn" id="cxCancel">取消</button>${old ? '<button type="button" class="btn danger" id="cxDel">刪除</button>' : ''}<button type="submit" class="btn primary">儲存</button></div>
+      </form>`;
+    const f = $('#cxForm');
+    f.querySelectorAll('input[type=range]').forEach(r => r.oninput = () => { const o = r.parentElement.querySelector('output'); o.textContent = r.name.startsWith('min') ? r.value : fmtD(+r.value); });
+    f.label.oninput = () => { f.status.placeholder = `${cxClip(f.label.value, 20) || '名稱'}中`; };
+    $('#cxCancel').onclick = () => openChar(id);
+    const del = $('#cxDel');
+    if (del) del.onclick = () => { if (del.dataset.sure){ S.custom = S.custom.filter(x => x.id !== cxId); syncCustom(); save(); toast('已刪除自訂互動'); openChar(id); }
+      else { del.dataset.sure = 1; del.textContent = '確定刪除？'; } };
+    f.onsubmit = ev => { ev.preventDefault();
+      const d = Object.fromEntries(new FormData(f).entries()); d.after = f.after.checked; d.id = old ? old.id : undefined;
+      const cl = cxClean(d), er = $('#cxErr');
+      if (!cl){ er.textContent = '請先填互動的名稱。'; er.classList.remove('hidden'); f.label.focus(); return; }
+      S.custom = S.custom || [];
+      if (old) S.custom[S.custom.findIndex(x => x.id === old.id)] = cl; else S.custom.push(cl);
+      syncCustom(); save(); toast(`已儲存「${cl.label}」`); openChar(id); };
+  }, false);
+}
+function cxManageHTML(id){
+  const list = (S.custom || []).filter(c => c.who === 'all' || c.who === id);
+  return `<div class="cxlist">${list.map(c => `<div class="cxitem"><span class="cxi">${esc(c.icon || '✨')}</span><span class="cxn"><b>${esc(c.label)}</b><small>${c.who === 'all' ? '所有室友' : '只有他'}・${esc((cxPlaces().find(p => p[0] === c.place) || ['', '就在這裡'])[1])}・${c.dur} 分・門檻 ${c.minAff}/${c.minDes}・好感 ${fmtD(c.dAff)} 情慾 ${fmtD(c.dDes)}${c.after ? '・aftercare' : ''}</small></span><button class="btn sm" data-cxe="${esc(c.id)}">編輯</button></div>`).join('')}
+    <button class="btn wide cxadd" id="cxAdd">＋ 新增互動</button></div>`;
+}
+
+</script>
+<script>
 'use strict';
 /* 《失衡》公寓模擬 v1 —— 純前端、無 AI */
 const SAVE_KEY = 'imbalance_save_v1';
@@ -2167,7 +2314,7 @@ function gain(id, da, dd){ const dimA = v => Math.max(0.15, 1 - Math.max(0, v) /
   addAff(id, 'h', da * dimA(S.aff[id].h)); addAff('h', id, da * 0.8 * dimA(S.aff.h[id])); addDes(id, 'h', dd * dimD(S.des[id].h)); addDes('h', id, dd * 0.8 * dimD(S.des.h[id])); }
 // 舊存檔補上新欄位的預設值
 function migrate(s){
-  s.hero.mood ??= 65; s.hero.traits ??= []; s.hero.hobbies ??= []; s.reqCd ??= {}; s.rejN ??= {}; s.evSeen ??= {}; s.evLast ??= {}; s.talkCd ??= {}; s.jeal ??= {}; s.jealOf ??= {};
+  s.hero.mood ??= 65; s.hero.traits ??= []; s.hero.hobbies ??= []; s.reqCd ??= {}; s.rejN ??= {}; s.evSeen ??= {}; s.evLast ??= {}; s.talkCd ??= {}; for (const k in s.talkCd) s.talkCd[k] = Math.min(s.talkCd[k], (s.t || 0) + 30); s.jeal ??= {}; s.jealOf ??= {};
   s.rival ??= {}; s.hist ??= {}; s.hev ??= {}; s.lastTest ??= {};
   // 用詞更新：舊存檔裡的文字一併改成新用詞（id 不變）
   // 已移除的互動：舊存檔裡進行中的直接結束，相關紀錄拿掉
@@ -2194,6 +2341,8 @@ function migrate(s){
   for (const id in (s.ents || {})){ const e = s.ents[id]; e.label = fixW(e.label); if (e.ov) e.ov.label = fixW(e.ov.label); }
   if (s.hAction){ s.hAction.label = fixW(s.hAction.label); s.hAction.lbl = fixW(s.hAction.lbl); } s.tierSeen ??= {}; s.later ??= null; s.lastCollide ??= -9999;
   (s.residents || []).forEach(id => { if (s.tierSeen[id] == null){ const a = s.aff[id].h, d = s.des[id].h; let m = 0; REL_TIERS.forEach((t, i) => { if (a >= t.aff && d >= t.des) m = i; }); s.tierSeen[id] = m; } });
+  s.custom = Array.isArray(s.custom) ? s.custom.map(cxClean).filter(Boolean) : [];
+  if (s.inter && s.inter.cx){ const c = cxClean(s.inter.cx); if (c){ s.inter.cx = c; s.inter.label = cxStatus(c); } else { ['h', s.inter.who].forEach(id => { const e = s.ents[id]; if (e){ e.busy = false; e.act = 'idle'; e.label = '閒著'; } }); s.inter = null; } }
   return s;
 }
 function checkUnlock(id){
@@ -2237,11 +2386,11 @@ function pruneHist(){
 }
 function addMem(id, text){ if (S.mem[id]) S.mem[id].push({t:S.t, text}); }
 // 和女主角相處時的即時回憶（時間、地點、他自己的語氣）
-function hMem(id, cat, x, room){
+function hMem(id, cat, x, room, text){
   const V = typeof MEM_VOICE !== 'undefined' && MEM_VOICE[id]; if (!V || !S.mem[id]) return;
   const L = V[cat] || V.chat, r = room || S.ents[id].room;
   const place = r === 'out' ? '外面' : (G.rooms[r] ? roomName(r) : '');
-  S.mem[id].push({t:S.t, text:W(fill(rnd(L), {h:S.hero.name, x:x || ''})), place, h:true, cat});
+  S.mem[id].push({t:S.t, text:W(text || fill(rnd(L), {h:S.hero.name, x:x || ''})), place, h:true, cat});
 }
 function dayEv(id, type, x){ if (S.dayEv[id]) S.dayEv[id].push({type, x}); }
 function bubble(id, text, mins = 20){ const e = S.ents[id]; if (e) e.bubble = {text, until:S.t + mins}; }
@@ -2447,7 +2596,7 @@ const ikPlace = I => I.room === 'r_h' ? '你房間' : I.room === 'r_' + I.who ? 
 const ikText = I => `${S.hero.name} 和 ${nm(I.who)} 在${ikPlace(I)}${IK[I.ik].n}中`;
 const afterText = I => `${nm(I.who)} 在照顧你（aftercare）`;
 // 平面圖／狀態用的一句話：清楚標示正在做什麼
-function interTxt(I){ if (I.ik) return '💗 ' + ikText(I); if (I.after) return '🤍 ' + afterText(I); return (I.intimate ? '💗 ' : '💞 ') + I.label; }
+function interTxt(I){ if (I.cx) return `${I.cx.icon || '✨'} ${S.hero.name} 和 ${nm(I.who)}：${I.label}`; if (I.ik) return '💗 ' + ikText(I); if (I.after) return '🤍 ' + afterText(I); return (I.intimate ? '💗 ' : '💞 ') + I.label; }
 function startInter(o){
   if (S.away && o.type === 'intimate') return;      // 你不在的時候，不會開始心動階段的親密互動
   // o: {who, place, dur, label, type, aff, des, feed, cheer, src, reqId}
@@ -2463,7 +2612,8 @@ function startInter(o){
   else if (o.type === 'intimate' && G.rooms[room].spots && G.rooms[room].spots.bed){ route(h, room, 'bed'); route(c, room, 'bed'); }
   else { const sl = freeSlot(room, ['h', o.who], true); route(h, room, sl); route(c, room, sl + 1); }
   [h, c].forEach(e => { if (walking(e)){ e.act = 'walk'; e.label = `和${e.id==='h'?nm(o.who):S.hero.name}前往${room==='out'?'外面':G.rooms[room].name}`; } });
-  if (o.ik) log(`💗 你和 ${nm(o.who)} 一起走進${room === 'r_h' ? '你的房間' : G.rooms[room].name}，準備${IK[o.ik].n}。`, ['h', o.who], 'heart');
+  if (o.cx){ if (room !== h.room || walking(c)) log(`${o.cx.icon || '✨'} 你和 ${nm(o.who)} 一起去${room === 'r_h' ? '你的房間' : room === 'out' ? '外面' : G.rooms[room].name}，準備「${o.cx.label}」。`, ['h', o.who]); }
+  else if (o.ik) log(`💗 你和 ${nm(o.who)} 一起走進${room === 'r_h' ? '你的房間' : G.rooms[room].name}，準備${IK[o.ik].n}。`, ['h', o.who], 'heart');
   else if (o.after){}
   else if (o.type === 'intimate' && !o.quiet) log(INTIMATE_START[o.who], ['h', o.who], 'heart');
   else if (o.type === 'intimate') log(`${nm(o.who)} 和你一起走進${room === 'r_h' ? '你的房間' : G.rooms[room].name}，門輕輕闔上。`, ['h', o.who], 'heart');
@@ -2482,6 +2632,7 @@ function interThink(){
     const lb = I.ik ? `${IK[I.ik].n}中（${I.room === 'r_' + I.who ? '他房間' : ikPlace(I)}）` : I.after ? '事後照顧（aftercare）' : I.label;
     if (I.ik === 'night' && S.t === I.start){ const m = S.t % 1440; I.dur = m < 7 * 60 ? 7 * 60 - m : 1440 - m + 7 * 60; }
     [h, c].forEach(e => { e.act = I.after ? 'after' : (I.act || act); e.label = lb; e.feed = !!I.feed; });
+    if (I.cx && S.t === I.start){ log(interTxt(I), ['h', I.who], I.cx.wit === 'intimate' ? 'heart' : ''); }
     if (I.ik && S.t === I.start){ log(interTxt(I), ['h', I.who], 'heart'); showTalk(I.who, `💗 ${ikText(I)}。`); }
     if (I.after && S.t === I.start){ const L = AFTERCARE[I.who].lines[I.acv || 0]; log(`🤍 ${L[0]}`, ['h', I.who], 'heart'); showTalk(I.who, L[0]); }
     if ((!I.ik || I.ik === 'night') && !I.after && I.intimate && INTIMATE_SCENE[I.who] && !(I.ik === 'night' && S.t !== I.start)){ const sc = INTIMATE_SCENE[I.who], k = S.t === I.start ? 0 : S.t === I.start + Math.floor(I.dur / 2) ? 1 : -1;
@@ -2498,7 +2649,7 @@ function endInter(ok, frac){
   if (ok && frac > 0) applyOutcome(I, frac);
   if (I.room === 'out') route(h, 'living');
   else { h.act = 'idle'; h.label = '閒著'; }
-  if (ok && frac >= 1 && I.intimate && AFTERCARE[I.who]) startAftercare(I);
+  if (ok && frac >= 1 && (I.intimate || (I.cx && I.cx.after)) && AFTERCARE[I.who]) startAftercare(I);
 }
 // 親密之後：短短的事後照顧，同樣在平面圖上即時進行（依各自的人設，可能走去廚房或浴室）
 function startAftercare(I){
@@ -2507,6 +2658,7 @@ function startAftercare(I){
   startInter({who:I.who, place:room, spot, dur:A.dur, label:'事後照顧', type:'care', kind:'after', after:true, aff:4, des:0, cheer:true, quiet:true, src:'after', reqId:'after', acv:Math.floor(Math.random() * A.lines.length)});
 }
 function applyOutcome(I, frac){
+  if (I.cx) return cxOutcome(I, frac);
   const id = I.who, C = CHAR[id], hn = S.hero.name;
   const mood = moodOf(S.ents[id]);
   const a0 = S.aff[id].h, d0 = S.des[id].h;
@@ -2833,7 +2985,7 @@ function heroInter(id, itype, auto){
   if (o.busy){ toast(`${nm(id)} 現在在忙別的事。`); return; }
   if (def.only && def.only !== id){ toast('這是別人的專屬互動。'); return; }
   if (def.hrs && !inHrs(def.hrs)){ toast(`「${def.label}」要在 ${String(Math.floor(def.hrs[0] % 24)).padStart(2, '0')}:00 之後的時段才行。`); return; }
-  if (interLocked(id, def)){ toast(`你們的關係還沒到這一步（需要「${REL_TIERS[def.tier].n}」）。`); return; }
+  if (interLocked(id, def)){ toast(def.cx && cxLocked(id, def) ? `「${def.label}」還沒解鎖（${cxNeed(def)}）。` : `你們的關係還沒到這一步（需要「${REL_TIERS[def.tier].n}」）。`); return; }
   S.hAction = null; if (!auto) closeSheet();
   if (h.room && h.room === o.room && !walking(o)) resolveHeroInter(id, itype);
   else { S.hPending = {who:id, itype, auto:!!auto}; log(`你${auto ? '想找人說說話，' : ''}去找 ${nm(id)}。`, ['h']); }
@@ -2844,24 +2996,25 @@ function interFromDef(id, d, extra){
   const type = d.ik ? 'intimate' : d.T || 'flirt';
   startInter({who:id, place:d.place, spot:d.spot, dur:d.dur, label:d.lbl || d.label, type, kind:d.K || d.id, ik:d.ik, act:d.act, dk:d.dk, wk:d.wk, catchP:d.catchP, feed:d.feed, aff:d.aff, des:d.des, ...extra});
 }
-const interLocked = (id, def) => (def.tier || 0) > relTier(id);
+const TALK_CD = 30;            // 重複說話不加分的冷卻：30 遊戲分鐘
+const interLocked = (id, def) => (def.tier || 0) > relTier(id) || cxLocked(id, def);
 const lineOf = (id, itype) => (H_LINES[id][itype] || (H_LINES_EXTRA[id] || {})[itype] || (PERSONA_LINES[id] || {})[itype] || (() => { const d = H_INTER.find(x => x.id === itype); return d && d.tier && STAGE_LINES[id][d.tier]; })() || ['', '']).map(l => fill(l, {n:S.hero.name}));
 function resolveHeroInter(id, itype){
   const def = H_INTER.find(x => x.id === itype), o = S.ents[id], C = CHAR[id];
   const base = {chat:.88, care:.92, joke:.78, praise:.88, flirt:.5, cook:.55, movie:.55, walk:.5, terrace:.5, hug:.42, stay:.45, intimate:.3, sex:.28, book:.75, jog:.5, coop:.55, listen:.6, shoot:.75, sketch:.75, brew:.8, tease:.6, approach:.4}[itype] ?? def.p ?? .6;
   const aff = S.aff[id].h, des = S.des[id].h, m = moodOf(o), T = TALK[id];
-  let p = base + aff / 200 + (['flirt','hug','stay','intimate','sex'].includes(itype) || (def.tier || 0) >= 1 ? des / 160 : 0) + (m - 50) / 300 + (hMood() - 50) / 400 - (S.jeal[id] || 0) / 400;
+  let p = base + aff / 200 + (['flirt','hug','stay','intimate','sex'].includes(itype) || (def.tier || 0) >= 1 || (def.cx && def.cx.wit !== 'none') ? des / 160 : 0) + (m - 50) / 300 + (hMood() - 50) / 400 - (S.jeal[id] || 0) / 400;
   if (['work','music','draw','code','photo'].includes(o.act) && !['chat','praise'].includes(itype)) p -= 0.2;
   p += compatOf(id) * 0.03;                                         // 合拍的人比較容易答應
   if (def.hobby) p += (HOBBIES[def.hobby].c[id] || 0) > 0 ? 0.15 : -0.1; // 興趣相投
   if (itype === 'tease' && TRAITS.playful.c[id] < 0) p -= 0.15;
-  if (itype === 'intimate' || (def.ik && !def.hrs)){ const h = hourOf(S.t); if (!(h >= 20 || h < 2)) p -= 0.25; }
+  if (itype === 'intimate' || (def.ik && !def.hrs) || (def.cx && def.cx.wit === 'intimate')){ const h = hourOf(S.t); if (!(h >= 20 || h < 2)) p -= 0.25; }
   const asleep = o.act === 'sleep';
   if (asleep) p = itype === 'chat' ? 0.12 : 0.03;
   p = clamp(p, 0.03, 0.97);
   const flirtNo = itype === 'flirt' && !asleep && aff < (hasT('bold') ? 15 : 25);      // 試玩版規則：還不夠熟時，撩人一定落空（大膽的她門檻低一點）
   const ok = !flirtNo && Math.random() < p;
-  let [aLine, rLine] = lineOf(id, itype);
+  let [aLine, rLine] = def.cx ? [cxLine(id, def, true), cxLine(id, def, false)] : lineOf(id, itype);
   // 試玩版的聊天文本：閒聊／關心／撩人的敘述
   if (itype === 'chat' && Math.random() < 0.6) aLine = fill(rnd(T.chat), {n:S.hero.name});
   if (itype === 'care') aLine = fill(T.care, {n:S.hero.name});
@@ -2870,8 +3023,8 @@ function resolveHeroInter(id, itype){
   if (ok && hMood() >= 75 && ['chat','joke','care'].includes(itype) && Math.random() < 0.4) aLine += '你的好心情，好像也感染了他。';
   const cp = compatOf(id); if (ok && cp >= 3 && Math.random() < 0.3) aLine += '他好像很喜歡跟你待在一起。'; else if (ok && cp <= -2 && Math.random() < 0.4) aLine += '只是他的反應，比你想的淡。';
   const voice = (S.hero.traits || []).map(t => TRAIT_VOICE[t]?.[itype]).find(Boolean) || '';
-  const noGain = !!(def.talk && (S.talkCd[id] || 0) > S.t);       // 2 小時內重複聊天，不再加分
-  if (def.talk) S.talkCd[id] = S.t + 120;
+  const noGain = !!(def.talk && (S.talkCd[id] || 0) > S.t);       // 30 分鐘（遊戲時間）內重複聊天，不再加分
+  if (def.talk) S.talkCd[id] = S.t + TALK_CD;
   if (ok){
     if (asleep) log(`${C.name} 被你叫醒了，揉著眼睛坐起來。`, [id]);
     log(`你${voice}對 ${C.name}「${def.label}」。${aLine}`, ['h', id], (itype === 'intimate' || def.ik) ? 'heart' : '');
@@ -2881,7 +3034,8 @@ function resolveHeroInter(id, itype){
       log('✨ Alexander 真的笑了。很短，但所有人都會記得這一天。', ['h','alexander'], 'big'); toast('✨ 你逗笑了 Alexander！');
       addAff('alexander', 'h', 6); dayEv('alexander', 'laugh'); dayEv('h', 'laugh');
     }
-    if (STAGED.some(x => x.id === itype)) interFromDef(id, def, {src:'h', noGain});
+    if (def.cx) cxStart(id, def);
+    else if (STAGED.some(x => x.id === itype)) interFromDef(id, def, {src:'h', noGain});
     else startInter({who:id, place:def.place, dur:def.dur, label:def.lbl || def.label, ik:def.ik, dk:def.dk, type:itype === 'intimate' || def.ik ? 'intimate' : itype === 'care' ? 'care' : (['chat','joke','praise','book','tease'].includes(itype) ? 'chat' : ['flirt','hug','stay','approach','listen'].includes(itype) ? 'flirt' : 'together'), kind:itype === 'stay' ? 'hug' : itype === 'tease' ? 'joke' : itype === 'approach' ? 'flirt' : itype, aff:def.aff, des:def.des, src:'h', noGain, cheer:itype === 'care' && hMood() < 40});
     if (aLine.length > 30) showTalk(id, aLine);
   } else {
@@ -3021,7 +3175,7 @@ function showAwaySummary(A){
 let lastFrame = 0, acc = 0, running = false;
 function startGame(){
   $('#start').classList.add('hidden'); $('#game').classList.remove('hidden');
-  for (const k in VIS) delete VIS[k]; ui.follow = true; ui.floor = G.floors ? (S.ents.h.f || 0) : 0; $('#tokens').innerHTML = ''; buildPlan(); ui.ff = null; ffUi(); setSpeed(SPEEDS.includes(S.speed) ? S.speed : DEFAULT_SPEED); switchView('home');
+  S.custom = S.custom || []; syncCustom(); for (const k in VIS) delete VIS[k]; ui.follow = true; ui.floor = G.floors ? (S.ents.h.f || 0) : 0; $('#tokens').innerHTML = ''; buildPlan(); ui.ff = null; ffUi(); setSpeed(SPEEDS.includes(S.speed) ? S.speed : DEFAULT_SPEED); switchView('home');
   if (S.pending) showRequest();
   if (!running){ running = true; lastFrame = performance.now(); requestAnimationFrame(frame); }
 }
@@ -3161,7 +3315,7 @@ function renderTokenDecor(){
     t.classList.toggle('sel', ui.sel === e.id);
   }
   const pb = $('#planBanner'), I0 = S.inter, hs = S.ents.h.act === 'solo';
-  if (pb){ const on = (I0 && I0.start != null && (I0.ik || I0.after)) || hs; pb.classList.toggle('hidden', !on);
+  if (pb){ const on = (I0 && I0.start != null && (I0.ik || I0.after || I0.cx)) || hs; pb.classList.toggle('hidden', !on);
     if (on){ pb.textContent = hs && !I0 ? `🔒 ${S.hero.name} 在房間獨處（自我取悅中）` : interTxt(I0); pb.classList.toggle('after', !!(I0 && I0.after)); } }
   const h = hourOf(S.t); const p = $('#plan'); p.classList.toggle('night', h >= 22 || h < 6); p.classList.toggle('dusk', (h >= 18 && h < 22) || (h >= 6 && h < 7));
 }
@@ -3186,11 +3340,11 @@ function needsHTML(e){ return `<div class="needs">${Object.keys(NEED_LBL).map(k 
 function renderHero(){
   const e = S.ents.h, I = S.inter;
   let actTxt = `${ACTS[e.act]?.icon || ''} ${e.label || ACTS[e.act]?.label || ''}`;
-  if (I){ actTxt = I.start == null ? `👣 正和 ${nm(I.who)} 前往${I.room === 'out' ? '外面' : G.rooms[I.room].name}` : (I.ik || I.after ? interTxt(I) : `${I.intimate ? '💗' : '💞'} 和 ${nm(I.who)}「${I.label}」`) + `・剩 ${Math.max(0, I.start + I.dur - S.t)} 分`; }
+  if (I){ actTxt = I.start == null ? `👣 正和 ${nm(I.who)} 前往${I.room === 'out' ? '外面' : G.rooms[I.room].name}` : (I.ik || I.after || I.cx ? interTxt(I) : `${I.intimate ? '💗' : '💞'} 和 ${nm(I.who)}「${I.label}」`) + `・剩 ${Math.max(0, I.start + I.dur - S.t)} 分`; }
   else if (S.hAction && S.hAction.until) actTxt += `・剩 ${Math.max(0, S.hAction.until - S.t)} 分`;
   const autoOn = S.heroAuto !== false; const byAuto = (S.hAction && S.hAction.auto) || (S.hPending && S.hPending.auto);
   const where = e.room === 'out' ? '外面' : roomName(e.room);
-  $('#heroPanel').innerHTML = `<div class="av">${avOf('h')}</div><div class="hp-main"><div><b>${esc(S.hero.name)}</b> <span class="muted small">在${where}</span></div><div class="hp-act">${actTxt}${byAuto ? ' <span class="pill">自動</span>' : ''}</div>${moodHTML()}${needsHTML(e)}
+  $('#heroPanel').innerHTML = `<div class="av">${avOf('h')}</div><div class="hp-main"><div><b>${esc(S.hero.name)}</b> <span class="muted small">在${where}</span></div><div class="hp-act">${esc(actTxt)}${byAuto ? ' <span class="pill">自動</span>' : ''}</div>${moodHTML()}${needsHTML(e)}
    <label class="autotog"><input type="checkbox" id="autoChk" ${autoOn ? 'checked' : ''}><span class="sw"></span>女主角自動生活</label></div>
    <div class="hp-btns"><button class="btn sm primary" id="btnAct">行動</button>${I || S.hAction || S.hPending ? `<button class="btn sm" id="btnStop">${I ? '結束' : '取消'}</button>` : ''}</div>`;
   $('#btnAct').onclick = openActions;
@@ -3323,6 +3477,7 @@ function renderSaveView(){
   box.innerHTML = `<h3 class="sec">存檔</h3><div class="card">
    <div class="kv"><span class="k">女主角</span><span>${esc(S.hero.name)}，${esc(S.hero.age)} 歲，${esc(S.hero.job)}</span><span class="k">外貌</span><span>${esc(S.hero.look || '—')}</span><span class="k">格局</span><span>${LAYOUTS[S.layout].name}</span><span class="k">進度</span><span>第 ${dayOf(S.t)} 天 ${clockStr(S.t)}</span></div>
    <div class="small muted">遊戲每過一小時（遊戲時間）會自動存到這台裝置的瀏覽器。</div>
+   <div class="small muted" id="buildTag">版本：${esc(document.querySelector('meta[name=imb-build]')?.content || '本機開發版')}</div>
    <button class="btn primary wide" id="sv1">💾 立即存檔</button>
    <button class="btn wide" id="sv2">⬇️ 匯出存檔檔案（.json）</button>
    <button class="btn wide" id="sv3">⬆️ 匯入存檔檔案</button>
@@ -3352,16 +3507,15 @@ function openChar(id, tab){
     const moments = [...S.mem[id]].filter(x => x.h).reverse().slice(0, 5), mems = moments.length ? moments : [...S.mem[id]].reverse().slice(0, 4);
     const canAct = home(e) && home(S.ents.h) && !S.inter; const rt = relTier(id), tab = ui.charTab;
     const pane = (k, html) => `<div class="cpane ${tab === k ? '' : 'hidden'}" data-p="${k}">${html}</div>`;
-    const act = `<div class="kv"><span class="k">現在</span><span>${ACTS[e.act]?.icon || ''} ${esc(e.label)}・${where}</span></div>
-      <div class="field-title">互動 ${canAct ? '' : '<span class="small">（他或你不在家，或你正在忙）</span>'}${(S.talkCd[id] || 0) > S.t ? '<span class="small">・剛聊過，再聊不會加分</span>' : ''}</div>
-      ${Object.keys(H_INTER_GRP).filter(g => H_INTER.some(d => d.grp === g && personaOk(d) && (!d.only || d.only === id))).map(g => `<div class="igrp">${H_INTER_GRP[g]}</div><div class="agrid">${H_INTER.filter(d => d.grp === g && personaOk(d) && (!d.only || d.only === id)).map(d => { const lock = interLocked(id, d);
-        return `<button class="btn" data-i="${d.id}" ${!canAct || lock ? 'disabled' : ''}><i>${lock ? '🔒' : d.icon}</i>${d.label}${lock ? `<small>需要「${REL_TIERS[d.tier].n}」</small>` : d.id === 'flirt' && S.aff[id].h < 25 ? '<small>還不夠熟</small>' : ''}</button>`; }).join('')}</div>`).join('')}`;
+    const note = [canAct ? '' : '他或你不在家，或你正在忙', (S.talkCd[id] || 0) > S.t ? '剛聊過，30 分鐘內再聊不會加分' : ''].filter(Boolean).join('・');
+    const act = `${note ? `<div class="small muted cnote">${note}</div>` : ''}
+      ${Object.keys(H_INTER_GRP).filter(g => g === 'custom' || H_INTER.some(d => d.grp === g && personaOk(d) && (!d.only || d.only === id))).map(g => `<div class="igrp">${H_INTER_GRP[g]}</div><div class="agrid">${H_INTER.filter(d => d.grp === g && personaOk(d) && (!d.only || d.only === id)).map(d => { const lock = interLocked(id, d), cl = d.cx && cxLocked(id, d);
+        return `<button class="btn${d.cx ? ' cxbtn' : ''}" data-i="${esc(d.id)}" ${!canAct || lock ? 'disabled' : ''}><i>${lock ? '🔒' : esc(d.icon)}</i>${esc(d.label)}${cl ? `<small>${cxNeed(d)}</small>` : lock ? `<small>需要「${REL_TIERS[d.tier].n}」</small>` : d.id === 'flirt' && S.aff[id].h < 25 ? '<small>還不夠熟</small>' : d.cx ? `<small>${d.cx.dur} 分</small>` : ''}</button>`; }).join('')}</div>${g === 'custom' ? cxManageHTML(id) : ''}`).join('')}`;
     const info = `<div class="kv"><span class="k">年齡</span><span>${C.age} 歲・${C.nick}</span><span class="k">職業</span><span>${C.job}</span>
       <span class="k">房間</span><span>${myRoom ? roomName(myRoom) : '—'}</span>
-      <span class="k">個性</span><span>${C.persona}</span><span class="k">特質</span><span>${C.tags.map(t => `<span class="pill">${t}</span>`).join('')}</span>
+      <span class="k">個性</span><span>${C.persona}</span>
       <span class="k">外貌</span><span>${C.look}</span><span class="k">喜歡</span><span>${C.likes.join('、')}</span><span class="k">討厭</span><span>${C.dislikes.join('、')}</span>
       <span class="k">心情</span><span>${moodLbl(m)}<span class="small muted">（${m}）</span>${bar(m, 'mood')}</span>
-      <span class="k">正在</span><span>${ACTS[e.act]?.icon || ''} ${esc(e.label)}・${where}</span>
       <span class="k">今日作息</span><span class="small">${sched}</span>
       <span class="k">室友交情</span><span class="small">${rels.map(r => `${nm(r.o)} ${r.v}（${PAIR_LBL(r.v)}${(S.rival[pkey(id, r.o)] || 0) >= 8 ? '・較勁中' : ''}）`).join('・')}</span></div>`;
     const rel = `<div class="card relme"><div class="relrow"><span class="lb">他對你的好感</span><div>${bar(S.aff[id].h, 'aff', -1)}</div><span class="lbv">${Math.round(S.aff[id].h)}</span>
@@ -3372,15 +3526,20 @@ function openChar(id, tab){
       <span class="k">合拍度</span><span>${(() => { const v = compatOf(id), w = compatWhy(id); return `<span class="pill ${v < 0 ? 'neg' : 'a'}">${compatLbl(v)}（${v >= 0 ? '+' : ''}${v}）</span><span class="small muted">${w.length ? w.join(' ') : '你的個性與興趣跟他沒什麼交集'}・好感成長 ×${cmul(id).toFixed(2)}</span>`; })()}</span></div>
       <div class="field-title">最近和你的時光</div>${mems.map(x => `<div class="memo ${x.h ? 'hmem' : ''}"><span class="tm">${stamp(x.t)}${x.place ? `・${esc(x.place)}` : ''}</span>${esc(x.text)}</div>`).join('') || '<div class="muted small">還沒有。</div>'}
       <button class="btn wide histbtn" id="histBtn">📜 他的紀錄</button>`;
-    $('#sheet').innerHTML = `<div class="grab"></div><div class="sh"><div class="av">${avOf(id)}</div><div><h3>${C.name} <span class="muted small">${C.age}歲</span></h3><div class="small muted">${C.job}</div>
-      <div><span class="tierpill t${rt}">${REL_TIERS[rt].n}</span><span class="pill">${moodLbl(m)}</span></div></div></div>
+    const nowIcon = S.inter && S.inter.who === id && S.inter.cx ? (S.inter.cx.icon || '✨') : (ACTS[e.act]?.icon || '•');
+    $('#sheet').innerHTML = `<div class="grab"></div><div class="sh ccard-h"><div class="av">${avOf(id)}</div><div class="ccard-m"><h3>${C.name} <span class="muted small">${C.age}歲</span></h3><div class="small muted">${C.job}</div>
+      <div class="ctags">${C.tags.map(t => `<span class="pill">${t}</span>`).join('')}</div></div><button class="iconbtn" id="histIcon" title="他的紀錄" aria-label="他的紀錄">📜</button></div>
+      <div class="cnow" id="cNow"><span class="cn-i">${esc(nowIcon)}</span><span class="cn-t">${esc(e.label || ACTS[e.act]?.label || '')}</span><span class="cn-p">・${esc(where)}</span></div>
       <div class="seg ctabs">${CHAR_TABS.map(([k, n]) => `<button data-ct="${k}" class="${tab === k ? 'on' : ''}">${n}</button>`).join('')}</div>
       ${pane('act', act)}${pane('info', info)}${pane('rel', rel)}`;
     $('#sheet').querySelectorAll('[data-ct]').forEach(b => b.onclick = () => { ui.charTab = b.dataset.ct;
       $('#sheet').querySelectorAll('[data-ct]').forEach(x => x.classList.toggle('on', x === b));
       $('#sheet').querySelectorAll('.cpane').forEach(p => p.classList.toggle('hidden', p.dataset.p !== ui.charTab)); $('#sheet').scrollTop = 0; });
     $('#sheet').querySelectorAll('[data-i]').forEach(b => b.onclick = () => heroInter(id, b.dataset.i));
+    $('#sheet').querySelectorAll('[data-cxe]').forEach(b => b.onclick = () => openCxForm(id, b.dataset.cxe));
+    const ca = $('#cxAdd'); if (ca) ca.onclick = () => openCxForm(id);
     const hb = $('#histBtn'); if (hb) hb.onclick = () => openHist(id);
+    const hi = $('#histIcon'); if (hi) hi.onclick = () => openHist(id);
   });
 }
 function openHero(){
@@ -3539,7 +3698,7 @@ function initStart(){
 }
 // 測試用掛鉤
 function ff(mins, autoAnswer){ for (let i = 0; i < mins; i++){ stepMinute(); allEnts().forEach(e => moveEnt(e, 1)); if (S.pending && autoAnswer != null) answerRequest(autoAnswer); } snapVis(); drawTokens(); renderAll(true); }
-window.__imb = { get S(){ return S; }, get form(){ return form; }, compatOf, cmul, heroAuto, ff, pickEvent, fireEvent, fireCollide, fireTest, witness, relTier, pairV, hMood, evById, showResult, migrate, heroInter, doAction, endOfDay, stepMinute, startInter, answerRequest, showRequest, openChar, closeSheet, switchView, setSpeed, save, renderAll, startFF, stopFF, hMem, catchUp, get vis(){ return VIS; }, visSpeed, snapVis, route, resumeOffline, get lastAway(){ return ui.lastAway; }, openHist, recHist, pruneHist, caught, leaveSeen, interFromDef, soloOk, endSolo, startAftercare, interTxt, get ffState(){ return ui.ff; }, get ffLast(){ return ui.ffLast; } };
+window.__imb = { get S(){ return S; }, get form(){ return form; }, compatOf, cmul, heroAuto, ff, pickEvent, fireEvent, fireCollide, fireTest, witness, relTier, pairV, hMood, evById, showResult, migrate, heroInter, doAction, endOfDay, stepMinute, startInter, answerRequest, showRequest, openChar, closeSheet, switchView, setSpeed, save, renderAll, startFF, stopFF, hMem, syncCustom, openCxForm, cxClean, catchUp, get vis(){ return VIS; }, visSpeed, snapVis, route, resumeOffline, get lastAway(){ return ui.lastAway; }, openHist, recHist, pruneHist, caught, leaveSeen, interFromDef, soloOk, endSolo, startAftercare, interTxt, get ffState(){ return ui.ff; }, get ffLast(){ return ui.ffLast; } };
 Promise.race([loadAvatars(), new Promise(r => setTimeout(r, 2000))]).then(initStart);
 
 </script>
