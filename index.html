@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f7f1e8">
 <title>失衡・公寓觀察</title>
-<meta name="imb-build" content="2026-11-10 15:04 (台北)">
+<meta name="imb-build" content="2026-11-10 15:39 (台北)">
 <style>
 :root{
   --bg:#f7f1e8; --card:#fffaf3; --line:#e8dccb; --ink:#4a3f35; --muted:#9a8b7b; --accent:#c9876b; --accent2:#e7b9a3;
@@ -532,6 +532,13 @@ span.av,div.av{display:inline-block;border-radius:50%}
 .nmon{display:flex;align-items:center;gap:3px;font-size:12px;white-space:nowrap}
 .nmchecks{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:4px}.nmchecks label{display:flex;gap:4px;align-items:center;font-size:13px}
 .nmfx{display:flex;gap:8px;margin-top:4px}.nmfx label{display:flex;flex-direction:column;font-size:12px;flex:1}.nmfx input{width:100%;font-size:16px;padding:5px;border:1px solid var(--line);border-radius:8px;box-sizing:border-box}
+.ckcd{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
+/* 底部 7 個分頁：窄螢幕縮小字和圖示 */
+@media (max-width:400px){ .tabs button{font-size:10.5px;padding:5px 0 7px;min-width:0} .tabs button i{font-size:17px} }
+/* 紀錄下面的數值變化 */
+.fx{font-size:11px;line-height:1.4;color:var(--muted);margin-top:2px;font-weight:400}
+.fx .up{color:#3f8a55}.fx .dn{color:#c0504d}
+.hrow .fx{grid-column:2}
 
 </style>
 </head>
@@ -600,6 +607,7 @@ span.av,div.av{display:inline-block;border-radius:50%}
       <div class="view hidden" id="v-rel"></div>
       <div class="view hidden" id="v-diary"></div>
       <div class="view hidden" id="v-log"></div>
+      <div class="view hidden" id="v-ach"></div>
       <div class="view hidden" id="v-save"></div>
     </main>
 
@@ -609,6 +617,7 @@ span.av,div.av{display:inline-block;border-radius:50%}
       <button data-v="rel"><i>💞</i>關係</button>
       <button data-v="diary"><i>📔</i>日記</button>
       <button data-v="log"><i>🕰️</i>紀錄</button>
+      <button data-v="ach"><i>🏆</i>成就</button>
       <button data-v="save"><i>💾</i>存檔</button>
     </nav>
   </section>
@@ -1450,7 +1459,7 @@ const INTIMATE_SCENE = {
 
 </script>
 <script>
-// 《失衡》室友主動找你的事件（98 則）——改編自 失衡 Bot 試玩版的事件文本
+// 《失衡》室友主動找你的事件（120 則）——改編自 失衡 Bot 試玩版的事件文本
 // t：0 日常／1 曖昧／2 親近／3 心動（最多到吻；之後在平面圖上即時「共度中」，不跳時間）
 // rooms：你所在的位置（entry 玄關、living 客廳、kitchen 廚房、balcony 露臺、r_h 你的房間〔他會走來敲門〕、office 公司）
 // fl：n 只在晚上 20:00–03:00；m 只在早上 7:00–10:00；low 你心情不好時才會出現
@@ -1973,6 +1982,129 @@ E('theo','t3y',3,['hero'],'n',
 ['把他拉過來','他整個人撲進你懷裡，抱得很緊。「不要只把我當弟弟，」他小聲說，然後抬起頭吻你，莽撞又認真。\n……門關上了。'],
 ['「你先回去睡。」','「……好。」他走到門口又回頭，「明天早餐我要坐你旁邊。這個你不能拒絕。」'],
 ['「那下次你陪我。」','他的眼睛一下子亮起來：「真的？說好了！」他伸出小指，非要你勾了才肯走。']);
+
+/* ===== 再補事件（每位室友共 20 則：日常 6／曖昧 6／親近 5／心動 3）===== */
+/* —— Alexander —— */
+E('alexander','a0w',0,['entry'],'',
+'玄關的鞋櫃被重新排過了。每一雙鞋都按顏色深淺排好，只有你的那雙運動鞋，被單獨放在最上層。\nAlexander 站在旁邊，手裡拿著一支水平儀。\n「你的鞋，」他說，「放哪裡都不對，所以我給了它一層。」',
+['謝謝他','「不用。」他把水平儀收進口袋，「只是解決一個問題。」可是他走之前，又回頭看了一眼你那層。'],
+['我會自己收好','「好。」他把那一層空了出來。第二天，那一層還是空著，像在等你。'],
+['「其他人也有一層嗎？」','「沒有。」他說，然後好像發現自己說太快了，補了一句：「他們的鞋很好排。」']);
+E('alexander','a1z',1,['living','kitchen'],'',
+'Jasper 剛在客廳替你拍完照，相機還掛在他脖子上，人已經哼著歌上樓了。\nAlexander 從書房出來，在你剛剛站的位置停了一下，把被移動過的椅子推回原位。\n「他拍你，」他說，「都不先問光從哪裡來。」',
+['「那你會怎麼拍？」','他想了很久。「我不拍。」他說，「我會把窗戶開在你習慣站的地方。」'],
+['我覺得拍得很好','「嗯。」他把椅子又推正了一公分，「他確實有天分。」語氣裡聽不出是稱讚還是別的。'],
+['幫他把椅子推回去','你們一起把客廳恢復成原本的樣子。他沒說謝謝，只是在最後一張椅子推好時，看了你一眼。']);
+E('alexander','a1w',1,['roof'],'m',
+'清晨六點半，頂樓。Alexander 剛跑完步，額頭上還有汗，看見你，有點意外。\n「你從來不在這個時間出現。」他說，把擦汗的毛巾掛上欄杆，「今天是例外？」',
+['「想看看你說的光。」','他沒說話，往旁邊讓了一步。光從屋頂線上漫過來的時候，他輕聲說：「……就是這個。」聲音很低，像是只說給你聽。'],
+['只是睡不著','「失眠的原因有三種。」他說，然後停住，「……算了，你不需要被分析。」他把自己的保溫瓶遞給你，「溫的。」'],
+['問他明天還跑不跑','「每天都跑。」他說，又頓了頓，「如果你要來，我可以慢一點。」']);
+E('alexander','a2z',2,['living'],'n',
+'深夜，客廳只開著一盞落地燈。Alexander 坐在沙發上，手裡拿著一本書，卻很久沒有翻頁。\n「Liam 說你今天沒吃晚餐。」他說，沒有抬頭，「他很擔心。」\n他終於看向你。「我也是。」',
+['坐到他身邊','他把書闔上，放在一邊。你們沒說什麼，只是並肩坐著。過了一會兒，他的手覆上你的手背，很輕，像在確認溫度。'],
+['我只是忘了','「忘了。」他重複一次，像在記錄一個數據。然後他起身走進廚房，十分鐘後端出一盤切得很整齊的水果。「現在不會忘了。」'],
+['「你們在討論我？」','「我們在討論房子裡的每一件事，」他說，「你是最重要的那一件。」說完他自己愣住，把書又翻開了。']);
+
+/* —— Jasper —— */
+E('jasper','j0w',0,['kitchen'],'m',
+'早上，Jasper 頂著一頭亂髮站在咖啡機前，顯然剛起床。他看見你，揉了揉眼睛。\n「{n}，」他的聲音還很啞，「告訴我今天是星期幾。我有一個拍攝，可能是今天，也可能是昨天。」',
+['幫他看行事曆','你拿起他的手機看了一眼。是今天，一小時後。他慘叫一聲，抓起相機包就往外衝，經過你時在你頭上揉了一把：「你救了我的職業生涯！」'],
+['「你自己看手機啊。」','「手機會讓人焦慮，」他把咖啡一口喝完，「你比較不會。」他看了一眼螢幕，臉色瞬間發白。'],
+['遞給他一杯咖啡','他接過咖啡，閉著眼睛喝了一口，「如果你是我的助理，我會付你雙倍薪水。」']);
+E('jasper','j1z',1,['living'],'n',
+'Jasper 在客廳翻一本很舊的雜誌，封面上的模特兒是 Theo。\n「你看，」他把雜誌轉向你，「這是我第一次拍他。他那時候還會緊張到同手同腳。」\n他笑著，卻突然安靜下來。「你覺得他好看嗎？」',
+['「你拍得好看。」','他愣了一下，然後笑得很開心，「這個答案我收下了。」他把雜誌闔上，「下次換你上封面，我保證不讓你同手同腳。」'],
+['「他本來就好看。」','「是啊。」他把雜誌放回架上，語氣很輕鬆，手指卻在書背上停了一下。「年輕真好。」'],
+['「你在吃醋？」','「我？」他笑出聲，「我只是在做市場調查。」過了一會兒，他小聲補了一句：「……好吧，有一點。」']);
+E('jasper','j1w',1,['entry'],'',
+'你在玄關遇到 Jasper，他手上拿著兩個安全帽。\n「今天天氣太好了，」他說，「我借了一台偉士牌。後座剛好空著，剛好在等一個不怕風的人。」',
+['戴上安全帽','你們在城市裡繞了一個下午。紅燈的時候，他回頭對你說了什麼，風太大你沒聽清楚。他笑著說：「沒關係，重要的話我會再說一次。」'],
+['我會怕','「那我騎很慢，」他說，「慢到你可以看清楚每一扇窗戶。」你還是搖頭，他也不勉強，把安全帽掛在玄關，「它會在這裡等你。」'],
+['「是借的還是偷的？」','「借的！」他大笑，「……跟一個很久沒聯絡的前任借的。」他眨眨眼，「放心，我會還，而且不會再借了。」']);
+E('jasper','j2z',2,['balcony'],'n',
+'露臺的燈壞了，只剩城市的光。Jasper 坐在欄杆邊，沒有拿相機，手裡轉著一個舊的底片盒。\n「我很少跟人說這個，」他說，「我拍照，是因為我不知道怎麼留住人。」\n他抬頭看你。「但你好像不用拍，也不會走。」',
+['坐到他身邊','你在他旁邊坐下。他把底片盒放進你手心，合上你的手指。「裡面是空的，」他說，「留給以後。」'],
+['「我不會走。」','他看著你很久，久到你以為他要開玩笑。可是他沒有，他只是很輕地說了一聲：「好。」'],
+['「你可以試著不拍。」','「那很可怕。」他笑了，眼睛卻有點濕，「但如果是你，我想試試看。」']);
+
+/* —— Liam —— */
+E('liam','l0w',0,['kitchen'],'',
+'Liam 在廚房裡哼著歌揉麵團，臉上沾了一道麵粉。他看見你，笑著抬起沾滿麵粉的手。\n「別過來，會弄髒你，」他說，「不過……如果你想學怎麼做麵包的話，圍裙在那邊。」',
+['穿上圍裙','你揉得很用力，麵團黏得到處都是。他笑到彎下腰，然後伸手替你擦掉鼻尖上的麵粉。「好了，」他說，「現在我們一樣髒了。」'],
+['看他揉就好','你坐在流理台邊看他。他揉麵的動作很穩，很溫柔。「麵團跟人一樣，」他說，「急不得。」'],
+['告訴他臉上有麵粉','他用手背擦了一下，結果抹得更多。你忍不住笑出來，他也笑了：「你故意的吧？」']);
+E('liam','l1z',1,['kitchen','living'],'',
+'Jasper 拿著一盒外帶甜點晃進廚房：「{n}，我買了你喜歡的檸檬塔。」\nLiam 正在烤箱前，手上的隔熱手套還沒脫。烤箱裡，是一個剛出爐的檸檬塔。\n兩個人同時看向你。',
+['兩個都吃一口','你各咬了一口。Jasper 笑著說：「公平。」Liam 也笑，可是他把自己那個檸檬塔切得特別大塊，推到你面前。'],
+['吃 Liam 做的','Liam 的耳朵紅了，「……你不用顧慮我。」Jasper 聳聳肩，把外帶盒放進冰箱：「我的放隔夜也好吃，我很有耐心的。」'],
+['提議三個人一起吃','你們坐在餐桌邊分著吃。Jasper 一直在講笑話，Liam 一直在幫你倒茶。你忽然發現，這是你來這裡以後最熱鬧的一個下午。']);
+E('liam','l1w',1,['living'],'n',
+'很晚了，Liam 下班回來，整個人陷進沙發裡，連圍裙都還沒脫。\n「今天出了一百二十份餐，」他閉著眼睛說，「我的手臂已經不是我的了。」\n他睜開一隻眼睛看你。「……你可以陪我坐五分鐘嗎？就五分鐘。」',
+['坐下來陪他','你坐到他旁邊。五分鐘後，他已經睡著了，頭慢慢歪到你的肩膀上。你沒有動，一直等到他自己醒來，紅著臉道歉。'],
+['幫他按按手臂','你捏了捏他的手臂，他痛得倒吸一口氣，然後笑出聲。「再用力一點……啊，對，就是那裡。」他聽起來快哭了，也很幸福。'],
+['去幫他泡杯茶','你端著茶回來時，他已經睡著了。你把茶放在桌上，替他蓋了一條毯子。第二天早上，桌上多了一張紙條：「茶冷了也很好喝。謝謝。」']);
+E('liam','l2z',2,['kitchen'],'n',
+'深夜的廚房，Liam 在洗碗，水聲很大，他沒聽見你進來。\n你聽見他在小聲說話，像在練習什麼：「……如果你願意，以後每天的早餐，我都……」\n他轉過身，看見你，整個人僵住，手上的盤子差點掉下去。',
+['假裝什麼都沒聽到','「你、你什麼時候來的？」他慌張地問。你說剛到。他鬆了一口氣，又好像有點失望。走之前，你聽見他小聲說：「……明天早上，鬆餅。」'],
+['「每天的早餐，你都怎樣？」','他的臉紅到耳根，沉默了很久。「……都想做給你吃。」他說，聲音小得幾乎被水聲蓋過，「不只是因為你是室友。」'],
+['幫他把碗擦乾','你拿起抹布站到他旁邊。你們一個洗、一個擦，誰都沒說話。最後一個盤子放好時，他的手碰到你的手，這次他沒有道歉。']);
+
+/* —— Marcus —— */
+E('marcus','m0w',0,['entry'],'',
+'Marcus 坐在玄關的台階上換吉他弦，舊弦捲成一團丟在腳邊。你經過時，他頭也不抬地說：\n「踩到會痛。」\n他把那團弦往旁邊撥了撥，給你讓出一條路。',
+['蹲下來看他換弦','他沒趕你走。換到最後一根時，他把吉他遞給你：「撥一下。」你撥了一個很難聽的音。他嘴角動了一下，幾乎算是笑了。'],
+['直接走過去','你跨過去時，聽見他在背後說：「門口那把傘是你的？要下雨了。」'],
+['問他為什麼要換','「舊的聲音會死。」他說，「聽久了就聽不出來了，但它就是死了。」他停了一下，「人也一樣。」']);
+E('marcus','m1z',1,['living','kitchen'],'',
+'Samuel 抱著筆電，紅著臉跟你說他寫了一個可以幫你排行程的小程式。你們正聊著，Marcus 從樓上下來，在冰箱前停了一下。\n「排行程，」他打開冰箱，背對著你們，「不如直接問她什麼時候有空。」\nSamuel 的臉更紅了。',
+['替 Samuel 解圍','你說這個程式很實用。Samuel 鬆了一口氣。Marcus 關上冰箱，經過你身邊時低聲說：「你人太好。」聽不出是誇獎還是抱怨。'],
+['問 Marcus 想說什麼','「沒什麼。」他拿著一罐啤酒上樓了，走到一半又停下來，「今晚錄音室沒人，如果你有空。」他沒等你回答。'],
+['笑著跟兩個人道謝','Samuel 抱著筆電逃回房間了。Marcus 看著你，嘴角動了一下：「……你真的很麻煩。」說完他也走了。']);
+E('marcus','m1w',1,['living'],'n',
+'客廳的唱盤在轉，是一首很慢的歌。Marcus 靠在沙發上，閉著眼睛。\n你以為他睡著了，正要離開，他開口了：\n「這首歌，」他說，「我第一次聽，是在一個很糟的晚上。」他睜開眼睛，「別走。今天也很糟。」',
+['坐下來陪他聽','你們一起聽完那首歌，又聽了下一首。他什麼都沒解釋，你也沒問。唱片轉完，他說：「謝了。」那是你聽過他最真心的兩個字。'],
+['問他發生什麼事','他沉默了很久。「樂團的人走了一個。」他說，「沒什麼，常有的事。」可是他握著酒杯的手，指節是白的。'],
+['替他把燈關小','你把燈調暗一點，在他旁邊的地板上坐下。他沒說話，只是把一條毯子丟到你身上。']);
+E('marcus','m2z',2,['balcony','kitchen'],'n',
+'Jasper 在露臺上跟你說了一個很好笑的故事，你笑得停不下來。\nMarcus 站在門邊，不知道聽了多久。等 Jasper 下樓，他才走過來。\n「你跟他在一起，」他說，「笑得很大聲。」\n他停了一下。「我不會講笑話。」',
+['「你不需要講笑話。」','他看著你，眼神有點變了。「那我需要什麼？」你說他在就好。他沒回答，只是伸手把你被風吹亂的頭髮撥到耳後，動作很笨拙。'],
+['「那你學啊。」','「學不會。」他說，然後很認真地講了一個冷笑話。冷到你笑出來，他也笑了，那是你第一次聽見他笑出聲。'],
+['「你在吃醋？」','「嗯。」他沒有否認，讓你一時說不出話。「很難看，」他說，「但我不想裝。」']);
+
+/* —— Samuel —— */
+E('samuel','s1z',1,['living'],'n',
+'Samuel 和 Theo 在客廳打電動，Theo 輸了，哀嚎著倒在沙發上。\n「{n}！」Theo 拉著你，「幫我報仇！Samuel 太強了！」\nSamuel 握著手把，看著你，推了推眼鏡：「我、我可以讓你……不、不用，我、我會認真打。」',
+['坐下來跟他對打','你輸得很慘。第三局，他的角色突然一直撞牆。Theo 大叫：「你放水！」Samuel 的耳朵紅透了：「沒、沒有……手、手滑。」'],
+['讓 Theo 繼續打','「他、他每次都這樣……」Samuel 小聲說，然後在 Theo 看不見的地方，對你露出一個很小的笑。'],
+['在旁邊幫 Samuel 加油','Theo 抗議你偏心。Samuel 打得更認真了，贏了之後轉頭看你，好像在等一句誇獎。你說他好厲害，他整個人亮了起來。']);
+E('samuel','s2z',2,['office'],'',
+'下班後，你在公司樓下遇到 Samuel。外面下著大雨，他手上只有一把很小的折疊傘。\n「我、我送你到地鐵站，」他說，把傘撐開，「傘、傘很小，所以……要靠近一點。」',
+['靠近他','你們擠在小小的傘下，他整個人僵得像一根木頭，把傘幾乎全部傾向你那邊。到地鐵站時，他的左半邊濕透了，卻笑得很開心。'],
+['一起等雨小一點','你們站在騎樓下等雨。他不太說話，可是一直偷偷看你。雨停的時候，他小聲說：「……其實我希望它不要停。」'],
+['把傘推回他那邊','「你、你會淋濕的！」他慌了，又把傘推回來。你們推來推去，最後兩個人都淋了半身，在雨裡笑成一團。']);
+
+/* —— Theo —— */
+E('theo','t0w',0,['living','kitchen'],'',
+'Theo 抱著一隻不知道從哪裡撿來的流浪貓衝進客廳，衣服上都是貓毛。\n「{n}！」他壓低聲音，「不要告訴 Alexander！牠只住一晚！真的！」\n貓在他懷裡打了一個呵欠。',
+['幫他藏貓','你們把貓藏在你的房間裡，給牠鋪了一條舊毛巾。Theo 蹲在旁邊看牠吃東西，小聲說：「你是全世界最好的室友。」'],
+['「你自己去跟他說。」','Theo 哀嚎了一聲，抱著貓去敲 Alexander 的門。十分鐘後他回來了，一臉不可置信：「他說可以……還給了我一個紙箱。」'],
+['先帶貓去看醫生','Theo 的眼睛亮了：「對！我是醫學生！我應該想到的！」他抱著貓衝出門，又跑回來，「你陪我去？」']);
+E('theo','t1z',1,['kitchen'],'',
+'Liam 在廚房做菜，Theo 黏在他旁邊偷吃。看見你進來，Theo 立刻跑過來。\n「{n}，你嚐嚐這個！」他把一塊炸雞塞到你嘴邊，「Liam 做的，超好吃！」\nLiam 在後面笑：「那是我留給 {n} 的，你已經吃掉一半了。」',
+['張嘴吃掉','Theo 看著你吃，笑得比自己吃還開心。「好吃吧？」他說，然後轉頭對 Liam 說，「以後 {n} 的份我幫你送！」Liam 嘆氣：「那就送不到了。」'],
+['自己拿著吃','Theo 有點失望地收回手，又很快打起精神，「那下次我餵你！」Liam 在後面咳了一聲。'],
+['也餵 Theo 一口','他愣住，臉一下子紅了，乖乖張嘴吃掉。Liam 默默把火關小，背對著你們笑。']);
+E('theo','t1w',1,['balcony'],'n',
+'深夜的露臺，Theo 抱著膝蓋坐在角落，眼睛紅紅的。他看見你，慌張地擦了擦臉。\n「我、我沒哭，」他說，「是風太大。」\n今晚沒有風。',
+['坐到他身邊','你坐下來，什麼都沒問。過了很久，他小聲說：「今天考試沒考好。我是不是不適合當醫生？」你說不是。他靠到你肩膀上，「……你說的，我就信。」'],
+['給他一條毯子','你把毯子披到他身上。他抓著毯子的一角，悶悶地說：「謝謝……你不要告訴別人喔。」'],
+['逗他笑','你說了一個很爛的笑話。他瞪你，然後噗哧一聲笑出來，「好爛……」他擦掉眼淚，「再說一個。」']);
+E('theo','t2z',2,['living','entry'],'',
+'Theo 剛拍完照回來，身上還穿著拍攝的西裝，頭髮梳得很整齊，看起來突然很像大人。\n他站在你面前，有點緊張地拉了拉領帶。\n「怎麼樣？」他問，「這樣……你會不會比較不把我當小孩？」',
+['替他把領帶整理好','你伸手替他把歪掉的領帶拉正。他屏住呼吸，一動也不動。你的手離開時，他抓住你的手腕，很小聲地說：「……再一下下就好。」'],
+['「你本來就不是小孩。」','他的眼睛一下子亮了，然後又有點不好意思，「真的？那……那我可以把這套西裝留著，下次穿給你看嗎？」'],
+['「穿西裝也還是 Theo 啊。」','「什麼意思啦！」他抗議，可是嘴角一直往上翹，「……不過，你喜歡原本的我，對不對？」']);
 
 </script>
 <script>
@@ -3073,6 +3205,7 @@ function migrate(s){
   s.achCustom = Array.isArray(s.achCustom) ? s.achCustom.map(achClean).filter(Boolean).slice(0, 50) : [];
   const ov = s.textOv && typeof s.textOv === 'object' && !Array.isArray(s.textOv) ? s.textOv : {}; s.textOv = {};
   for (const [k, v] of Object.entries(ov)) if (typeof v === 'string' && v.trim() && k.length < 200) s.textOv[k] = txClean(v);
+  s.coef = s.coef && typeof s.coef === 'object' && !Array.isArray(s.coef) ? s.coef : {};
   s.npcMods = Array.isArray(s.npcMods) ? s.npcMods.map(nmClean).filter(Boolean).slice(0, 100) : [];
   return s;
 }
@@ -3091,9 +3224,9 @@ function checkTier(id){
 }
 
 /* ---------- 紀錄 / 回憶 / 日記事件 ---------- */
-function log(text, who = [], kind = ''){ text = W(text); S.log.push({t:S.t, text, who, kind}); if (S.log.length > 300) S.log.shift();
+function log(text, who = [], kind = ''){ text = W(text); const L0 = {t:S.t, text, who, kind}; S.log.push(L0); if (typeof fxReg === 'function') fxReg(L0, who); if (S.log.length > 300) S.log.shift();
   // 每位室友自己的重要時刻（修羅場、親密、獨處、關係變化），保留 14 天
-  if (['rival','heart','big'].includes(kind) || /^[🔒🔓👀🤍💗]/u.test(text)){ S.hev ??= {}; (who || []).forEach(id => { if (id === 'h' || !CHAR[id]) return; (S.hev[id] = S.hev[id] || []).push({t:S.t, text, k:kind}); }); } }
+  if (['rival','heart','big'].includes(kind) || /^[🔒🔓👀🤍💗]/u.test(text)){ S.hev ??= {}; (who || []).forEach(id => { if (id === 'h' || !CHAR[id]) return; const H0 = {t:S.t, text, k:kind}; (S.hev[id] = S.hev[id] || []).push(H0); if (typeof fxReg === 'function') fxReg(H0, [id]); }); } }
 /* ---------- 每位室友的行程紀錄（按分鐘合併成一段一段；只留最近 14 天） ---------- */
 const HIST_DAYS = 14;
 function recHist(){
@@ -3115,13 +3248,13 @@ function pruneHist(){
   for (const id in S.hev) S.hev[id] = S.hev[id].filter(x => x.t >= cut);
   for (const id in S.mem) S.mem[id] = S.mem[id].filter(m => !m.h || m.t >= cut);   // 相處回憶留 14 天；重要里程碑永久保留
 }
-function addMem(id, text){ if (S.mem[id]) S.mem[id].push({t:S.t, text}); }
+function addMem(id, text){ if (S.mem[id]){ const m = {t:S.t, text}; S.mem[id].push(m); if (typeof fxReg === 'function') fxReg(m, [id]); } }
 // 和女主角相處時的即時回憶（時間、地點、他自己的語氣）
 function hMem(id, cat, x, room, text){
   const V = typeof MEM_VOICE !== 'undefined' && MEM_VOICE[id]; if (!V || !S.mem[id]) return;
   const L = V[cat] || V.chat, r = room || S.ents[id].room || S.ents[id].dest;   // 走在路上時記目的地
   const place = r === 'out' ? '外面' : (G.rooms[r] ? roomName(r) : '');
-  S.mem[id].push({t:S.t, text:W(text || fill(rnd(L), {h:S.hero.name, x:x || ''})), place, h:true, cat});
+  const m = {t:S.t, text:W(text || fill(rnd(L), {h:S.hero.name, x:x || ''})), place, h:true, cat}; S.mem[id].push(m); if (typeof fxReg === 'function') fxReg(m, [id]);
 }
 function dayEv(id, type, x){ if (S.dayEv[id]) S.dayEv[id].push({type, x}); }
 function bubble(id, text, mins = 20){ const e = S.ents[id]; if (e) e.bubble = {text, until:S.t + mins}; }
@@ -3142,7 +3275,7 @@ function stepMinute(){
   requestThink();
   heroWarnings();
   recHist();
-  if (S.pending && !S.autoPause && S.t - S.pending.at > 30){ const id = S.pending.who; releasePending(); addAff(id, 'h', -0.5); log(`${nm(id)} 等不到你的回應，自己走開了。`, [id]); }
+  if (S.pending && !S.autoPause && S.t - S.pending.at > 30){ const id = S.pending.who; const fxo = typeof fxBegin === 'function'; if (fxo) fxBegin(); releasePending(); addAff(id, 'h', -0.5); log(`${nm(id)} 等不到你的回應，自己走開了。`, [id]); if (fxo) fxEnd(); }
   if (S.t % 10 === 0) achThink();
   if (S.t - S.lastSave >= 60){ save(); }
 }
@@ -3899,7 +4032,7 @@ function showAwaySummary(A){
     const segs = ((S.hist && S.hist[id]) || []).filter(x => x[1] > cut);
     const mins = {}; segs.forEach(x => { if (['walk','wait','idle'].includes(x[2])) return; const k = x[3] || ACTS[x[2]]?.label; mins[k] = (mins[k] || 0) + Math.max(1, Math.min(x[1], S.t) - Math.max(x[0], cut)); });
     const top = Object.keys(mins).sort((a, b) => mins[b] - mins[a]).slice(0, 3).map(k => `${k}（${durTxt(mins[k])}）`).join('、');
-    const lines = ev.slice(-3).map(x => `<div class="logline"><span class="tm">${stamp(x.t)}</span>${esc(x.text)}</div>`).join('');
+    const lines = ev.slice(-3).map(x => `<div class="logline"><span class="tm">${stamp(x.t)}</span>${esc(x.text)}${fxHtml(x, id)}</div>`).join('');
     const rq = A.req[id] ? `<div class="small">來找過你 ${A.req[id]} 次，你不在，先婉轉地延後了。</div>` : '';
     return `<div class="awaycard"><div class="sh"><div class="av mini-av">${avOf(id)}</div><b>${CHAR[id].name}</b><button class="btn small awayhist" data-h="${id}">📜 他的紀錄</button></div>
       <div class="small muted">${top ? '大多在：' + esc(top) : '沒什麼特別的。'}</div>${rq}${lines}</div>`;
@@ -3917,7 +4050,7 @@ function showAwaySummary(A){
 let lastFrame = 0, acc = 0, running = false;
 function startGame(){
   $('#start').classList.add('hidden'); $('#game').classList.remove('hidden');
-  S.custom = S.custom || []; S.textOv = S.textOv || {}; applyTextOv(); syncCustom(); S.npcMods = S.npcMods || []; syncNpcMods(); reseatAll(); for (const k in VIS) delete VIS[k]; ui.follow = true; ui.floor = G.floors ? (S.ents.h.f || 0) : 0; $('#tokens').innerHTML = ''; buildPlan(); ui.ff = null; ffUi(); setSpeed(SPEEDS.includes(S.speed) ? S.speed : DEFAULT_SPEED); switchView('home');
+  S.custom = S.custom || []; S.textOv = S.textOv || {}; applyTextOv(); syncCustom(); S.npcMods = S.npcMods || []; syncNpcMods(); S.coef = S.coef || {}; applyCoef(); reseatAll(); for (const k in VIS) delete VIS[k]; ui.follow = true; ui.floor = G.floors ? (S.ents.h.f || 0) : 0; $('#tokens').innerHTML = ''; buildPlan(); ui.ff = null; ffUi(); setSpeed(SPEEDS.includes(S.speed) ? S.speed : DEFAULT_SPEED); switchView('home');
   if (S.pending) showRequest();
   $('#cheatChk').onchange = ev => setCheat(ev.target.checked); $('#cheatBtn').onclick = openCheat; cheatSync();
   if (!running){ running = true; lastFrame = performance.now(); requestAnimationFrame(frame); }
@@ -4125,7 +4258,7 @@ function renderTicker(){
   box.querySelectorAll('.tkt').forEach(b => { const on = b.dataset.w === w; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
   const src = w === 'all' ? S.log : S.log.filter(l => (l.who || []).includes(w));
   const items = src.slice(-12).reverse();
-  box.querySelector('.tklist').innerHTML = items.map(l => `<div><span class="tm">${clockStr(l.t)}</span>${esc(l.text)}</div>`).join('') || `<div class="muted small">${w === 'all' ? '還沒有。' : `最近沒有和 ${esc(w === 'h' ? S.hero.name : nm(w))} 有關的事。`}</div>`;
+  box.querySelector('.tklist').innerHTML = items.map(l => `<div><span class="tm">${clockStr(l.t)}</span>${esc(l.text)}${fxHtml(l)}</div>`).join('') || `<div class="muted small">${w === 'all' ? '還沒有。' : `最近沒有和 ${esc(w === 'h' ? S.hero.name : nm(w))} 有關的事。`}</div>`;
 }
 function switchView(v){
   ui.view = v; document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
@@ -4133,7 +4266,7 @@ function switchView(v){
   renderView(v); renderAll(true); window.scrollTo(0, 0);
 }
 function renderView(v){
-  if (v === 'people') renderPeople(); if (v === 'rel') renderRel(); if (v === 'diary') renderDiary(); if (v === 'log') renderLog(); if (v === 'save') renderSaveView();
+  if (v === 'people') renderPeople(); if (v === 'rel') renderRel(); if (v === 'diary') renderDiary(); if (v === 'log') renderLog(); if (v === 'save') renderSaveView(); if (v === 'ach') renderAchView();
 }
 function renderPeople(){
   const box = $('#v-people');
@@ -4172,7 +4305,7 @@ function renderDiary(){
     if (S.dayEv[who] && S.dayEv[who].length) html += `<div class="small muted center">今天已累積 ${S.dayEv[who].length} 件事，午夜會寫進日記。</div>`;
   } else {
     const list = [...(S.mem[who] || [])].reverse();
-    html += list.length ? `<div class="card">${list.map(m => `<div class="memo"><span class="tm">${stamp(m.t)}</span>${esc(m.text)}</div>`).join('')}</div>` : `<div class="card muted">還沒有回憶。</div>`;
+    html += list.length ? `<div class="card">${list.map(m => `<div class="memo"><span class="tm">${stamp(m.t)}</span>${esc(m.text)}${fxHtml(m, 'h')}</div>`).join('')}</div>` : `<div class="card muted">還沒有回憶。</div>`;
   }
   box.innerHTML = html;
   box.querySelectorAll('.seg button').forEach(b => b.onclick = () => { ui.diaryMode = b.dataset.m; renderDiary(); });
@@ -4194,7 +4327,7 @@ function openHist(id, day, mode){
       const byDay = {}; segs.forEach(x => (byDay[dayOf(x[0])] = byDay[dayOf(x[0])] || []).push(x));
       body = Object.keys(byDay).sort((a, b) => b - a).map(d => `<div class="card entry"><div class="eh">第 ${d} 天・週${DOW[dowOf((d - 1) * 1440 + 1)]}</div>${byDay[d].map(x => {
         const hot = ['intimate','after','solo'].includes(x[2]) || (x[5].includes('h') && (['together','shower','sleep'].includes(x[2]) || /中|照顧|共度/.test(x[3])));
-        return `<div class="hrow ${hot ? 'hot' : ''}"><span class="tm">${clockStr(x[0])}–${clockStr(x[1] + 1)}</span><span class="ha">${ACTS[x[2]]?.icon || '•'} ${esc(x[3] || ACTS[x[2]]?.label || '')}</span><span class="hw">${esc(roomTxt(x[4]))}${x[5].length ? `・和 ${esc(who(x[5]))}` : ''}</span></div>`; }).join('')}</div>`).join('') || '<div class="card muted">這天還沒有紀錄。</div>';
+        return `<div class="hrow ${hot ? 'hot' : ''}"><span class="tm">${clockStr(x[0])}–${clockStr(x[1] + 1)}</span><span class="ha">${ACTS[x[2]]?.icon || '•'} ${esc(x[3] || ACTS[x[2]]?.label || '')}</span><span class="hw">${esc(roomTxt(x[4]))}${x[5].length ? `・和 ${esc(who(x[5]))}` : ''}</span>${x[5].length && typeof fxSeg === 'function' ? fxSeg(id, x[0], x[1]) : ''}</div>`; }).join('')}</div>`).join('') || '<div class="card muted">這天還沒有紀錄。</div>';
     } else if (ui.histMode === 'with'){
       const tot = {}; H.filter(x => inDay(x[0])).forEach(x => x[5].forEach(w => tot[w] = (tot[w] || 0) + (x[1] - x[0] + 1)));
       const ks = Object.keys(tot).sort((a, b) => tot[b] - tot[a]); const mx = Math.max(1, ...Object.values(tot));
@@ -4206,10 +4339,10 @@ function openHist(id, day, mode){
     } else if (ui.histMode === 'mem'){
       const list = [...(S.mem[id] || [])].filter(m => inDay(m.t)).reverse();
       const nH = list.filter(m => m.h).length;
-      body = list.length ? `<div class="small muted" style="margin:0 2px 6px">和 ${esc(S.hero.name)} 相處的回憶 ${nH} 則</div><div class="card">${list.map(m => `<div class="memo ${m.h ? 'hmem' : ''}"><span class="tm">${stamp(m.t)}${m.place ? `・${esc(m.place)}` : ''}</span>${esc(m.text)}</div>`).join('')}</div>` : '<div class="card muted">這天沒有新的回憶。</div>';
+      body = list.length ? `<div class="small muted" style="margin:0 2px 6px">和 ${esc(S.hero.name)} 相處的回憶 ${nH} 則</div><div class="card">${list.map(m => `<div class="memo ${m.h ? 'hmem' : ''}"><span class="tm">${stamp(m.t)}${m.place ? `・${esc(m.place)}` : ''}</span>${esc(m.text)}${fxHtml(m, id)}</div>`).join('')}</div>` : '<div class="card muted">這天沒有新的回憶。</div>';
     } else {
       const list = [...((S.hev && S.hev[id]) || [])].filter(x => inDay(x.t) && (x.k === 'rival' || /吃醋|撞見|看見|較勁|👀/.test(x.text))).reverse();
-      body = `<div class="card"><div class="small">現在的吃醋值：<b>${Math.round(S.jeal[id] || 0)}</b>${S.jealOf[id] && (S.jeal[id] || 0) >= 5 ? `（因為 ${nm(S.jealOf[id])}）` : ''}</div>${list.map(x => `<div class="logline"><span class="tm">${stamp(x.t)}</span>${esc(x.text)}</div>`).join('') || '<div class="muted small">這段時間沒有吃醋或較勁的時刻。</div>'}</div>`;
+      body = `<div class="card"><div class="small">現在的吃醋值：<b>${Math.round(S.jeal[id] || 0)}</b>${S.jealOf[id] && (S.jeal[id] || 0) >= 5 ? `（因為 ${nm(S.jealOf[id])}）` : ''}</div>${list.map(x => `<div class="logline"><span class="tm">${stamp(x.t)}</span>${esc(x.text)}${fxHtml(x, id)}</div>`).join('') || '<div class="muted small">這段時間沒有吃醋或較勁的時刻。</div>'}</div>`;
     }
     $('#sheet').innerHTML = `<div class="grab"></div><div class="sh"><div class="av">${avOf(id)}</div><div><h3>📜 ${C.name} 的紀錄</h3><div class="small muted">保留最近 ${HIST_DAYS} 天</div></div></div>
       <button class="btn" id="histBack">← 回到 ${C.name}</button>
@@ -4223,7 +4356,7 @@ function openHist(id, day, mode){
 }
 function renderLog(){
   const box = $('#v-log');
-  box.innerHTML = `<h3 class="sec">事件紀錄</h3><div class="card">${[...S.log].reverse().slice(0, 150).map(l => `<div class="logline"><span class="tm">${stamp(l.t)}</span>${esc(l.text)}</div>`).join('')}</div>`;
+  box.innerHTML = `<h3 class="sec">事件紀錄</h3><div class="card">${[...S.log].reverse().slice(0, 150).map(l => `<div class="logline"><span class="tm">${stamp(l.t)}</span>${esc(l.text)}${fxHtml(l)}</div>`).join('')}</div>`;
 }
 function renderSaveView(){
   const box = $('#v-save');
@@ -4234,11 +4367,12 @@ function renderSaveView(){
    <button class="btn primary wide" id="sv1">💾 立即存檔</button>
    <button class="btn wide" id="sv2">⬇️ 匯出存檔檔案（.json）</button>
    <button class="btn wide" id="sv3">⬆️ 匯入存檔檔案</button>
+   <button class="btn wide" id="saveShare">📤 分享存檔檔案</button>
    </div><h3 class="sec">設定</h3><div class="card">
    <label class="res-row" style="border:none"><input type="checkbox" id="auto2" ${S.heroAuto !== false ? 'checked' : ''}><span class="nm">女主角自動生活（沒下指令時照自己的作息）</span></label>
    <label class="res-row" style="border:none"><input type="checkbox" id="apChk" ${S.autoPause ? 'checked' : ''}><span class="nm">室友來邀約時自動暫停</span></label>
    <button class="btn danger wide" id="sv4">重新開始（新存檔）</button></div>`;
-  achSection(box);
+  $('#saveShare').onclick = shareSave;
   $('#sv1').onclick = () => { save(); toast('已存檔'); };
   $('#sv2').onclick = exportSave;
   $('#sv3').onclick = () => $('#importFile').click();
@@ -4278,7 +4412,7 @@ function openChar(id, tab){
         <div class="small muted" style="margin-top:4px">你對他：好感 ${Math.round(S.aff.h[id])}・情慾 ${Math.round(S.des.h[id])}${S.jealOf[id] && (S.jeal[id] || 0) >= 5 ? `・他在吃 ${nm(S.jealOf[id])} 的醋` : ''}</div></div>
       <div class="kv"><span class="k">階段</span><span><span class="tierpill t${rt}">${REL_TIERS[rt].n}</span><span class="pill">${tierName(S.aff[id].h, S.des[id].h)}</span><br><span class="small muted">${rt < 3 ? `下一階段「${REL_TIERS[rt + 1].n}」：好感 ${REL_TIERS[rt + 1].aff}／情慾 ${REL_TIERS[rt + 1].des}` : '已到最高階段'}</span></span>
       <span class="k">合拍度</span><span>${(() => { const v = compatOf(id), w = compatWhy(id); return `<span class="pill ${v < 0 ? 'neg' : 'a'}">${compatLbl(v)}（${v >= 0 ? '+' : ''}${v}）</span><span class="small muted">${w.length ? w.join(' ') : '你的個性與興趣跟他沒什麼交集'}・好感成長 ×${cmul(id).toFixed(2)}</span>`; })()}</span></div>
-      <div class="field-title">最近和你的時光</div>${mems.map(x => `<div class="memo ${x.h ? 'hmem' : ''}"><span class="tm">${stamp(x.t)}${x.place ? `・${esc(x.place)}` : ''}</span>${esc(x.text)}</div>`).join('') || '<div class="muted small">還沒有。</div>'}
+      <div class="field-title">最近和你的時光</div>${mems.map(x => `<div class="memo ${x.h ? 'hmem' : ''}"><span class="tm">${stamp(x.t)}${x.place ? `・${esc(x.place)}` : ''}</span>${esc(x.text)}${fxHtml(x, id)}</div>`).join('') || '<div class="muted small">還沒有。</div>'}
       <button class="btn wide histbtn" id="histBtn">📜 他的紀錄</button>`;
     const nowIcon = S.inter && S.inter.who === id && S.inter.cx ? (S.inter.cx.icon || '✨') : (ACTS[e.act]?.icon || '•');
     $('#sheet').innerHTML = `<div class="grab"></div><div class="sh ccard-h"><div class="av">${avOf(id)}</div><div class="ccard-m"><h3>${C.name} <span class="muted small">${C.age}歲</span></h3><div class="small muted">${C.job}</div>
@@ -4829,9 +4963,9 @@ function cheatSync(){
 function setCheat(on){
   S.cheat = !!on; if (on && !S.cheatUsed){ S.cheatUsed = S.t; log('🛠️ 打開了作弊模式。這個存檔之後會帶著 🛠️ 標記。', ['h']); }
   cheatSync();
-  if (on) openCheat(); else { if (ui.sheet && ui.sheet.cheat) closeSheet(); document.querySelectorAll('[data-ck]').forEach(n => n.remove()); }
+  if (on) openCheat(); else { if (ui.sheet && ui.sheet.cheat) closeSheet(); document.querySelectorAll('[data-ck],[data-ckcd],#ckCoef0,#ckText,#ckNpc,#nmForm,#nmList,#txList,#txFields').forEach(n => n.remove()); }
   save(); toast(on ? '🛠️ 作弊模式：可以修改數值' : '作弊模式關閉：數值不能修改');
-  if (ui.view === 'save') renderView('save');
+  if (ui.view === 'save' || ui.view === 'ach') renderView(ui.view);
 }
 // 可以改的數值：[標籤, 取值, 設值, 最小, 最大]
 function cheatFields(){
@@ -4844,6 +4978,13 @@ function cheatFields(){
   }
   f.push(['h', '你的心情', () => hMood(), v => { S.hero.mood = v; }, 0, 100]);
   for (const k of Object.keys(NEED_LBL)) f.push(['h', `你的${NEED_LBL[k]}`, () => S.ents.h.needs[k], v => { S.ents.h.needs[k] = v; }, 0, 100]);
+  // 室友之間：交情（雙向一起改）與競爭
+  const R = S.residents;
+  for (let i = 0; i < R.length; i++) for (let j = i + 1; j < R.length; j++){ const a = R[i], b = R[j], k = pkey(a, b);
+    f.push(['pair', `${nm(a)} ⇄ ${nm(b)} 交情`, () => pairV(a, b), v => { S.aff[a][b] = v; S.aff[b][a] = v; }, -100, 100]);
+    f.push(['pair', `${nm(a)} ⇄ ${nm(b)} 競爭`, () => S.rival[k] || 0, v => { S.rival[k] = v; }, 0, 100]); }
+  // 個性係數（影響吃醋、被逗笑、被稱讚、被撩的反應）
+  for (const id of R) for (const [k, n] of COEF_LBL) f.push(['coef', `${nm(id)}・${n}`, () => CHAR[id][k], v => { (S.coef[id] = S.coef[id] || {})[k] = v; CHAR[id][k] = v; }, 0, 1.5, 0.05]);
   return f;
 }
 function openCheat(){
@@ -4852,19 +4993,31 @@ function openCheat(){
     const F = cheatFields(); let last = null;
     $('#sheet').innerHTML = `<div class="grab"></div><h3>🛠️ 修改數值 <span class="pill">作弊模式</span></h3>
       <div class="small muted">拖動或輸入數字，馬上生效。關掉左上角的「作弊」開關就不能再改。</div>
-      <div class="cheatpanel">${F.map((x, i) => { const head = x[0] !== last ? `<div class="cksec">${x[0] === 'h' ? esc(S.hero.name) : esc(nm(x[0]))}</div>` : ''; last = x[0];
-        const v = Math.round(x[2]()); return head + `<label class="ckrow"><span>${esc(x[1])}</span><input type="range" min="${x[4]}" max="${x[5]}" value="${v}" data-ck="${i}"><input type="number" min="${x[4]}" max="${x[5]}" value="${v}" data-ck="${i}" inputmode="numeric"></label>`; }).join('')}</div>
+      <div class="cheatpanel">${F.map((x, i) => { const head = x[0] !== last ? `<div class="cksec" id="cks-${x[0]}">${x[0] === 'h' ? esc(S.hero.name) : x[0] === 'pair' ? '室友之間（交情／競爭）' : x[0] === 'coef' ? '個性係數（0～1.5）' : esc(nm(x[0]))}</div>` : ''; last = x[0];
+        const st = x[6] || 1, v = Math.round(x[2]() / st) * st, vs = st < 1 ? v.toFixed(2) : v; return head + `<label class="ckrow"><span>${esc(x[1])}</span><input type="range" min="${x[4]}" max="${x[5]}" step="${st}" value="${vs}" data-ck="${i}"><input type="number" min="${x[4]}" max="${x[5]}" step="${st}" value="${vs}" data-ck="${i}" inputmode="decimal"></label>`; }).join('')}
+        <div class="cksec">邀約／拒絕的冷卻</div><div class="ckcd">${S.residents.map(id => `<button type="button" class="btn sm" data-ckcd="${id}">重置 ${esc(nm(id))}</button>`).join('')}<button type="button" class="btn sm" data-ckcd="all">全部重置</button></div>
+        <button type="button" class="btn wide" id="ckCoef0">個性係數還原成預設</button></div>
       <button class="btn wide" id="ckNpc">🧩 自訂室友行為（新活動、室友之間、來找你的事件）</button><button class="btn wide" id="ckText">📝 修改遊戲裡的文字（事件、台詞、日記…）</button><button class="btn wide" id="ckClose">完成</button>`;
-    const apply = (i, raw) => { if (!S.cheat) return; const x = F[i], v = clamp(Math.round(Number(raw)), x[4], x[5]); if (!Number.isFinite(v)) return; x[3](v);
-      $('#sheet').querySelectorAll(`[data-ck="${i}"]`).forEach(n => { if (+n.value !== v) n.value = v; });
-      if (x[0] !== 'h'){ S.tiers[x[0]] = S.tiers[x[0]] ?? tierIdx(x[0]); checkTier(x[0]); } achThink(); save(); };
+    const apply = (i, raw) => { if (!S.cheat) return; const x = F[i], st = x[6] || 1, v = clamp(Math.round(Number(raw) / st) * st, x[4], x[5]); if (!Number.isFinite(v)) return; x[3](st < 1 ? Math.round(v * 100) / 100 : v);
+      $('#sheet').querySelectorAll(`[data-ck="${i}"]`).forEach(n => { if (Math.abs(+n.value - v) > 1e-9) n.value = st < 1 ? v.toFixed(2) : v; });
+      if (CHAR[x[0]]){ S.tiers[x[0]] = S.tiers[x[0]] ?? tierIdx(x[0]); checkTier(x[0]); } achThink(); save(); };
     $('#sheet').querySelectorAll('[data-ck]').forEach(n => { n.oninput = () => apply(+n.dataset.ck, n.value); n.onchange = () => { apply(+n.dataset.ck, n.value); renderAll(true); }; });
     $('#ckClose').onclick = closeSheet;
+    $('#sheet').querySelectorAll('[data-ckcd]').forEach(b => b.onclick = () => { resetCooldowns(b.dataset.ckcd); toast(b.dataset.ckcd === 'all' ? '已重置所有人的冷卻' : `已重置 ${nm(b.dataset.ckcd)} 的冷卻`); });
+    $('#ckCoef0').onclick = () => { resetCoef(); toast('個性係數已還原成預設'); ui.sheet.render(); };
     $('#ckNpc').onclick = () => openNpcMods();
     $('#ckText').onclick = () => { txUi.item = null; openTextEditor(); };
   }, false);
   ui.sheet.cheat = true; return true;
 }
+const COEF_LBL = [['jealousy', '醋意'], ['joke', '被逗笑'], ['praise', '被稱讚'], ['flirt', '被撩']];
+const COEF0 = Object.fromEntries(CHARS.map(c => [c.id, Object.fromEntries(COEF_LBL.map(([k]) => [k, c[k]]))]));
+// 讀檔時：先還原預設，再套用這個存檔改過的係數
+function applyCoef(){ for (const c of CHARS){ for (const [k] of COEF_LBL) c[k] = COEF0[c.id][k]; const o = S && S.coef && S.coef[c.id]; if (o) for (const [k] of COEF_LBL) if (typeof o[k] === 'number' && isFinite(o[k])) c[k] = clamp(o[k], 0, 1.5); } }
+function resetCoef(){ if (!S.cheat) return false; S.coef = {}; applyCoef(); save(); return true; }
+function resetCooldowns(who){ if (!S.cheat) return false; const L = who === 'all' ? S.residents : [who];
+  for (const id of L){ S.reqCd[id] = 0; S.rejN[id] = 0; S.lastReq[id] = -99999; }
+  if (who === 'all'){ S.lastAnyReq = -99999; S.lastCollide = -99999; } save(); return true; }
 /* ---- 成就 ---- */
 const anyRes = f => S.residents.some(f), allRes = f => S.residents.length && S.residents.every(f);
 const ACH = [
@@ -4901,18 +5054,18 @@ function achThink(){
   for (const a of achList()){ if (S.ach[a.id]) continue; let ok = false; try { ok = a.ok(); } catch(e){}
     if (ok){ S.ach[a.id] = {t:S.t, cheat:!!S.cheatUsed}; log(`🏆 達成成就「${a.n}」${S.cheatUsed ? '（🛠️）' : ''}`, ['h'], 'big'); toast(`🏆 ${a.icon} ${a.n}`); } }
 }
+function renderAchView(){ const box = $('#v-ach'); box.innerHTML = ''; achSection(box); }
 function achSection(box){
   const L = achList(), got = S.ach || {}, nGot = L.filter(a => got[a.id]).length;
   const card = el('div'); card.innerHTML = `<h3 class="sec">🏆 成就 <span class="muted small">${nGot} / ${L.length}</span>${S.cheatUsed ? ' <span class="pill cheatbadge" title="這個存檔用過作弊模式">🛠️ 用過作弊模式</span>' : ''}</h3>
     <div class="card achlist">${L.map(a => { const g = got[a.id]; return `<div class="ach${g ? ' got' : ''}" data-ach="${esc(a.id)}"><span class="ai">${g ? esc(a.icon) : '🔒'}</span><span class="an"><b>${esc(a.n)}${g && g.cheat ? ' <span class="cheatbadge" title="在用過作弊模式之後達成">🛠️</span>' : ''}${a.custom ? ' <small class="pill">自訂</small>' : ''}</b><small>${esc(a.d)}${g ? `・第 ${dayOf(g.t)} 天達成` : ''}</small></span>${a.custom ? `<button class="btn sm" data-ace="${esc(a.id)}">編輯</button>` : ''}</div>`; }).join('')}
       <button class="btn wide" id="achAdd">＋ 自訂成就</button>
-      <div class="acts2" style="margin-top:8px"><button class="btn" id="achShare">📤 分享成就</button><button class="btn" id="saveShare">📤 分享存檔檔案</button></div>
+      <button class="btn wide" id="achShare" style="margin-top:8px">📤 分享成就</button>
       <textarea class="sharebox hidden" id="shareBox" rows="5" readonly></textarea></div>`;
   box.appendChild(card);
   $('#achAdd').onclick = () => openAchForm();
   card.querySelectorAll('[data-ace]').forEach(b => b.onclick = () => openAchForm(b.dataset.ace));
   $('#achShare').onclick = shareAch;
-  $('#saveShare').onclick = shareSave;
 }
 function achShareText(){
   const L = achList(), got = S.ach || {}, g = L.filter(a => got[a.id]);
@@ -4947,16 +5100,16 @@ function openAchForm(aid){
       </form>`;
     const f = $('#achForm'), sync = () => { $('#achWho').hidden = !ACH_COND[f.type.value].who; f.num.min = ACH_COND[f.type.value].min; f.num.max = ACH_COND[f.type.value].max; };
     f.type.onchange = sync; sync();
-    $('#acCancel').onclick = () => { closeSheet(); switchView('save'); };
-    const del = $('#acDel'); if (del) del.onclick = () => { S.achCustom = S.achCustom.filter(x => x.id !== aid); delete (S.ach || {})[aid]; save(); closeSheet(); renderView('save'); toast('已刪除自訂成就'); };
+    $('#acCancel').onclick = () => { closeSheet(); switchView('ach'); };
+    const del = $('#acDel'); if (del) del.onclick = () => { S.achCustom = S.achCustom.filter(x => x.id !== aid); delete (S.ach || {})[aid]; save(); closeSheet(); renderView('ach'); toast('已刪除自訂成就'); };
     f.onsubmit = ev => { ev.preventDefault(); const d = Object.fromEntries(new FormData(f).entries()); d.id = old ? old.id : undefined; const a = achClean(d);
       if (!a){ toast('請先填成就的名稱'); return; }
       S.achCustom = S.achCustom || []; if (old) S.achCustom[S.achCustom.findIndex(x => x.id === old.id)] = a; else S.achCustom.push(a);
       if (old && S.ach) delete S.ach[a.id];   // 條件改了就重新判斷
-      achThink(); save(); closeSheet(); switchView('save'); toast(`已儲存「${a.n}」`); };
+      achThink(); save(); closeSheet(); switchView('ach'); toast(`已儲存「${a.n}」`); };
   }, false);
 }
-Object.assign(window.__imb, { setCheat, openCheat, cheatFields, achThink, achList, achCondOk, achClean, achShareText, openAchForm, ACH });
+Object.assign(window.__imb, { renderAchView, applyCoef, resetCoef, resetCooldowns, COEF0, setCheat, openCheat, cheatFields, achThink, achList, achCondOk, achClean, achShareText, openAchForm, ACH });
 
 </script>
 <script>
@@ -5294,6 +5447,76 @@ function openNmForm(kind, mid){
   ui.sheet.cheat = true; return true;
 }
 Object.assign(window.__imb, { nmClean, syncNpcMods, nmThink, nmSnippet, nmSave, nmDelete, nmToggle, nmImport, nmExport, openNpcMods, openNmForm, nmRomance });
+
+</script>
+<script>
+/* ---------- 每一筆紀錄下面的「數值變化」 ----------
+   一個互動／事件／撞見／一起做事從開始到結束，比較前後的好感、情慾、吃醋、室友交情、競爭、心情（已經過上下限的真實變化），
+   把變化存進這段時間寫下的每一筆紀錄（主紀錄、他的重要時刻、回憶）。舊紀錄沒有就不顯示。 */
+const FX = {d:0, snap:null, ents:[], filt:false};
+function fxSnap(){
+  const ids = ['h', ...S.residents], a = {}, d = {};
+  for (const x of ids) for (const y of ids) if (x !== y){ if (S.aff[x] && S.aff[x][y] != null) a[x + '|' + y] = S.aff[x][y]; if (S.des[x] && S.des[x][y] != null) d[x + '|' + y] = S.des[x][y]; }
+  return {a, d, j:{...(S.jeal || {})}, r:{...(S.rival || {})}, m:S.hero.mood};
+}
+function fxReg(obj, who){ if (FX.d > 0 && obj) FX.ents.push([obj, who || []]); }
+function fxBegin(filt){ if (!S) return; if (FX.d++ === 0){ FX.snap = fxSnap(); FX.ents = []; FX.filt = !!filt; } }
+const fxR = v => Math.round(v * 10) / 10;
+function fxDiff(s0, s1){
+  const out = [], seen = new Set();
+  for (const k in s1.a){ const [x, y] = k.split('|'), dv = fxR(s1.a[k] - (s0.a[k] ?? s1.a[k]));
+    if (x !== 'h' && y !== 'h'){ const pk = pkey(x, y); if (seen.has(pk)) continue; seen.add(pk); const k2 = y + '|' + x, dv2 = fxR((s1.a[k2] ?? 0) - (s0.a[k2] ?? s1.a[k2] ?? 0)); const av = fxR((dv + dv2) / 2); if (Math.abs(av) >= 0.1) out.push(['p', ...pk.split('|'), av]); continue; }
+    if (Math.abs(dv) >= 0.1) out.push(['a', x, y, dv]); }
+  for (const k in s1.d){ const [x, y] = k.split('|'); if (x !== 'h' && y !== 'h') continue; const dv = fxR(s1.d[k] - (s0.d[k] ?? s1.d[k])); if (Math.abs(dv) >= 0.1) out.push(['d', x, y, dv]); }
+  for (const k of new Set([...Object.keys(s0.j), ...Object.keys(s1.j)])){ const dv = fxR((s1.j[k] || 0) - (s0.j[k] || 0)); if (Math.abs(dv) >= 0.1) out.push(['j', k, '', dv]); }
+  for (const k of new Set([...Object.keys(s0.r), ...Object.keys(s1.r)])){ const dv = fxR((s1.r[k] || 0) - (s0.r[k] || 0)); if (Math.abs(dv) >= 0.1) out.push(['r', ...k.split('|'), dv]); }
+  const dm = fxR((s1.m ?? 0) - (s0.m ?? 0)); if (Math.abs(dm) >= 0.1) out.push(['m', 'h', '', dm]);
+  return out;
+}
+function fxEnd(){
+  if (!S || FX.d === 0) return; if (--FX.d > 0) return;
+  const ents = FX.ents; FX.ents = []; if (!ents.length) return;
+  const out = fxDiff(FX.snap, fxSnap()); if (!out.length) return; const n = S.fxN = (S.fxN || 0) + 1;
+  for (const [o, who] of ents){
+    const W = (who || []).filter(id => id !== 'h');
+    const f = FX.filt ? out.filter(x => x[0] === 'p' || x[0] === 'r' ? W.includes(x[1]) && W.includes(x[2]) : x[0] !== 'm' && W.includes(x[1])) : out;
+    if (f.length){ o.fx = f.map(x => [...x]); o.fxi = n; }
+  }
+}
+// 顯示：「對你的好感 +3・情慾 +2」「Theo 吃醋 +8・Theo↔Liam 交情 -2」
+function fxText(x, solo){
+  const [t, a, b] = x, n = id => nm(id), me = id => id === solo;
+  if (t === 'a') return a === 'h' ? `你對 ${n(b)} 的好感` : me(a) && b === 'h' ? '對你的好感' : b === 'h' ? `${n(a)} 對你的好感` : `${n(a)} 對 ${n(b)} 的好感`;
+  if (t === 'd') return a === 'h' ? `你對 ${n(b)} 的情慾` : me(a) ? '情慾' : `${n(a)} 情慾`;
+  if (t === 'j') return `${n(a)} 吃醋`;
+  if (t === 'p') return `${n(a)}↔${n(b)} 交情`;
+  if (t === 'r') return `${n(a)}↔${n(b)} 競爭`;
+  return '你的心情';
+}
+function fxHtml(e, owner){
+  if (!e || !Array.isArray(e.fx) || !e.fx.length || !S) return '';
+  const R = (e.who || (owner ? [owner] : [])).filter(id => CHAR[id]), solo = R.length === 1 ? R[0] : null;
+  const ok = x => Array.isArray(x) && typeof x[3] === 'number' && (x[1] === 'h' || CHAR[x[1]]) && (!x[2] || x[2] === 'h' || CHAR[x[2]]);
+  const sp = e.fx.filter(x => ok(x) && !((x[0] === 'a' || x[0] === 'd') && x[1] === 'h')).map(x => { const v = x[3], s = (v > 0 ? '+' : '') + (Number.isInteger(v) ? v : v.toFixed(1)); return `<span class="${v > 0 ? 'up' : 'dn'}">${esc(fxText(x, solo))} ${s}</span>`; });
+  return sp.length ? `<div class="fx">${sp.join('・')}</div>` : '';
+}
+// 他的紀錄・行程：和人相處的那一段，把那段時間的紀錄變化加起來（同一次互動只算一次）
+function fxSeg(id, t0, t1){
+  if (!S) return ''; const seen = new Set(), sum = {};
+  for (const l of S.log){ if (!l.fx || l.t < t0 || l.t > t1 + 1 || !(l.who || []).includes(id) || seen.has(l.fxi ?? l)) continue; seen.add(l.fxi ?? l);
+    for (const x of l.fx){ if (x[0] === 'm' || (x[1] !== id && x[2] !== id)) continue; const k = x.slice(0, 3).join('|'); sum[k] = sum[k] ? [...sum[k].slice(0, 3), fxR(sum[k][3] + x[3])] : [...x]; } }
+  const fx = Object.values(sum).filter(x => Math.abs(x[3]) >= 0.1);
+  return fx.length ? fxHtml({fx, who:[id]}) : '';
+}
+// 包住會改數值的動作：從開始到結束算一次
+function fxWrap(name, filt){
+  const f = window[name]; if (typeof f !== 'function' || f.__fx) return;
+  const w = function(...a){ fxBegin(filt); try { return f.apply(this, a); } finally { fxEnd(); } }; w.__fx = true; window[name] = w;
+  if (window.__imb && name in window.__imb) window.__imb[name] = w;
+}
+['answerRequest', 'endInter', 'heroInter', 'witness', 'caught', 'leaveSeen', 'endSolo', 'cookShare', 'startGroup', 'endGroup', 'resolveGrpInvite', 'startAftercare', 'fireCollide', 'fireTest', 'resolveHeroInter', 'stopHero', 'resolveEvent', 'heroSoloDone'].forEach(n => fxWrap(n));
+['socialThink', 'nmThink'].forEach(n => fxWrap(n, true));
+Object.assign(window.__imb, { fxHtml, fxSeg, fxBegin, fxEnd, fxDiff, get FX(){ return FX; } });
 
 </script>
 </body>
