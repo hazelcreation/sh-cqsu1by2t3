@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f7f1e8">
 <title>失衡・公寓觀察</title>
-<meta name="imb-build" content="2026-11-10 13:28 (台北)">
+<meta name="imb-build" content="2026-11-10 13:41 (台北)">
 <style>
 :root{
   --bg:#f7f1e8; --card:#fffaf3; --line:#e8dccb; --ink:#4a3f35; --muted:#9a8b7b; --accent:#c9876b; --accent2:#e7b9a3;
@@ -974,7 +974,9 @@ function bedroomFurn(r, outer){ // outer: 'L'（外牆在左）或 'R'
   if (H > 80){ f.push(['shelf', X(36,6), y+30, 6, 26]); f.push(['armchair', X(22,8), y+40, 8, 8]); f.push(['plant', X(23,5), y+52, 5, 5]); f.push(['ctable', X(22,8), y+30, 8, 7]); }
   else f.push(['plant', X(38,4), y+24, 4, 4]);
   r.furn = f;
-  r.spots = { ensuite:[X(6,0)+0, y+12], bed:[X(11,0), y+H-12], desk:[X(33.5,0), y+17], sofa:H > 80 ? [X(26,0), y+44] : undefined };
+  r.spots = { ensuite:[X(6,0)+0, y+12], bed:[X(11,0), y+H-12], desk:[X(33.5,0), y+17], floor:[X(28,0), y + (H > 80 ? 64 : Math.min(35, H - 26))] };   // floor：房間中間的空地（聊天、站著說話）
+  if (H > 80) r.spots.sofa = [X(26,0), y+44];
+  r.bathZone = [X(1,19), y+1, X(1,19) + 19, y+22+5];   // 浴室＋門口：除了洗澡，誰都不該站在這裡
   return r;
 }
 LAYOUTS.townhouse3 = {
@@ -988,13 +990,13 @@ LAYOUTS.townhouse3 = {
     {id:'living',name:'客廳',type:'living',f:0,x:0,y:22,w:44,h:56,door:[44,52],seg:0, furn:[
       ['shelf',2,23.5,24,4],['tv',1,36,2.4,18],['rug',7,35,28,22],['ctable',11,40,9,12],['sofa',25,34,9,24,'face-l'],
       ['armchair',10,59,9,8],['plant',37,25,5,5],['plant',2,71,5,5],['lamp',36,70,4,4]],
-      spots:{sofa:[29.5,46,'v']}},
+      spots:{sofa:[29.5,46,'v'], table:[15.5,46], floor:[22,66]}},
     {id:'r_theo',name:'Theo 的房間',type:'bed',owner:'theo',f:0,x:0,y:78,w:44,h:52,door:[44,104],seg:0},
     {id:'kitchen',name:'廚房・餐廳',type:'kitchen',f:0,x:56,y:0,w:44,h:50,door:[56,25],seg:0, furn:[
       ['counter',62,1,36,6],['counter',92,7,6,28],['stove',92,10,6,9],['ksink',75,1.6,9,5],['fridge',91.5,36,6.5,9],
       ['dtable',63,18,17,13],['chair',64.5,14,4,4],['chair',72,14,4,4],['chair',64.5,31,4,4],['chair',72,31,4,4],['chair',59,22.5,4,4],['chair',80,22.5,4,4],
       ['plant',58,43,5,5]],
-      spots:{stove:[88,15], table:[71.5,24.5]}},
+      spots:{stove:[88,15], table:[71.5,24.5], floor:[70,42]}},
     {id:'r_liam',name:'Liam 的房間',type:'bed',owner:'liam',f:0,x:56,y:50,w:44,h:62,door:[56,81],seg:0},
     {id:'wc',name:'客用洗手間',type:'wc',f:0,x:56,y:112,w:44,h:18,door:[56,121],seg:0, furn:[
       ['toilet',90,114,6,7],['sink',90,123,7,5],['plant',62,114,4,4]]},
@@ -1007,7 +1009,7 @@ LAYOUTS.townhouse3 = {
       ['planter',94,2,5,40],['planter',58,124,40,5],['plant',59,2,6,6],['plant',86,2,6,6],['plant',59,110,6,6],
       ['lounge',62,48,9,18],['lounge',76,48,9,18],['otable',68,70,10,10],['chair',64,73,4,4],['chair',79,73,4,4],
       ['parasol',66,86,14,14],['string',58,40,40,1.2]],
-      spots:{sofa:[72,58]}},
+      spots:{sofa:[72,58], table:[73,75], floor:[78,100]}},
   ],
   hall:[[44,0,12,130,0],[44,0,12,130,1],[44,0,12,130,2]],
   deco:[[44,0,12,12,0,''],[44,0,12,12,1,''],[44,0,12,12,2,'']],
@@ -2149,13 +2151,42 @@ function roomOf(id, ref){ // 將 own/his/h_room 轉成房間 id；獨立衛浴�
   if (ref === 'bath' && G && G.L.ensuite) return id === 'h' ? 'r_h' : 'r_' + id;
   if (ref === 'own') return 'r_' + id; if (ref === 'h_room') return 'r_h'; return ref;
 }
-const SPOT_OF = {sleep:'bed', nap:'bed', shower:'ensuite', wait:'ensuite', code:'desk', game:'desk', draw:'desk', photo:'desk', music:'desk', study:'desk', cook:'stove', meal:'table', coffee:'table', relax:'sofa', read:'sofa'};
-function spotKey(act, roomId){ const r = G.rooms[roomId]; const k = SPOT_OF[act]; return r && r.spots && k && r.spots[k] ? k : null; }
+/* ---------- 每個活動該在房間的哪裡（家具旁）：打電動／電腦在書桌、睡覺／親密在床、看電影在沙發、煮飯在爐台、吃喝在餐桌、
+   洗澡在浴室；其他（聊天、站著說話）在房間中間的空地。房間沒有那個家具時，依序找替代的位置。 ---------- */
+const SPOT_OF = {sleep:'bed', nap:'bed', solo:'bed', phone:'bed', shower:'ensuite', wait:'ensuite', code:'desk', game:'desk', draw:'desk', photo:'desk', music:'desk', study:'desk', hobby:'desk',
+  cook:'stove', meal:'table', coffee:'table', relax:'sofa', read:'sofa', balcony:'sofa', idle:'floor', chat:'floor', together:'floor', after:'floor'};
+const SPOT_FALLBACK = {desk:['desk', 'table', 'sofa', 'floor'], bed:['bed', 'sofa', 'floor'], sofa:['sofa', 'bed', 'table', 'floor'], table:['table', 'sofa', 'floor'],
+  stove:['stove', 'table', 'floor'], floor:['floor', 'sofa', 'table'], ensuite:['ensuite']};
+function resolveSpot(roomId, want){
+  const r = G.rooms[roomId]; if (!r || !r.spots || !want) return null;
+  let order = SPOT_FALLBACK[want] || [want];
+  if (want === 'sofa' && r.type !== 'bed') order = ['sofa', 'table', 'floor'];            // 公共空間沒有沙發就到桌邊，不會跑去床
+  if (want === 'desk' && r.type !== 'bed') order = ['table', 'sofa', 'floor'];            // 客廳／露臺：用電腦、念書在桌邊或沙發
+  return order.find(k => r.spots[k]) || null;
+}
+function spotKey(act, roomId){ return resolveSpot(roomId, SPOT_OF[act]); }
+// 一起互動時該在哪：看互動的種類、名稱
+function interSpot(o, roomId){
+  const r = G.rooms[roomId]; if (!r || !r.spots) return null;
+  if (o.spot && r.spots[o.spot]) return o.spot;
+  const t = `${o.kind || ''}|${o.K || ''}|${o.act || ''}|${o.ik || ''}|${o.reqId || ''}|${o.label || ''}`, bed = r.type === 'bed';
+  let want;
+  if (o.after && AFTERCARE[o.who]) want = AFTERCARE[o.who].place === 'ensuite' ? 'ensuite' : AFTERCARE[o.who].place === 'kitchen' ? 'stove' : 'bed';
+  else if (/shower|洗澡/.test(t)) want = 'ensuite';
+  else if (o.type === 'intimate' || o.ik || /night|sleep|morning|過夜|共度|晨間|纏綿|愛撫/.test(t)) want = 'bed';
+  else if (/coop|game|電動|電腦|設計圖|plan|listen|錄|耳機|選照片|code|study|念書|sketch|畫|shoot|照片|studio/.test(t)) want = 'desk';
+  else if (/movie|電影|黑膠|relax|沙發|quiz|抽考|吉他|guitar/.test(t)) want = 'sofa';
+  else if (/cook|做飯|試菜|泡麵|stove|溫存/.test(t) && r.spots.stove) want = 'stove';
+  else if (/coffee|咖啡|brew|紅豆|便當|甜點|feed|meal|吃|喝/.test(t)) want = 'table';
+  else if (/hug|stay|kiss|吻|擁抱|靠|依偎|hold|牽手|flirt|撩|撒嬌|親熱|cuff|袖扣/.test(t)) want = bed ? 'bed' : 'sofa';
+  else want = bed ? 'floor' : 'sofa';
+  return resolveSpot(roomId, want);
+}
 const actRoom = a => roomOf('h', a.room === 'h_room' ? 'r_h' : a.room);
 /* ---------- 房間裡的位置：每個人的頭像＋名字都不重疊；一起互動的兩人並肩、中間不會夾別人 ----------
    以最小的平面圖（寬 328px，1 單位≈3.28px）估算每個頭像佔的範圍（頭像＋右上角圖示、下方名字），
    在房間裡找離「該在的位置」（沙發、餐桌、爐台、床…）最近、又不會和別人重疊的點。 */
-let SEAT_PX = 3.28;
+let SEAT_PX = 3.28, SEAT_BATH = false;   // SEAT_BATH：這次找位置是不是要去浴室（洗澡）
 const textPx = s => [...String(s || '')].reduce((w, ch) => w + (ch.charCodeAt(0) > 0x2e80 ? 10.5 : /[A-Z]/.test(ch) ? 7 : 5.8), 0) + 8;
 const nameW = id => Math.min(90, textPx(nm(id)));
 // 某人在 (x,y) 時佔的矩形（px，相對於該點）；side：單人 null、並肩的左邊 'l'、右邊 'r'
@@ -2165,8 +2196,12 @@ function footRects(id, side){
   if (side === 'r') return [[1, -24, 35, 13], [0, 9, L + 1, 24]];
   return [[-14.5, -24, 21.5, 13], [-L / 2 - 1, 9, L / 2 + 1, 24]];
 }
-function rectsAt(id, side, x, y){ return footRects(id, side).map(r => [x + r[0] / SEAT_PX, y + r[1] / SEAT_PX, x + r[2] / SEAT_PX, y + r[3] / SEAT_PX]); }
-const rHit = (a, b) => a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3];
+// 第一個矩形是頭像本身（av）；並肩時頭上的狀態標籤（soft）可以稍微超出房間左右兩邊
+function rectsAt(id, side, x, y){ return footRects(id, side).map((r, i, all) => { const q = [x + r[0] / SEAT_PX, y + r[1] / SEAT_PX, x + r[2] / SEAT_PX, y + r[3] / SEAT_PX]; if (!i) q.av = true; if (side === 'l' && i === all.length - 1) q.soft = true; return q; }); }
+// 浴室區（core）只擋頭像本身：名字可以蓋過浴室的牆，但人不會站在浴室門口
+const rHit = (a, b) => !((a.core && !b.av) || (b.core && !a.av)) && a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3];
+const padR = (m, p) => { const q = [m[0] - p, m[1] - p, m[2] + p, m[3] + p]; q.av = m.av; return q; };
+const inRoom = (r, rs) => rs.every(q => (q.soft ? q[0] >= 0.3 && q[2] <= 99.7 : q[0] >= r.x + 0.3 && q[2] <= r.x + r.w - 0.3) && q[1] >= r.y + 0.3 && q[3] <= r.y + r.h - 0.3);
 // 房間裡其他人（已在、或正走過來的）目前／將來的位置
 function seatTarget(o){ if (o.path && o.path.length){ const w = o.path[o.path.length - 1]; return [w.x, w.y]; } return [o.x, o.y]; }
 // 房間名稱標籤（左上角或右上角）也算障礙，頭像不要蓋住它
@@ -2180,6 +2215,7 @@ function roomLabelRect(roomId){
 }
 function roomOccupants(roomId, exceptIds, over){
   const out = []; const lb = roomLabelRect(roomId); if (lb) out.push(lb);
+  const R = G.rooms[roomId]; if (R && R.bathZone && !SEAT_BATH){ const z = R.bathZone.slice(); z.core = true; out.push(z); }
   for (const o of allEnts()){
     if (exceptIds.includes(o.id) || o.hidden) continue;
     const r = o.path && o.path.length ? o.dest : o.room; if (r !== roomId) continue;
@@ -2194,8 +2230,8 @@ function findSeat(roomId, ids, anchor, exceptIds, pack, over, extra, noFallback)
   const r = G.rooms[roomId], occ = roomOccupants(roomId, exceptIds, over).concat(extra || []);
   const pair = ids.length === 2, pad = 1.5 / SEAT_PX;
   const mine = (x, y) => pair ? [...rectsAt(ids[0], 'l', x, y), ...rectsAt(ids[1], 'r', x, y)] : rectsAt(ids[0], null, x, y);
-  const inside = rs => rs.every(q => q[0] >= r.x + 0.3 && q[2] <= r.x + r.w - 0.3 && q[1] >= r.y + 0.3 && q[3] <= r.y + r.h - 0.3);
-  const free = (rs, p) => !occ.some(q => rs.some(m => rHit([m[0] - p, m[1] - p, m[2] + p, m[3] + p], q)));
+  const inside = rs => inRoom(r, rs);
+  const free = (rs, p) => !occ.some(q => rs.some(m => rHit(q.core ? m : padR(m, p), q)));
   for (const [x, y] of pack ? packCands(roomId) : seatCands(roomId, anchor)){ const rs = mine(x, y); if (inside(rs) && free(rs, pad)){ const q = [x, y]; q.ok = true; return q; } }
   if (pack || noFallback) return null;
   // 房間擠不下（玄關、洗手間這種小房間）：站到門口的走廊上
@@ -2253,15 +2289,16 @@ function assignPos(e, roomId, slot){
   e.seat = null;
   const spot = typeof slot === 'string' && r.spots && r.spots[slot] ? slot : null;
   e.slot = spot || 'free';
-  const q = findSeat(roomId, [e.id], seatAnchor(r, spot), [e.id]);
-  return q.ok ? q : (repack(roomId, e) || movePairFor(roomId, e) || q);
+  SEAT_BATH = spot === 'ensuite';
+  try { const q = findSeat(roomId, [e.id], seatAnchor(r, spot), [e.id]);
+    return q.ok ? q : (repack(roomId, e) || movePairFor(roomId, e) || q); } finally { SEAT_BATH = false; }
 }
 // 讀檔時（含舊存檔）：正在一起互動的兩人改成並肩，其他站著重疊的人各自挪到空位
 function reseatAll(){
   const I = S.inter, h = S.ents.h;
   if (I && I.room && G.rooms[I.room] && S.ents[I.who]){ const c = S.ents[I.who];
     if (!walking(h) && !walking(c) && h.room === I.room && c.room === I.room && !(h.seat && h.seat.with === c.id && c.seat && c.seat.with === 'h' && h.x === c.x && h.y === c.y)){
-      const [sh, sc] = seatPair(I.room, 'h', I.who, null); [[h, sh], [c, sc]].forEach(([e, sl]) => { const q = assignPos(e, I.room, sl); e.x = q[0]; e.y = q[1]; }); makeRoomFor(I.room, ['h', I.who]); } }
+      const [sh, sc] = seatPair(I.room, 'h', I.who, interSpot(I, I.room)); [[h, sh], [c, sc]].forEach(([e, sl]) => { const q = assignPos(e, I.room, sl); e.x = q[0]; e.y = q[1]; }); makeRoomFor(I.room, ['h', I.who]); } }
   for (const e of allEnts()){
     if (e.hidden || walking(e) || !e.room || !G.rooms[e.room]) continue;
     if (e.seat && S.ents[e.seat.with] && S.ents[e.seat.with].seat && S.ents[e.seat.with].seat.with === e.id) continue;
@@ -2271,17 +2308,24 @@ function reseatAll(){
 }
 // 一起互動的兩人：找一個能並肩坐下（左＝女主角、右＝他）、旁邊不會有人插進來的位置
 function seatPair(roomId, a, b, spot){
-  const r = G.rooms[roomId]; const sp = spot && r.spots && r.spots[spot] ? spot : (r.spots && r.spots.sofa ? 'sofa' : null);
-  const anchor = seatAnchor(r, sp);
+  const r = G.rooms[roomId]; const sp = spot && r.spots && r.spots[spot] ? spot : resolveSpot(roomId, r.type === 'bed' ? 'floor' : 'sofa');
+  const anchor = seatAnchor(r, sp); SEAT_BATH = sp === 'ensuite';
+  try {
   let p = findSeat(roomId, [a, b], anchor, [a, b]);
+  const far = q => Math.hypot(q[0] - anchor[0], q[1] - anchor[1]);
+  if (p.ok && far(p) > 6){            // 離家具太遠：左右對調試試（名字長短不同，貼牆的位置可能剛好放得下）
+    const q = findSeat(roomId, [b, a], anchor, [a, b]);
+    if (q.ok && far(q) < far(p) - 3) return [{pair:'r', with:b, p:q}, {pair:'l', with:a, p:q}];
+  }
   if (!p.ok) p = crowdedPairSeat(roomId, a, b, anchor) || findSeat(roomId, [a, b], anchor, [a, b, ...allEnts().filter(o => !pairedIn(o)).map(o => o.id)]);
   return [{pair:'l', with:b, p}, {pair:'r', with:a, p}];
+  } finally { SEAT_BATH = false; }
 }
 // 房間很擠：找一個「這對坐下後，被擋到的人都還找得到空位」的地方（必要時大家重新排緊）
 function crowdedPairSeat(roomId, a, b, anchor){
   const r = G.rooms[roomId];
   const movers = allEnts().filter(o => ![a, b].includes(o.id) && !o.hidden && !pairedIn(o) && (o.path && o.path.length ? o.dest : o.room) === roomId);
-  const inside = rs => rs.every(q => q[0] >= r.x + 0.3 && q[2] <= r.x + r.w - 0.3 && q[1] >= r.y + 0.3 && q[3] <= r.y + r.h - 0.3);
+  const inside = rs => inRoom(r, rs);
   const fixed = roomOccupants(roomId, [a, b, ...movers.map(o => o.id)]);
   for (let pass = 0; pass < 2; pass++){
     let tries = 0;
@@ -2310,7 +2354,7 @@ function movePairFor(roomId, e){
   if (!A) return null; const B = S.ents[A.seat.with]; if ((B.path && B.path.length ? B.dest : B.room) !== roomId) return null;
   const r = G.rooms[roomId], f = r.f;
   const singles = allEnts().filter(o => ![A.id, B.id, e.id].includes(o.id) && !o.hidden && !pairedIn(o) && (o.path && o.path.length ? o.dest : o.room) === roomId).map(o => o.id);
-  const inside = rs => rs.every(q => q[0] >= r.x + 0.3 && q[2] <= r.x + r.w - 0.3 && q[1] >= r.y + 0.3 && q[3] <= r.y + r.h - 0.3);
+  const inside = rs => inRoom(r, rs);
   const fixed = roomOccupants(roomId, [A.id, B.id, e.id, ...singles]);
   let tries = 0;
   for (const [x, y] of seatCands(roomId, seatTarget(A))){
@@ -2773,6 +2817,8 @@ function heroAuto(e){
   }
   autoAct('phone');
 }
+// 跟時間有關的台詞：「早安」只在早上說、「晚安」只在晚上說
+function quipFits(q, t = S.t){ const h = hourOf(t); if (/早安|早……/.test(q)) return h >= 5 && h < 11; if (/晚安/.test(q)) return h >= 20 || h < 3; return true; }
 function heroWarnings(){
   const n = S.ents.h.needs;
   for (const k in n){ if (n[k] < 15 && !S.warned[k]){ S.warned[k] = true; toast(`⚠️ 你的${NEED_LBL[k]}快見底了`); } if (n[k] > 30) S.warned[k] = false; }
@@ -2797,7 +2843,7 @@ function startInter(o){
   h.busy = c.busy = true;
   if (room === 'out'){ route(h, 'out'); route(c, 'out'); }
   else {                                                   // 兩人並肩（女主角在左、他在右），中間不會夾別人
-    const R = G.rooms[room], sp = o.spot && R.spots && R.spots[o.spot] ? o.spot : (o.type === 'intimate' && R.spots && R.spots.bed ? 'bed' : null);
+    const sp = interSpot({...o, who:o.who}, room);
     const [sh, sc] = seatPair(room, 'h', o.who, sp); route(h, room, sh); route(c, room, sc); makeRoomFor(room, ['h', o.who]); }
   [h, c].forEach(e => { if (walking(e)){ e.act = 'walk'; e.label = `和${e.id==='h'?nm(o.who):S.hero.name}前往${room==='out'?'外面':G.rooms[room].name}`; } });
   if (o.cx){ if (room !== h.room || walking(c)) log(`${o.cx.icon || '✨'} 你和 ${nm(o.who)} 一起去${room === 'r_h' ? '你的房間' : room === 'out' ? '外面' : G.rooms[room].name}，準備「${o.cx.label}」。`, ['h', o.who]); }
@@ -2959,18 +3005,20 @@ function socialThink(){
   }
   // 設定卡台詞：和女主角同房間時偶爾說一句
   const hr = S.ents.h;
-  if (hr.room && !walking(hr) && hr.act !== 'sleep'){
+  // 只在她真的在家、和他在同一個房間時（「外面」不算同一個地方：她在上班、他在上課不會聽到）
+  if (hr.room && G.rooms[hr.room] && !hr.hidden && !walking(hr) && hr.act !== 'sleep' && !S.away){
     for (const id of S.residents){ const e = S.ents[id];
-      if (e.room !== hr.room || e.busy || walking(e) || e.act === 'sleep' || (S.quipCd?.[id] || 0) > S.t) continue;
+      if (e.hidden || e.room !== hr.room || e.busy || walking(e) || e.act === 'sleep' || (S.quipCd?.[id] || 0) > S.t) continue;
+      const lines = QUIPS[id].filter(q => quipFits(q)); if (!lines.length) continue;
       if (Math.random() > 0.004) continue;
       S.quipCd = S.quipCd || {}; S.quipCd[id] = S.t + 240;
-      const q = rnd(QUIPS[id]); bubble(id, q, 15); log(`${nm(id)}：${q}`, [id, 'h']); break; }
+      const q = rnd(lines); bubble(id, q, 15); log(`${nm(id)}：${q}`, [id, 'h']); break; }
   }
   // 公司巧遇 Samuel
   const h = S.ents.h, s = S.ents.samuel;
   if (s && h.act === 'work' && s.act === 'work' && !S.firsts['office:' + dayOf(S.t)] && Math.random() < 0.004){
     S.firsts['office:' + dayOf(S.t)] = 1; addAff('samuel', 'h', 2); addAff('h', 'samuel', 1);
-    log(rnd([`你在公司茶水間遇見 Samuel。他手上的咖啡差點灑出來，只擠出一聲「早……」。`, `電梯門打開，裡面是 Samuel。他往角落縮了縮，到了樓層才小聲說「掰掰」。`, `午休時你看見 Samuel 一個人在角落吃三明治，他發現你在看，耳朵一下子紅了。`]), ['h','samuel']);
+    log(rnd([`你在公司茶水間遇見 Samuel。他手上的咖啡差點灑出來，只擠出一聲「早……」。`, `電梯門打開，裡面是 Samuel。他往角落縮了縮，到了樓層才小聲說「掰掰」。`, `午休時你看見 Samuel 一個人在角落吃三明治，他發現你在看，耳朵一下子紅了。`].filter(x => x.includes('早……') ? quipFits(x) : x.includes('午休') ? hourOf(S.t) >= 11.5 && hourOf(S.t) < 14.5 : true)), ['h','samuel']);
     dayEv('samuel', 'office'); dayEv('h', 'office');
   }
 }
@@ -3889,7 +3937,7 @@ function initStart(){
 }
 // 測試用掛鉤
 function ff(mins, autoAnswer){ for (let i = 0; i < mins; i++){ stepMinute(); allEnts().forEach(e => moveEnt(e, 1)); if (S.pending && autoAnswer != null) answerRequest(autoAnswer); } snapVis(); drawTokens(); renderAll(true); }
-window.__imb = { get S(){ return S; }, get form(){ return form; }, compatOf, cmul, heroAuto, ff, pickEvent, fireEvent, fireCollide, fireTest, witness, relTier, pairV, hMood, evById, showResult, migrate, heroInter, doAction, endOfDay, stepMinute, startInter, answerRequest, showRequest, openChar, closeSheet, switchView, setSpeed, save, renderAll, startFF, stopFF, hMem, syncCustom, openCxForm, cxClean, catchUp, get vis(){ return VIS; }, visSpeed, snapVis, route, resumeOffline, get lastAway(){ return ui.lastAway; }, openHist, recHist, pruneHist, caught, leaveSeen, interFromDef, soloOk, endSolo, startAftercare, interTxt, crowdedPairSeat, setSeatPx: v => { SEAT_PX = v; for (const k in SEAT_CACHE) delete SEAT_CACHE[k]; }, findSeat, seatPair, reseatAll, rectsAt, roomOccupants, npcThink, heroThink, endInter, onArrive, kickHero, goHomeIfForeign, nearestRoom, get ffState(){ return ui.ff; }, get ffLast(){ return ui.ffLast; } };
+window.__imb = { get S(){ return S; }, socialThink, get form(){ return form; }, compatOf, cmul, heroAuto, ff, pickEvent, fireEvent, fireCollide, fireTest, witness, relTier, pairV, hMood, evById, showResult, migrate, heroInter, doAction, endOfDay, stepMinute, startInter, answerRequest, showRequest, openChar, closeSheet, switchView, setSpeed, save, renderAll, startFF, stopFF, hMem, syncCustom, openCxForm, cxClean, catchUp, get vis(){ return VIS; }, visSpeed, snapVis, route, resumeOffline, get lastAway(){ return ui.lastAway; }, openHist, recHist, pruneHist, caught, leaveSeen, interFromDef, soloOk, endSolo, startAftercare, interTxt, quipFits, interSpot, resolveSpot, spotKey, crowdedPairSeat, setSeatPx: v => { SEAT_PX = v; for (const k in SEAT_CACHE) delete SEAT_CACHE[k]; }, findSeat, seatPair, reseatAll, rectsAt, roomOccupants, npcThink, heroThink, endInter, onArrive, kickHero, goHomeIfForeign, nearestRoom, get ffState(){ return ui.ff; }, get ffLast(){ return ui.ffLast; } };
 Promise.race([loadAvatars(), new Promise(r => setTimeout(r, 2000))]).then(initStart);
 
 </script>
