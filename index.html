@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f7f1e8">
 <title>失衡・公寓觀察</title>
-<meta name="imb-build" content="2026-11-10 10:36 (台北)">
+<meta name="imb-build" content="2026-11-10 10:59 (台北)">
 <style>
 :root{
   --bg:#f7f1e8; --card:#fffaf3; --line:#e8dccb; --ink:#4a3f35; --muted:#9a8b7b; --accent:#c9876b; --accent2:#e7b9a3;
@@ -145,7 +145,7 @@ h3.sec{font-size:15px;margin:14px 4px 8px;color:#7a6654}
 .seg{display:flex;background:var(--soft);border-radius:12px;padding:3px;margin-bottom:10px}
 .seg button{flex:1;border:none;background:none;padding:7px;border-radius:9px;cursor:pointer}
 .seg button.on{background:var(--card);box-shadow:var(--shadow);font-weight:700;color:var(--accent)}
-.whochips{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:6px}
+.whochips{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:6px;margin-bottom:6px}
 .whochips .chip{flex:none}
 .whochips .chip .av{width:20px;height:20px}
 .entry{margin-bottom:10px}
@@ -346,11 +346,10 @@ span.av,div.av{display:inline-block;border-radius:50%}
 .relme .relrow{grid-template-columns:auto 1fr auto}.relme .lbv{font-variant-numeric:tabular-nums;font-size:12px;min-width:2em;text-align:right}
 .tapav{cursor:pointer}
 .token.edge-l .tb,.token.edge-l .tag{left:-4px;transform:none}.token.edge-r .tb,.token.edge-r .tag{left:auto;right:-4px;transform:none}
-.tktabs{display:flex;gap:6px;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:4px 0 6px;margin:0 -2px;border:none!important}
-.tktabs::-webkit-scrollbar{display:none}
-.tkt{flex:0 0 auto;display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:4px 10px 4px 4px;font-size:12.5px;white-space:nowrap;cursor:pointer;color:inherit;min-height:32px}
-.tkt:first-child{padding-left:12px}
-.tkt .av{width:24px;height:24px;flex:0 0 24px;display:inline-block;border-radius:50%;overflow:hidden}
+.tktabs{display:flex;flex-wrap:wrap;gap:5px;padding:4px 0 6px;border:none!important}
+.tkt{flex:0 0 auto;display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:2px 9px 2px 2px;font-size:12px;white-space:nowrap;cursor:pointer;color:inherit;min-height:28px}
+.tkt:first-child{padding-left:10px}
+.tkt .av{width:22px;height:22px;flex:0 0 22px;display:inline-block;border-radius:50%;overflow:hidden}
 .tkt .av img,.tkt .av svg{width:100%;height:100%;object-fit:cover}
 .tkt.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
 .tkhead{border:none!important}
