@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f7f1e8">
 <title>失衡・公寓觀察</title>
-<meta name="imb-build" content="2026-11-10 21:04 (台北)">
+<meta name="imb-build" content="2026-11-10 22:05 (台北)">
 <style>
 :root{
   --bg:#f7f1e8; --card:#fffaf3; --line:#e8dccb; --ink:#4a3f35; --muted:#9a8b7b; --accent:#c9876b; --accent2:#e7b9a3;
@@ -585,6 +585,34 @@ span.av,div.av{display:inline-block;border-radius:50%}
 .ckallav{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--soft);font-size:16px;font-weight:700;color:var(--accent)}
 @media (min-width:560px){.ckpick{grid-template-columns:repeat(8,1fr)}}
 
+/* 玩法提示與事件編輯 */
+.speeds button.hintbtn{font-size:13px;min-width:28px;opacity:.9}
+.speeds button.hintbtn.on{background:none;color:inherit}
+.modal .box.hintbox{text-align:left;max-width:440px;display:flex;flex-direction:column;max-height:88vh;padding:16px 16px 14px}
+.modal .box.hintbox h3{margin:0 0 8px;text-align:left;font-size:18px}
+.hintscroll{overflow-y:auto;flex:1;min-height:0;-webkit-overflow-scrolling:touch;padding-right:2px}
+.hintsec{margin:0 0 14px}
+.hintsec h4{margin:0 0 6px;font-size:14px;color:var(--accent)}
+.hintsec p{margin:0 0 6px;font-size:13.5px;line-height:1.65;color:inherit}
+.hintsec p:last-child{margin-bottom:0}
+.modal .box.hintbox .acts{margin-top:8px}
+.evfilters{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 8px}
+.evfilters input[type=search]{flex:1 1 140px;min-width:0;padding:7px 10px;border:1px solid var(--line);border-radius:10px;font:inherit}
+.evfilters select{flex:0 1 auto;padding:7px 8px;border:1px solid var(--line);border-radius:10px;font:inherit;background:#fff;max-width:42%}
+.evlist{display:flex;flex-direction:column;gap:6px;max-height:52vh;overflow:auto;margin-bottom:10px}
+.evrow{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;text-align:left;border:1px solid var(--line);background:#fff;border-radius:12px;padding:8px 10px;cursor:pointer;font:inherit;color:inherit}
+.evrow b{font-size:13.5px}
+.evrow .evq{font-size:12.5px;line-height:1.45;color:var(--muted)}
+.evrow.edited{border-color:var(--accent);background:#fff8f2}
+.evrow.off{opacity:.55}
+.evform .evrooms{display:flex;flex-wrap:wrap;gap:4px 10px;margin:4px 0 10px}
+.evform .cxacts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.evform .cxacts .btn{flex:1 1 auto}
+@media (min-width:560px){
+  .modal .box.hintbox{max-width:520px;padding:22px 22px 18px}
+  .evfilters select{max-width:none}
+}
+
 </style>
 </head>
 <body>
@@ -636,7 +664,7 @@ span.av,div.av{display:inline-block;border-radius:50%}
     <header class="topbar">
       <div class="clock"><span id="dayText">第 1 天</span><b id="timeText">08:00</b></div>
       <div class="speeds" id="speeds">
-        <button data-s="0" title="暫停">⏸</button><button data-s="1" title="1x＝真實時間：1 遊戲分鐘＝現實 1 分鐘">1x</button><button data-s="10">10x</button><button data-s="60">60x</button><button data-s="300">300x</button><button id="ffBtn" class="ffbtn" title="快轉（3600x，逐分鐘模擬）">⏩</button>
+        <button data-s="0" title="暫停">⏸</button><button data-s="1" title="1x＝真實時間：1 遊戲分鐘＝現實 1 分鐘">1x</button><button data-s="10">10x</button><button data-s="60">60x</button><button data-s="300">300x</button><button id="ffBtn" class="ffbtn" title="快轉（3600x，逐分鐘模擬）">⏩</button><button type="button" id="hintBtn" class="hintbtn" title="怎麼玩">❓</button>
       </div>
       <label class="cheatsw" id="cheatSw" title="作弊模式：打開才能修改數值"><input type="checkbox" id="cheatChk" aria-label="作弊模式"><span class="sw"></span><span class="cl">作弊</span></label><button class="cheatbtn hidden" id="cheatBtn" type="button" title="修改數值">🛠️ 編輯</button>
       <div class="spdnote" id="spdNote">1x＝真實時間</div>
@@ -681,6 +709,26 @@ span.av,div.av{display:inline-block;border-radius:50%}
 // ===== 用詞（集中在這裡；要換字只改這裡，舊字放進 LEGACY_WORDS 會自動替換，含舊存檔） =====
 const WORDS = {
   sex:'纏綿', solo:'自我取悅', mark:'吻痕', poss:'獨佔欲',
+  hintTitle:'怎麼玩《失衡》',
+  hintClose:'關閉',
+  hintSecIntro:'這是什麼',
+  hintIntro:'你是剛搬進倫敦合租公寓的新房客，和六個男室友同住。他們照自己的作息生活、彼此往來；你控制女主角的行動。有人來找你時，你可以接受、拒絕，或換個方式回應。每個人對你的好感值和情慾值，會決定你們能走多近。',
+  hintSecTime:'時間與快轉',
+  hintTime:'畫面上方可以切換速度：1x 是真實時間（遊戲裡過 1 分鐘，現實也過 1 分鐘）；10x、60x、300x 會越來越快。⏩ 是快轉，會一分鐘一分鐘地模擬，遇到要你回應的事會自動停下來。關掉分頁或離開一陣子再回來，大家會把你不在的時間過完（最多補 7 天），並告訴你發生了什麼。',
+  hintSecAct:'你可以做什麼',
+  hintAct:'點平面圖上的房間或自己的頭像，選要做的事：吃飯、洗澡、上班、休息都可以。選單裡有「＋ 自訂行動」，可以自己寫一件事（地點、時段、效果、日記和泡泡小故事）。也可以約「和誰一起」做一件事。想找某個室友時，點他、選互動；關係到了才能解鎖比較親近的選項。',
+  hintSecRel:'室友與關係',
+  hintRel:'每位室友對你有好感和情慾，你對他也有（後者在關係頁比較隱密）。好感會把關係推向日常、曖昧、親近、心動；能做的事和解鎖的事件會跟著變。室友彼此還有交情和競爭。紀錄裡看到的數值變化，就是這一刻實際加減的分數。',
+  hintSecEv:'事件',
+  hintEv:'當你和室友在同一個空間，有時會跳出一段專屬事件，通常有三種回應。事件有自己的地點、時段和關係階段，看過的比較不會立刻再出現。',
+  hintSecMark:'吻痕與獨佔欲',
+  hintMark:'如果有人在你頸側留下吻痕，狀態會持續 12 個遊戲小時（會跟速度和離線補時走），並顯示在你的狀態上。在意你的人看到會吃醋。獨佔欲較高的人（Theo 預設就很高）只要看見你跟別人互動，不論好感高低都會吃醋；吃得兇不兇，看他對你的好感和獨佔欲，分成悶悶不樂、明顯吃醋、大吃飛醋。',
+  hintSecAch:'成就',
+  hintAch:'底下分頁有「🏆 成就」。達成條件後會解鎖，也可以自己新增條件。用過作弊的存檔，之後達成的成就會標 🛠️。',
+  hintSecCheat:'作弊模式',
+  hintCheat:'左上角有一個「作弊」開關。打開後才能改數值、自訂室友行為、修改遊戲裡的文字，以及調整既有事件的機率、時段、頻率和出現要求。關掉之後，已經改過的文字和事件設定仍會生效，只是不能再改。用過作弊的存檔會一直帶著標記。',
+  hintSecSave:'存檔',
+  hintSave:'遊戲每過一個遊戲小時會自動存進這個瀏覽器。開頭畫面有「回到小屋」（繼續上次，並補上你離開的時間）和「搬進小屋」（開新檔；若已有存檔會先請你確認，並把舊檔另外備份）。請在同一台裝置、同一個瀏覽器遊玩。換電腦、換瀏覽器或清除網站資料前，請先到「存檔」頁匯出備份。',
   markApply:'💋 {x} 在你頸側留下吻痕。至少十二小時內，大概藏不住。',
   markFade:'頸側的吻痕淡了。',
   markChip:'💋 {mark}（{x}）· 剩 {left}',
@@ -3356,6 +3404,8 @@ function migrateInner(s){
   s.coef = s.coef && typeof s.coef === 'object' && !Array.isArray(s.coef) ? s.coef : {};
   s.npcMods = Array.isArray(s.npcMods) ? s.npcMods.map(x => typeof nmClean === 'function' ? nmClean(x) : x).filter(Boolean).slice(0, 100) : [];
   if (typeof sanitizeMark === 'function') sanitizeMark(s); else { s.mark = s.mark && typeof s.mark === 'object' ? s.mark : null; s.poss = s.poss && typeof s.poss === 'object' && !Array.isArray(s.poss) ? s.poss : {}; s.possCd = s.possCd && typeof s.possCd === 'object' ? s.possCd : {}; }
+  if (typeof evSanitize === 'function') evSanitize(s);
+  else { s.evOv = s.evOv && typeof s.evOv === 'object' && !Array.isArray(s.evOv) ? s.evOv : {}; s.evWhen = s.evWhen && typeof s.evWhen === 'object' ? s.evWhen : {}; s.evDay = s.evDay && typeof s.evDay === 'object' ? s.evDay : {}; }
   return s;
 }
 function checkUnlock(id){
@@ -3858,6 +3908,9 @@ function requestThink(){
     if (S.t - (S.lastReq[id] || -999) < 150) continue;
     // 同一個空間：觸發事件
     if (e.room === h.room && !walking(h) && Math.random() < 0.008 * (1 + Math.max(0, S.aff[id].h) / 80)){ const ev = pickEvent(id, h.room); if (ev){ fireEvent(id, ev, false); return; } }
+    // 不需要你在場的事件：他在事件地點、你在公寓裡即可
+    else if (home(h) && !walking(h) && e.room !== h.room && typeof evNeedHazel === 'function' && Math.random() < 0.004 * (1 + Math.max(0, S.aff[id].h) / 80)){
+      const ev = pickEvent(id, e.room, null, {away:true}); if (ev){ fireEvent(id, ev, false); return; } }
     if (!SOCIAL_ACTS.includes(e.act)) continue;
     if (Math.random() > 0.004 * (1 + Math.max(0, S.aff[id].h) / 80) * (1 + (S.jeal[id] || 0) / 80) * clamp(1 + compatOf(id) * 0.08, 0.6, 1.5)) continue;
     const opts = REQUESTS[id].filter(r => condOk(id, r)); if (!opts.length) continue;
@@ -3879,25 +3932,34 @@ function requestThink(){
   }
 }
 /* ---------- 事件（改編自試玩版 50 則事件） ---------- */
-function pickEvent(id, room, force){
+function pickEvent(id, room, force, opts){
   const mt = relTier(id); let t;
   if (force != null) t = Math.min(force, 3);
   else if (mt === 0) t = 0;
   else { const r = Math.random(); t = r < .5 ? mt : r < .8 ? mt - 1 : Math.floor(Math.random() * mt); if (t === 3 && Math.random() < .5) t = 2; }
   const hr = hourOf(S.t), night = hr >= 20 || hr < 3, morn = hr >= 7 && hr < 10;
+  const useOv = typeof evEligible === 'function';
+  const ok = e => {
+    if (useOv){ if (!evEligible(e, id, room, force)) return false; }
+    else if (!(e.rooms.includes(room) && (!e.night || night || force != null) && (!e.morning || morn || force != null) && (!e.low || hMood() < 45 || force != null))) return false;
+    if (opts && opts.away) return typeof evNeedHazel === 'function' && evNeedHazel(e) === false;
+    return true;
+  };
   for (let k = t; k >= 0; k--){
-    const pool = (EVENTS[id] || []).filter(e => e.t === k && e.rooms.includes(room) && (!e.night || night || force != null) && (!e.morning || morn || force != null) && (!e.low || hMood() < 45 || force != null));
+    const pool = (EVENTS[id] || []).filter(e => e.t === k && ok(e));
     if (!pool.length) continue;
     const alt = pool.filter(e => e.id !== S.evLast[id]); const P = alt.length ? alt : pool;
     const minSeen = Math.min(...P.map(e => S.evSeen[e.id] || 0));     // 先出沒看過的，避免重複
     if (force == null && minSeen >= 1 && Math.random() < 0.4 + 0.25 * minSeen) continue;   // 看過的事件很少再出現
-    return rnd(P.filter(e => (S.evSeen[e.id] || 0) === minSeen));
+    const U = P.filter(e => (S.evSeen[e.id] || 0) === minSeen);
+    return (typeof evPickWeighted === 'function') ? evPickWeighted(U) : rnd(U);
   }
   return null;
 }
 function fireEvent(id, ev, knock){
   const e = S.ents[id]; S.pending = {who:id, ev:ev.id, at:S.t, knock:!!knock}; e.busy = true;
   S.lastReq[id] = S.t; S.lastAnyReq = S.t; S.lastEvt = S.t; bubble(id, knock ? '🚪' : '💭', 60);
+  if (typeof evMarkFired === 'function') evMarkFired(ev);
   if (knock) log(`${nm(id)} 敲了敲你的房門。`, [id, 'h']);
   showRequest();
 }
@@ -4254,6 +4316,7 @@ function startGame(){
   S.custom = S.custom || []; S.textOv = S.textOv || {}; applyTextOv(); syncCustom(); if (typeof syncHacts === 'function') syncHacts(); S.npcMods = S.npcMods || []; syncNpcMods(); S.coef = S.coef || {}; applyCoef(); reseatAll(); for (const k in VIS) delete VIS[k]; ui.follow = true; ui.floor = G.floors ? (S.ents.h.f || 0) : 0; $('#tokens').innerHTML = ''; buildPlan(); ui.ff = null; ffUi(); setSpeed(SPEEDS.includes(S.speed) ? S.speed : DEFAULT_SPEED); switchView('home');
   if (S.pending) showRequest();
   $('#cheatChk').onchange = ev => setCheat(ev.target.checked); $('#cheatBtn').onclick = openCheat; cheatSync();
+  if (typeof bindHint === 'function') bindHint();
   if (!running){ running = true; lastFrame = performance.now(); requestAnimationFrame(frame); }
 }
 function frame(now){
@@ -5477,11 +5540,13 @@ function renderCheatMenu(){
       <button type="button" class="btn wide ckmenubtn" id="ckVals">📊 修改數值</button>
       <button type="button" class="btn wide ckmenubtn" id="ckNpc">🧩 自訂室友行為</button>
       <button type="button" class="btn wide ckmenubtn" id="ckText">📝 修改遊戲裡的文字</button>
+      <button type="button" class="btn wide ckmenubtn" id="ckEv">🗂️ 修改事件</button>
       <button type="button" class="btn wide" id="ckClose">完成</button>
     </div>`;
   $('#ckVals').onclick = () => { ckUi.page = 'vals'; ckUi.who = ckUi.who || 'h'; ui.sheet.render(); };
   $('#ckNpc').onclick = () => openNpcMods();
   $('#ckText').onclick = () => { if (typeof txUi !== 'undefined') txUi.item = null; openTextEditor(); };
+  $('#ckEv').onclick = () => { if (typeof evUi !== 'undefined') evUi.edit = null; openEvEditor(null); };
   $('#ckClose').onclick = closeSheet;
 }
 function ckPickers(){
@@ -5647,6 +5712,293 @@ Object.assign(window.__imb, { renderAchView, applyCoef, resetCoef, resetCooldown
 
 </script>
 <script>
+/* 玩法提示：右上角速度列旁的 ❓，任何時候都可以打開。內文在 WORDS 裡，可用文字編輯改。 */
+const HINT_SECS = [
+  ['hintSecIntro', 'hintIntro'],
+  ['hintSecTime', 'hintTime'],
+  ['hintSecAct', 'hintAct'],
+  ['hintSecRel', 'hintRel'],
+  ['hintSecEv', 'hintEv'],
+  ['hintSecMark', 'hintMark'],
+  ['hintSecAch', 'hintAch'],
+  ['hintSecCheat', 'hintCheat'],
+  ['hintSecSave', 'hintSave'],
+];
+function hintBody(){
+  return HINT_SECS.map(([sk, bk]) => `<section class="hintsec"><h4>${esc(WORDS[sk] || '')}</h4><p>${esc(WORDS[bk] || '').replace(/\n/g, '</p><p>')}</p></section>`).join('');
+}
+function openHint(){
+  const m = $('#modal'); if (!m) return;
+  m.classList.remove('hidden');
+  m.innerHTML = `<div class="box hintbox" role="dialog" aria-labelledby="hintHd">
+    <h3 id="hintHd">❓ ${esc(WORDS.hintTitle || '怎麼玩')}</h3>
+    <div class="hintscroll">${hintBody()}</div>
+    <div class="acts"><button type="button" class="btn primary wide" id="hintClose">${esc(WORDS.hintClose || '關閉')}</button></div>
+  </div>`;
+  const close = () => closeModal();
+  $('#hintClose').onclick = close;
+  m.onclick = ev => { if (ev.target === m) close(); };
+}
+function bindHint(){
+  const b = $('#hintBtn'); if (!b || b.dataset.bound) return;
+  b.dataset.bound = '1';
+  b.onclick = ev => { ev.preventDefault(); ev.stopPropagation(); openHint(); };
+}
+if (typeof window !== 'undefined') Object.assign(window.__imb || (window.__imb = {}), { openHint, bindHint, HINT_SECS });
+
+</script>
+<script>
+/* 作弊模式：修改既有事件的機率、時段、頻率、出現要求。覆蓋存在 S.evOv，不動預設；可還原、可跟自訂內容包一起匯出。 */
+const EV_TIER_N = () => (typeof REL_TIERS !== 'undefined' ? REL_TIERS.map(t => t.n) : ['日常','曖昧','親近','心動']);
+const evAll = () => { const L = []; const ids = (S && S.residents && S.residents.length) ? [...S.residents] : Object.keys(EVENTS || {}); for (const id of Object.keys(EVENTS || {})) if (!ids.includes(id)) ids.push(id); for (const id of ids) for (const e of (EVENTS[id] || [])) L.push(e); return L; };
+function evDef(e){
+  return {
+    on:true, w:1,
+    h0: e.morning ? 7 : e.night ? 20 : 0,
+    h1: e.morning ? 10 : e.night ? 3 : 24,
+    wrap: !!(e.night && !e.morning),
+    cd:0, maxDay:0, repeat:true,
+    minAff:null, maxAff:null, minDes:null, maxDes:null,
+    minPair:null, maxRival:null,
+    rooms:(e.rooms || []).slice(),
+    needHazel:true, prereq:'', low:!!e.low
+  };
+}
+function evOvOf(e){ return (S && S.evOv && S.evOv[e.id] && typeof S.evOv[e.id] === 'object') ? S.evOv[e.id] : {}; }
+function evMerged(e){ return Object.assign({}, evDef(e), evOvOf(e)); }
+function evClean(id, o){
+  if (!o || typeof o !== 'object') return null;
+  const e = evByIdWho(id) || evAll().find(x => x.id === id);
+  if (!e) return null;
+  const d = evDef(e), out = {};
+  const num = (v, lo, hi) => { const n = Number(v); return Number.isFinite(n) ? clamp(n, lo, hi) : null; };
+  if (o.on === false) out.on = false;
+  const w = num(o.w, 0, 20); if (w != null && w !== d.w) out.w = Math.round(w * 100) / 100;
+  const h0 = num(o.h0, 0, 24), h1 = num(o.h1, 0, 24);
+  if (h0 != null && h1 != null && (h0 !== d.h0 || h1 !== d.h1)){ out.h0 = h0; out.h1 = h1; }
+  const cd = num(o.cd, 0, 1440 * 14); if (cd) out.cd = Math.round(cd);
+  const md = num(o.maxDay, 0, 20); if (md) out.maxDay = Math.round(md);
+  if (o.repeat === false) out.repeat = false;
+  for (const k of ['minAff','maxAff']){ const n = num(o[k], -100, 100); if (n != null) out[k] = Math.round(n); }
+  for (const k of ['minDes','maxDes','minPair','maxRival']){ const n = num(o[k], 0, 100); if (n != null) out[k] = Math.round(n); }
+  if (Array.isArray(o.rooms)){
+    const R = [...new Set(o.rooms.map(String).filter(r => r && r !== 'out'))].slice(0, 12);
+    const same = R.length === d.rooms.length && R.every(r => d.rooms.includes(r));
+    if (R.length && !same) out.rooms = R;
+  }
+  if (o.needHazel === false) out.needHazel = false;
+  if (typeof o.prereq === 'string' && /^[a-z0-9_]{2,32}$/i.test(o.prereq) && o.prereq !== id) out.prereq = o.prereq;
+  if (o.low === true && !d.low) out.low = true;
+  if (o.low === false && d.low) out.low = false;
+  return Object.keys(out).length ? out : null;
+}
+function evByIdWho(eid){
+  for (const id of Object.keys(EVENTS || {})){ const e = (EVENTS[id] || []).find(x => x.id === eid); if (e) return e; }
+  return null;
+}
+function evSetOv(eid, o){
+  if (!S || !S.cheat) return false;
+  S.evOv = S.evOv || {};
+  const c = evClean(eid, o);
+  if (!c) delete S.evOv[eid]; else S.evOv[eid] = c;
+  save(); return true;
+}
+function evReset(eid){ if (!S || !S.cheat) return false; if (S.evOv) delete S.evOv[eid]; save(); return true; }
+function evResetAll(){ if (!S || !S.cheat) return false; S.evOv = {}; save(); return true; }
+function evSanitize(s){
+  if (!s) return;
+  const src = s.evOv && typeof s.evOv === 'object' && !Array.isArray(s.evOv) ? s.evOv : {};
+  s.evOv = {};
+  for (const [k, v] of Object.entries(src)){ const c = evClean(k, v); if (c) s.evOv[k] = c; }
+  s.evWhen = s.evWhen && typeof s.evWhen === 'object' ? s.evWhen : {};
+  s.evDay = s.evDay && typeof s.evDay === 'object' ? s.evDay : {};
+}
+function evHourOk(e, hr, force){
+  if (force != null) return true;
+  const m = evMerged(e);
+  const a = m.h0, b = m.h1;
+  if (a == null || b == null) return true;
+  if (a === 0 && b === 24) return true;
+  if (a === b) return true;
+  if (a < b) return hr >= a && hr < b;
+  return hr >= a || hr < b;   // 跨午夜，如 20–3
+}
+function evRoomList(e){ const m = evMerged(e); return (m.rooms && m.rooms.length) ? m.rooms : (e.rooms || []); }
+function evEligible(e, id, room, force){
+  const m = evMerged(e);
+  if (m.on === false || (m.w || 0) <= 0) return false;
+  const rooms = evRoomList(e);
+  if (room && !rooms.includes(room)) return false;
+  if (!evHourOk(e, hourOf(S.t), force)) return false;
+  if (m.low && hMood() >= 45 && force == null) return false;
+  const aff = S.aff[id] ? S.aff[id].h : 0, des = S.des[id] ? S.des[id].h : 0;
+  if (m.minAff != null && aff < m.minAff) return false;
+  if (m.maxAff != null && aff > m.maxAff) return false;
+  if (m.minDes != null && des < m.minDes) return false;
+  if (m.maxDes != null && des > m.maxDes) return false;
+  if (m.minPair != null && (S.aff.h && S.aff.h[id] || 0) < m.minPair) return false;
+  if (m.maxRival != null){
+    const top = Math.max(0, ...((S.residents || []).filter(o => o !== id).map(o => S.rival[pkey(id, o)] || 0)));
+    if (top > m.maxRival) return false;
+  }
+  if (m.prereq && !(S.evSeen && S.evSeen[m.prereq])) return false;
+  if (m.repeat === false && (S.evSeen[e.id] || 0) >= 1 && force == null) return false;
+  if (m.maxDay > 0){ const k = e.id + ':' + dayOf(S.t); if ((S.evDay && S.evDay[k] || 0) >= m.maxDay) return false; }
+  if (m.cd > 0 && S.t - ((S.evWhen && S.evWhen[e.id]) || -99999) < m.cd) return false;
+  return true;
+}
+function evW(e){ const w = evMerged(e).w; return (typeof w === 'number' && w > 0) ? w : 1; }
+function evPickWeighted(L){
+  if (!L.length) return null;
+  const w = L.map(evW), sum = w.reduce((a, b) => a + b, 0);
+  let r = Math.random() * (sum || 1), i = 0;
+  for (; i < L.length; i++){ r -= w[i]; if (r <= 0) return L[i]; }
+  return L[L.length - 1];
+}
+function evNeedHazel(e){ return evMerged(e).needHazel !== false; }
+function evMarkFired(e){
+  S.evWhen = S.evWhen || {}; S.evDay = S.evDay || {};
+  S.evWhen[e.id] = S.t;
+  const k = e.id + ':' + dayOf(S.t); S.evDay[k] = (S.evDay[k] || 0) + 1;
+}
+
+const evUi = {who:'all', tier:'all', q:'', edit:null};
+function evHoursLabel(e){
+  const d = evDef(e), m = evMerged(e);
+  const fmt = (a,b) => (a === 0 && b === 24) ? '全天' : `${pad(Math.floor(a))}:00–${pad(Math.floor(b))}:00`;
+  const now = fmt(m.h0, m.h1), def = fmt(d.h0, d.h1);
+  return now === def ? def : now;
+}
+function evRoomsAll(){
+  const s = new Set(['living','kitchen','entry','balcony','r_h','office']);
+  evAll().forEach(e => (e.rooms || []).forEach(r => s.add(r)));
+  return [...s];
+}
+function evRoomName(id){
+  if (id === 'r_h') return '你的房間';
+  if (id === 'office') return '公司';
+  if (typeof roomName === 'function' && G && G.rooms && G.rooms[id]) return roomName(id);
+  const map = {living:'客廳', kitchen:'廚房', entry:'玄關', balcony:'露臺', hall:'玄關', roof:'露臺', hero:'你的房間'};
+  return map[id] || id;
+}
+function evFirstLine(e){ return String(e.text || '').split('\n')[0].replace(/\{n\}/g, (S && S.hero && S.hero.name) || '你').slice(0, 36); }
+
+function openEvEditor(edit){
+  if (!S || !S.cheat) return false;
+  evUi.edit = edit || null;
+  openSheet(() => evUi.edit ? renderEvForm(evUi.edit) : renderEvList(), false);
+  return true;
+}
+function renderEvList(){
+  const q = (evUi.q || '').trim().toLowerCase();
+  const who = evUi.who, tier = evUi.tier;
+  const TN = EV_TIER_N();
+  let rows = evAll();
+  if (who !== 'all') rows = rows.filter(e => e.c === who);
+  if (tier !== 'all') rows = rows.filter(e => String(e.t) === String(tier));
+  if (q) rows = rows.filter(e => (e.id + evFirstLine(e) + nm(e.c) + TN[e.t]).toLowerCase().includes(q));
+  const changed = e => !!(S.evOv && S.evOv[e.id]);
+  const off = e => evMerged(e).on === false;
+  $('#sheet').innerHTML = `<div class="grab"></div><button type="button" class="btn sm ckback" id="ckBack">← 回到選單</button>
+    <h3>🗂️ 修改事件 <span class="pill">作弊模式</span> <span class="muted small">${evAll().length} 則</span></h3>
+    <div class="small muted">可改既有事件的發生機率、時段、頻率和出現要求。預設值會寫在每一欄旁邊；還原後就回到原本的規則。</div>
+    <div class="evfilters">
+      <input type="search" id="evQ" placeholder="搜尋名稱、編號、室友…" value="${esc(evUi.q || '')}">
+      <select id="evWho"><option value="all">所有室友</option>${((S && S.residents) || []).map(id => `<option value="${id}" ${who===id?'selected':''}>${esc(nm(id))}</option>`).join('')}</select>
+      <select id="evTier"><option value="all">所有階段</option>${TN.map((n,i)=>`<option value="${i}" ${String(tier)===String(i)?'selected':''}>${esc(n)}</option>`).join('')}</select>
+    </div>
+    <div class="evlist">${rows.map(e => {
+      const m = evMerged(e);
+      return `<button type="button" class="evrow${changed(e)?' edited':''}${off(e)?' off':''}" data-evid="${esc(e.id)}">
+        <b>${esc(nm(e.c))}・${esc(TN[e.t] || '')}${e.nm?'・自訂':''}</b>
+        <span class="muted small">${esc(e.id)}　${esc(evHoursLabel(e))}　權重 ${m.w}${off(e)?'　已關閉':''}${changed(e)?'　已改':''}</span>
+        <span class="evq">${esc(evFirstLine(e))}</span>
+      </button>`;
+    }).join('') || '<div class="muted small">沒有符合的事件。</div>'}</div>
+    ${(S.evOv && Object.keys(S.evOv).length) ? '<button type="button" class="btn wide" id="evResetAll">全部還原成預設</button>' : ''}`;
+  $('#ckBack').onclick = () => openCheat();
+  $('#evQ').oninput = ev => { evUi.q = ev.target.value; evUi.edit = null; ui.sheet.render(); };
+  $('#evWho').onchange = ev => { evUi.who = ev.target.value; ui.sheet.render(); };
+  $('#evTier').onchange = ev => { evUi.tier = ev.target.value; ui.sheet.render(); };
+  $('#sheet').querySelectorAll('[data-evid]').forEach(b => b.onclick = () => openEvEditor(b.dataset.evid));
+  const ra = $('#evResetAll'); if (ra) ra.onclick = () => { if (confirm('要把所有事件都還原成預設嗎？')){ evResetAll(); ui.sheet.render(); toast('已還原所有事件'); } };
+}
+function renderEvForm(eid){
+  const e = evByIdWho(eid); if (!e){ evUi.edit = null; renderEvList(); return; }
+  const d = evDef(e), m = evMerged(e), TN = EV_TIER_N();
+  const hrs = (name, v) => `<select name="${name}">${Array.from({length:25}, (_,i)=>`<option value="${i}" ${Number(v)===i?'selected':''}>${i===24?'24:00（一天結束）':pad(i)+':00'}</option>`).join('')}</select>`;
+  const num = (name, lbl, v, lo, hi, def, hint) => `<label class="cxf"><span>${lbl} <small class="muted">預設 ${def}</small></span><input name="${name}" type="number" inputmode="decimal" min="${lo}" max="${hi}" step="any" value="${v==null?'':v}" placeholder="${def}"></label>${hint?`<div class="muted small">${hint}</div>`:''}`;
+  const rooms = evRoomsAll();
+  const prereqs = evAll().filter(x => x.c === e.c && x.id !== e.id);
+  $('#sheet').innerHTML = `<div class="grab"></div><button type="button" class="btn sm ckback" id="evBack">← 事件列表</button>
+    <h3>🗂️ ${esc(nm(e.c))}・${esc(TN[e.t] || '')} <span class="pill">${esc(e.id)}</span></h3>
+    <p class="small evq">${esc(evFirstLine(e))}</p>
+    <form id="evForm" class="cxform evform" autocomplete="off">
+      <label class="cxchk"><input type="checkbox" name="on" ${m.on!==false?'checked':''}> 啟用這個事件</label>
+      ${num('w','發生機率（權重）', m.w, 0, 20, d.w, '同一個階段、同一個地點時，權重較高的比較容易被抽到。0 等於不會出現。')}
+      <div class="cxsec">時段</div>
+      <div class="small muted">預設：${esc((d.h0===0&&d.h1===24)?'全天':`${pad(Math.floor(d.h0))}:00–${pad(Math.floor(d.h1))}:00`)}${d.h0===7&&d.h1===10?'（早晨）':(d.h0===20&&d.h1===3)?'（夜間）':''}。若「從」比「到」晚（例如 20:00 到 03:00），代表跨過午夜。</div>
+      <div class="cxrow"><label class="cxf cx-s"><span>從</span>${hrs('h0', m.h0)}</label><label class="cxf cx-s"><span>到</span>${hrs('h1', m.h1)}</label></div>
+      <div class="cxsec">頻率</div>
+      ${num('cdH','冷卻（小時）', m.cd? Math.round(m.cd/60*10)/10 : 0, 0, 336, d.cd? d.cd/60 : 0, '這則事件剛結束後，要隔多久才能再出現。0 表示不另外限制。')}
+      ${num('maxDay','每天最多幾次', m.maxDay, 0, 20, d.maxDay, '0 表示不限次數。看過的事件本來就比較不容易再出現。')}
+      <label class="cxchk"><input type="checkbox" name="repeat" ${m.repeat!==false?'checked':''}> 可以重複出現（預設：可以，但看過後會變少）</label>
+      <div class="cxsec">出現要求</div>
+      <div class="cxrow">
+        ${num('minAff', nm(e.c)+' 對你的好感至少', m.minAff, -100, 100, '不限')}
+        ${num('maxAff', '好感最多', m.maxAff, -100, 100, '不限')}
+      </div>
+      <div class="cxrow">
+        ${num('minDes', nm(e.c)+' 對你的情慾至少', m.minDes, 0, 100, '不限')}
+        ${num('maxDes', '情慾最多', m.maxDes, 0, 100, '不限')}
+      </div>
+      <div class="cxrow">
+        ${num('minPair', '你對他的好感至少', m.minPair, 0, 100, '不限')}
+        ${num('maxRival', '他與其他室友的競爭最多', m.maxRival, 0, 100, '不限')}
+      </div>
+      <label class="cxchk"><input type="checkbox" name="low" ${m.low?'checked':''}> 只在你心情較低時出現（預設：${d.low?'是':'否'}）</label>
+      <label class="cxchk"><input type="checkbox" name="needHazel" ${m.needHazel!==false?'checked':''}> 需要你在同一個房間（預設：需要。關掉後，他在事件地點、你在公寓裡即可）</label>
+      <label class="cxf"><span>要先發生過的事件 <small class="muted">預設：無</small></span>
+        <select name="prereq"><option value="">沒有</option>${prereqs.map(x => `<option value="${esc(x.id)}" ${m.prereq===x.id?'selected':''}>${esc(x.id)}・${esc(evFirstLine(x))}</option>`).join('')}</select></label>
+      <div class="cxsec">地點（預設：${esc((d.rooms||[]).map(evRoomName).join('、') || '—')}）</div>
+      <div class="evrooms">${rooms.map(r => `<label class="cxchk"><input type="checkbox" name="room" value="${esc(r)}" ${(m.rooms||[]).includes(r)?'checked':''}> ${esc(evRoomName(r))}</label>`).join('')}</div>
+      <div class="cxacts"><button type="button" class="btn" id="evCancel">取消</button><button type="button" class="btn" id="evDef">還原預設</button><button type="submit" class="btn primary">儲存</button></div>
+    </form>`;
+  $('#evBack').onclick = () => openEvEditor(null);
+  $('#evCancel').onclick = () => openEvEditor(null);
+  $('#evDef').onclick = () => { evReset(e.id); toast('已還原成預設'); openEvEditor(e.id); };
+  $('#evForm').onsubmit = ev => {
+    ev.preventDefault();
+    const f = ev.target, rooms = [...f.querySelectorAll('input[name=room]:checked')].map(n => n.value);
+    const empty = v => v === '' || v == null;
+    const o = {
+      on: f.on.checked,
+      w: empty(f.w.value) ? d.w : +f.w.value,
+      h0: +f.h0.value, h1: +f.h1.value,
+      cd: Math.round((empty(f.cdH.value) ? 0 : +f.cdH.value) * 60),
+      maxDay: empty(f.maxDay.value) ? 0 : +f.maxDay.value,
+      repeat: f.repeat.checked,
+      minAff: empty(f.minAff.value) ? null : +f.minAff.value,
+      maxAff: empty(f.maxAff.value) ? null : +f.maxAff.value,
+      minDes: empty(f.minDes.value) ? null : +f.minDes.value,
+      maxDes: empty(f.maxDes.value) ? null : +f.maxDes.value,
+      minPair: empty(f.minPair.value) ? null : +f.minPair.value,
+      maxRival: empty(f.maxRival.value) ? null : +f.maxRival.value,
+      low: f.low.checked,
+      needHazel: f.needHazel.checked,
+      prereq: f.prereq.value || '',
+      rooms
+    };
+    evSetOv(e.id, o); toast('已儲存這則事件的設定'); openEvEditor(null);
+  };
+}
+
+Object.assign(window.__imb || (window.__imb = {}), {
+  openEvEditor, evSetOv, evReset, evResetAll, evSanitize, evEligible, evMerged, evDef, evClean, evAll, evUi, evNeedHazel, evMarkFired, evPickWeighted, evHourOk
+});
+
+</script>
+<script>
 /* ---------- 作弊模式：修改遊戲裡的文字 ----------
    每一句和角色有關、玩家看得到的文字（事件、邀約、回應、吃醋、撞見、日記、回憶、台詞、泡泡小故事、作息狀態……）
    都可以改。修改存成「覆蓋」放在存檔裡（S.textOv），不動預設；可以單項／整個角色還原，也可以單獨匯出／匯入。
@@ -5659,10 +6011,12 @@ const TX_CAT = {EVENTS:'事件', TEST_EV:'吃醋試探', COLLIDE_OPEN:'兩人同
   GRP_LINES:'一起做事的回應', REJECT_LINES:'被拒絕・冷卻', REJ:'被拒絕・冷卻', ALT_LINES:'被拒絕・冷卻', ACCEPT_END:'互動開始與結束', INTIMATE_START:'互動開始與結束', INTIMATE_END:'互動開始與結束', INTIMATE_SCENE:'互動開始與結束', AFTERCARE:'互動開始與結束',
   TALK:'聊天敘述', MEM_VOICE:'回憶', DIARY:'日記', IK_DIARY:'日記', H_DIARY:'日記', QUIPS:'台詞（同房間時）', COOK_SHARE:'分享料理', NPC_SPECIAL:'室友之間', PAIR_NOTE:'室友之間', NPC_REL_NOTE:'室友之間',
   SNIP:'泡泡小故事', SNIP_H:'泡泡小故事', SNIP_CX_GENERIC:'泡泡小故事', SCHED:'作息・狀態', ACTS:'作息・狀態', CHARS:'角色簡介', TRAIT_VOICE:'你的語氣',
-  MARK_JEAL:'吻痕・吃醋反應', MARK_BUBBLE:'吻痕・吃醋反應', POSS_JEAL:'獨佔欲・吃醋反應', POSS_BUBBLE:'獨佔欲・吃醋反應', WORDS:'吻痕與用詞',
+  MARK_JEAL:'吻痕・吃醋反應', MARK_BUBBLE:'吻痕・吃醋反應', POSS_JEAL:'獨佔欲・吃醋反應', POSS_BUBBLE:'獨佔欲・吃醋反應', WORDS:'玩法提示與用詞',
   NPC_CHAT_LINES:'室友之間（共用）', NPC_BAD_LINES:'室友之間（共用）', RIVAL_LINES:'室友之間（共用）', GRP_TENSE:'一起做事（共用）', GRP_WARM:'一起做事（共用）'};
 const TX_HERO = new Set(['SNIP_H', 'H_DIARY', 'TRAIT_VOICE', 'WORDS']);
-const TX_FIELD = {text:'內容', a:'接受', r:'拒絕', d:'第三種回應', 0:'①', 1:'②', 2:'③', 3:'④', lbl:'名稱', label:'名稱', txt:'冷卻時的反應', look:'外貌', persona:'個性', open:'開頭', close:'結尾', ev:'事件句'};
+const TX_FIELD = {text:'內容', a:'接受', r:'拒絕', d:'第三種回應', 0:'①', 1:'②', 2:'③', 3:'④', lbl:'名稱', label:'名稱', txt:'冷卻時的反應', look:'外貌', persona:'個性', open:'開頭', close:'結尾', ev:'事件句',
+  hintTitle:'提示標題', hintClose:'關閉按鈕',
+  hintSecIntro:'段落・這是什麼', hintIntro:'這是什麼', hintSecTime:'段落・時間', hintTime:'時間與快轉', hintSecAct:'段落・行動', hintAct:'你可以做什麼', hintSecRel:'段落・關係', hintRel:'室友與關係', hintSecEv:'段落・事件', hintEv:'事件', hintSecMark:'段落・吻痕', hintMark:'吻痕與獨佔欲', hintSecAch:'段落・成就', hintAch:'成就', hintSecCheat:'段落・作弊', hintCheat:'作弊模式', hintSecSave:'段落・存檔', hintSave:'存檔'};
 const hasCJK = s => typeof s === 'string' && /[\u3400-\u9fff\uff00-\uffef「」……]/.test(s);
 const TX = {items:[], orig:new Map(), ready:false};
 const txKey = p => p.join('|');
@@ -5685,7 +6039,7 @@ function txBuild(){
     if (tn === 'SNIP'){ for (const cat of Object.keys(T)) for (const id of Object.keys(T[cat])) add(id, tn, [tn, cat, id], `${cat}`); continue; }
     if (tn === 'CHARS'){ T.forEach((c, i) => add(c.id, tn, [tn, i], c.name)); continue; }
     if (tn === 'ACTS'){ for (const k of Object.keys(T)) if (!k.startsWith('nm_') && !k.startsWith('ha_')) add('all', tn, [tn, k, 'label'], `活動名稱：${k}`); continue; }
-    if (TX_HERO.has(tn)){ add('h', tn, [tn], tn === 'SNIP_H' ? '泡泡' : tn === 'H_DIARY' ? '你的日記' : tn === 'WORDS' ? '吻痕與用詞' : '你的語氣'); continue; }
+    if (TX_HERO.has(tn)){ add('h', tn, [tn], tn === 'SNIP_H' ? '泡泡' : tn === 'H_DIARY' ? '你的日記' : tn === 'WORDS' ? '玩法提示與用詞' : '你的語氣'); continue; }
     if (Array.isArray(T)){ add('all', tn, [tn], TX_CAT[tn] || tn); continue; }
     for (const k of Object.keys(T)){
       const pair = k.includes('|') ? k.split('|') : null, who = pair ? pair : [k];
@@ -6062,25 +6416,33 @@ function haSave(o){ const c = haClean(o); if (!c) return null; S.hacts = S.hacts
 function haDelete(id){ S.hacts = (S.hacts || []).filter(x => x.id !== id); if (S.hAction && S.hAction.id === id && !S.hAction.until) S.hAction = null; syncHacts(); save(); }
 function packData(){
   const d = {format:'imb-pack-v1', hacts:S.hacts || [], custom:S.custom || [], achCustom:S.achCustom || []};
-  if ((S.npcMods || []).length) d.npcMods = S.npcMods; if (Object.keys(S.textOv || {}).length) d.textOv = S.textOv; return d;
+  if ((S.npcMods || []).length) d.npcMods = S.npcMods; if (Object.keys(S.textOv || {}).length) d.textOv = S.textOv;
+  if (S.evOv && typeof S.evOv === 'object' && Object.keys(S.evOv).length) d.evOv = S.evOv; return d;
 }
 function packExport(){
   const blob = new Blob([JSON.stringify(packData(), null, 1)], {type:'application/json'});
   const a = el('a'); a.href = URL.createObjectURL(blob); a.download = `失衡_自訂內容_${S.hero.name}.json`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
-  toast(`已匯出自訂內容（行動 ${(S.hacts || []).length}・互動 ${(S.custom || []).length}）`);
+  const nEv = Object.keys((S.evOv || {})).length;
+  toast(`已匯出自訂內容（行動 ${(S.hacts || []).length}・互動 ${(S.custom || []).length}${nEv ? '・事件 ' + nEv : ''}）`);
 }
 function packImport(json){
   let d; try { d = typeof json === 'string' ? JSON.parse(json) : json; if (!d || typeof d !== 'object') throw 0; } catch(e){ toast('這不是有效的自訂內容檔'); return null; }
   if (Array.isArray(d)) d = {hacts:d};
   if (d.format === 'imb-npc-v1') d = {npcMods:d.mods};
-  const n = {hacts:0, custom:0, ach:0, npc:0, text:0}, uid = (p, L, id) => L.some(x => x.id === id) ? p + Math.random().toString(36).slice(2, 10) : id;
+  const n = {hacts:0, custom:0, ach:0, npc:0, text:0, ev:0}, uid = (p, L, id) => L.some(x => x.id === id) ? p + Math.random().toString(36).slice(2, 10) : id;
   S.hacts = S.hacts || []; for (const o of (Array.isArray(d.hacts) ? d.hacts : []).slice(0, 60)){ const c = haClean(o); if (!c) continue; c.id = uid('ha_', S.hacts, c.id); S.hacts.push(c); n.hacts++; }
   S.custom = S.custom || []; for (const o of (Array.isArray(d.custom) ? d.custom : []).slice(0, 60)){ const c = cxClean(o); if (!c) continue; c.id = uid('cx_', S.custom, c.id); S.custom.push(c); n.custom++; }
   if (Array.isArray(d.achCustom) && typeof achClean === 'function'){ S.achCustom = S.achCustom || []; for (const o of d.achCustom.slice(0, 60)){ const c = achClean(o); if (!c) continue; if (S.achCustom.some(x => x.id === c.id)) continue; S.achCustom.push(c); n.ach++; } }
   if (Array.isArray(d.npcMods) && d.npcMods.length){ if (S.cheat) n.npc = nmImport({mods:d.npcMods}) || 0; else n.npcSkip = d.npcMods.length; }
   if (d.textOv && typeof d.textOv === 'object'){ if (S.cheat){ const r = txImport({ov:d.textOv}); n.text = typeof r === 'number' ? r : 0; } else n.textSkip = 1; }
+  if (d.evOv && typeof d.evOv === 'object' && !Array.isArray(d.evOv)){
+    if (S.cheat && typeof evClean === 'function'){
+      S.evOv = S.evOv || {};
+      for (const [k, v] of Object.entries(d.evOv)){ const c = evClean(k, v); if (c){ S.evOv[k] = c; n.ev++; } }
+    } else n.evSkip = Object.keys(d.evOv).length;
+  }
   syncHacts(); syncCustom(); save();
-  toast(`已匯入：行動 ${n.hacts}・互動 ${n.custom}・成就 ${n.ach}${n.npcSkip ? `（${n.npcSkip} 個室友行為要打開作弊模式才能匯入）` : ''}${n.textSkip ? '（改過的文字要打開作弊模式才能匯入）' : ''}`);
+  toast(`已匯入：行動 ${n.hacts}・互動 ${n.custom}・成就 ${n.ach}${n.ev ? '・事件 ' + n.ev : ''}${n.npcSkip ? `（${n.npcSkip} 個室友行為要打開作弊模式才能匯入）` : ''}${n.textSkip ? '（改過的文字要打開作弊模式才能匯入）' : ''}${n.evSkip ? '（改過的事件要打開作弊模式才能匯入）' : ''}`);
   return n;
 }
 /* ---- 表單 ---- */
