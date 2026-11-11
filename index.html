@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f7f1e8">
 <title>失衡・公寓觀察</title>
-<meta name="imb-build" content="2026-11-11 02:39 (台北)">
+<meta name="imb-build" content="2026-11-11 11:02 (台北)">
 <style>
 :root{
   --bg:#f7f1e8; --card:#fffaf3; --line:#e8dccb; --ink:#4a3f35; --muted:#9a8b7b; --accent:#c9876b; --accent2:#e7b9a3;
@@ -769,7 +769,7 @@ const WORDS = {
   hintSecEv:'事件',
   hintEv:'當你和室友在同一個空間，有時會跳出一段專屬事件，通常有三種回應。事件有自己的地點、時段和關係階段，看過的比較不會立刻再出現。',
   hintSecMark:'吻痕與獨佔欲',
-  hintMark:'如果有人在你頸側留下吻痕，狀態會持續 12 個遊戲小時（會跟速度和離線補時走），並顯示在你的狀態上。在意你的人一看到就會吃醋，不必等到事情結束。獨佔欲較高的人（Theo 預設就很高）只要看見你跟別人互動，不論好感高低、不論是聊天、一起做事、曖昧還是纏綿，當下就會算；就算那個人後來離開了，也已經算過了。吃得兇不兇，看他對你的好感和獨佔欲，分成悶悶不樂、明顯吃醋、大吃飛醋。大吃飛醋時可能會直接打斷你們（Theo 預設一定會；明顯吃醋時也有一點機會）。打斷的機會看每個人的「打斷傾向」，可在作弊模式裡改。如果是在關著門的臥室，只有進到同一間房的人才算看見。纏綿被打斷時，只會寫到門外的敲門聲，不會寫更進一步的內容。',
+  hintMark:'如果有人在你頸側留下吻痕，狀態會持續 12 個遊戲小時（會跟速度和離線補時走），並顯示在你的狀態上。在意你的人一看到就會吃醋，不必等到事情結束。看見你和別人曖昧、親近或親密，也會當場寫進紀錄（時間是第一次看見的那一刻），不會拖到互動結束才出現。獨佔欲較高的人（Theo 預設就很高）只要看見你跟別人互動，不論好感高低、不論是聊天、一起做事、曖昧還是纏綿，當下就會算；就算那個人後來離開了，也已經算過了。吃得兇不兇，看他對你的好感和獨佔欲，分成悶悶不樂、明顯吃醋、大吃飛醋。大吃飛醋時可能會直接打斷你們（Theo 預設一定會；明顯吃醋時也有一點機會）。打斷的機會看每個人的「打斷傾向」，可在作弊模式裡改。如果是在關著門的臥室，只有進到同一間房的人才算看見。纏綿被打斷時，只會寫到門外的敲門聲，不會寫更進一步的內容。',
   hintSecAch:'成就',
   hintAch:'底下分頁有「🏆 成就」。達成條件後會解鎖，也可以自己新增條件。用過作弊的存檔，之後達成的成就會標 🛠️。',
   hintSecCheat:'作弊模式',
@@ -3506,6 +3506,8 @@ function migrateInner(s){
   s.coef = s.coef && typeof s.coef === 'object' && !Array.isArray(s.coef) ? s.coef : {};
   s.npcMods = Array.isArray(s.npcMods) ? s.npcMods.map(x => typeof nmClean === 'function' ? nmClean(x) : x).filter(Boolean).slice(0, 100) : [];
   if (typeof sanitizeMark === 'function') sanitizeMark(s); else { s.mark = s.mark && typeof s.mark === 'object' ? s.mark : null; s.poss = s.poss && typeof s.poss === 'object' && !Array.isArray(s.poss) ? s.poss : {}; s.possCd = s.possCd && typeof s.possCd === 'object' ? s.possCd : {}; }
+  s.witSeen = s.witSeen && typeof s.witSeen === 'object' && !Array.isArray(s.witSeen) ? s.witSeen : {};
+
   if (typeof evSanitize === 'function') evSanitize(s);
   else { s.evOv = s.evOv && typeof s.evOv === 'object' && !Array.isArray(s.evOv) ? s.evOv : {}; s.evWhen = s.evWhen && typeof s.evWhen === 'object' ? s.evWhen : {}; s.evDay = s.evDay && typeof s.evDay === 'object' ? s.evDay : {}; }
   return s;
@@ -3565,11 +3567,12 @@ function stepMinute(){
   S.t += 1;
   if (S.t % 1440 === 0) endOfDay();
   const hr = hourOf(S.t);
-  // 先處理進行中的互動，再讓獨佔欲／吻痕「一看到就算」，最後才讓人離開房間（否則第三人可能還沒被算到就走掉）
+  // 先處理進行中的互動，再讓獨佔欲／吻痕／一般目擊吃醋「一看到就算」，最後才讓人離開房間（否則第三人可能還沒被算到就走掉）
   groupTick();
   interThink();
   if (typeof markThink === 'function') markThink();
   if (typeof possThink === 'function') possThink();
+  if (typeof witnessThink === 'function') witnessThink();
   for (const id of S.residents) npcThink(S.ents[id]);
   heroThink();
   for (const e of allEnts()) if (e.act !== e.actP){ e.actP = e.act; e.actT = S.t; }   // 這段活動從什麼時候開始（泡泡故事固定挑同一段）
@@ -3794,6 +3797,7 @@ function startInter(o){
   else if (o.after){}
   else if (o.type === 'intimate' && !o.quiet) log(INTIMATE_START[o.who], ['h', o.who], 'heart');
   else if (o.type === 'intimate') log(`${nm(o.who)} 和你一起走進${room === 'r_h' ? '你的房間' : G.rooms[room].name}，門輕輕闔上。`, ['h', o.who], 'heart');
+  if (typeof witnessThink === 'function') witnessThink();
 }
 function interThink(){
   const I = S.inter; if (!I) return;
@@ -3820,11 +3824,15 @@ function interThink(){
 }
 function endInter(ok, frac, opt){
   if (!S._jealCut && typeof possThink === 'function') possThink();
+  if (typeof witnessThink === 'function') witnessThink();
   const I = S.inter; if (!I) return;
   const h = S.ents.h, c = S.ents[I.who];
-  h.busy = c.busy = false; h.feed = c.feed = false; S.inter = null;
+  h.busy = c.busy = false; h.feed = c.feed = false;
+  S._witActKey = (typeof witActKey === 'function') ? witActKey(I.who) : null;
+  S.inter = null;
   if (I.intimate && ui.ff) stopFF('intimate_end');
   if (ok && frac > 0) applyOutcome(I, frac);
+  S._witActKey = null;
   if (I.room === 'out') route(h, 'living');
   else { h.act = 'idle'; h.label = '閒著'; goHomeIfForeign(h); }
   if (!S.away) npcThink(c);                                          // 他也馬上回到自己的作息，不會留在你房間發呆
@@ -3903,17 +3911,52 @@ function leaveSeen(x){
 }
 const fmtD = v => (v >= 0 ? '+' : '') + (Math.round(v * 10) / 10);
 // 修羅場：別的室友看見（同一個空間）或察覺（同一層樓）你和某人親近
+function witActKey(partner){
+  const I = S.inter;
+  if (I && I.who === partner) return 'i:' + partner + ':' + (I.created || I.start || 0);
+  if (S._witActKey) return S._witActKey;
+  return 'w:' + partner + ':' + S.t;
+}
+function witnessKindLive(){
+  const I = S.inter; if (!I || !I.who || I.cut || I.after) return null;
+  const h = S.ents.h, c = S.ents[I.who];
+  if (!h || !c) return null;
+  // 已在互動房間裡就算（坐到位子前的一小段路也算開始），不必等 I.start；人還在別的房間走向此處時先不算
+  const here = e => I.room === 'out' ? (e.room === 'out' || e.dest === 'out') : (e.room === I.room);
+  if (I.start == null && !(here(h) && here(c))) return null;
+  if (I.cx && I.cx.wit && I.cx.wit !== 'none') return I.cx.wit;
+  if (I.wk) return I.wk;
+  if (I.ik || I.intimate) return 'intimate';
+  if (I.kind === 'hug') return 'hug';
+  if (I.type === 'flirt' || I.kind === 'flirt') return 'flirt';
+  if (I.type === 'intimate' || I.type === 'sex' || I.kind === 'intimate') return 'intimate';
+  return null;
+}
+function witnessThink(){
+  if (!S || S._jealCut) return;
+  const I = S.inter, kind = witnessKindLive();
+  if (!I || !kind) return;
+  witness(I.who, kind);
+}
+// 修羅場：別的室友看見（同一個空間）或察覺（同一層樓）你和某人親近。
+// 進行中每一分鐘都會檢查；每人每段互動只算一次，紀錄時間是第一次看見的那一分。結束時再呼叫也會跳過已算過的人。
 function witness(x, kind){
   const h = S.ents.h, room = h.room, R = room && G.rooms[room], pub = R && !R.owner;
   const k0 = kind === 'intimate' ? 8 : kind === 'hug' ? 5 : 4;
+  const act = witActKey(x);
+  S.witSeen = S.witSeen && typeof S.witSeen === 'object' ? S.witSeen : {};
   for (const y of S.residents){
     if (y === x) continue; const ey = S.ents[y], C = CHAR[y];
     if (!home(ey) || ey.act === 'sleep' || (S.inter && S.inter.who === y)) continue;
-    if (typeof possOf === 'function' && possOf(y) > 0) continue;   // 獨佔欲的看見已在進行中當場計算，結束時不再算一次
+    if (typeof possOf === 'function' && possOf(y) > 0) continue;   // 獨佔欲的看見已在進行中當場計算，這裡不再算一次
+    if (S.witSeen[act + ':' + y]) continue;
+    // 已在這個房間裡（只是挪位子）仍算看見；從別的房間走過來的要等走到
+    if (walking(ey) && ey.room !== room) continue;
     const sameRoom = ey.room && ey.room === room && (pub || kind === 'intimate');
     const sameFloor = !sameRoom && (ey.f || 0) === (h.f || 0) && (kind === 'intimate' || pub && !ey.room);
     if (!sameRoom && !sameFloor) continue;
     if (S.aff[y].h < 20) continue;                      // 還沒對她動心的人，不會在意
+    S.witSeen[act + ':' + y] = S.t;
     const lv = sameRoom ? 1 : 0.5, k = k0 * lv;
     if (C.jealousy < 0.2){ addDes(y, 'h', 1); addPair(x, y, 0.5); log(fill(rnd(WITNESS[y]), {x:nm(x), room:R ? R.name : '走廊'}), [y, x], 'rival'); bubble(y, '😏', 30); continue; }
     addJeal(y, k * C.jealousy * 3 * (0.5 + Math.max(0, S.aff[y].h) / 100)); S.jealOf[y] = x;
@@ -4089,7 +4132,11 @@ function resolveEvent(P, ch){
     if (T === 3) interFromDef(id, nightOrSex('night'), {place:'h_room', aff:4, des:2, src:'ev', reqId:'ev3'});
     else if (P.ev && ev.rooms[0] !== 'office' && S.ents.h.room) startInter({who:id, place:'here', dur:[15,20,30][T], label:opt[0].replace(/[「」]/g, '').slice(0, 10), type:'chat', aff:0, des:0, src:'ev', quiet:true});
     if (T === 2) addMem('h', `${firstLine(ev.text)}……我選擇了「${opt[0]}」。`);
-    if (T >= 1) witness(id, T >= 2 ? 'hug' : 'flirt');
+    if (T >= 1){
+      const wk = T >= 2 ? 'hug' : 'flirt';
+      if (S.inter && !S.inter.wk && !S.inter.ik) S.inter.wk = wk;
+      witness(id, wk);
+    }
     dayEv(id, T === 0 ? 'chat' : 'flirt', opt[0]); dayEv('h', T === 0 ? 'chat' : 'flirt', id);
   } else if (ch === 'r'){
     const R = REJ[id]; addAff(id, 'h', R.aff[T] - 0.3); addDes(id, 'h', -(T * 2 + 1) * 0.5); S.rejN[id] = (S.rejN[id] || 0) + 1; S.reqCd[id] = S.t + R.cd[T] * 60; addMood(hasT('gentle') ? -3 : -1);
@@ -5011,7 +5058,7 @@ function initStart(){
 }
 // 測試用掛鉤
 function ff(mins, autoAnswer){ for (let i = 0; i < mins; i++){ stepMinute(); allEnts().forEach(e => moveEnt(e, 1)); if (S.pending && autoAnswer != null) answerRequest(autoAnswer); } snapVis(); drawTokens(); renderAll(true); }
-window.__imb = { get S(){ return S; }, socialThink, get form(){ return form; }, compatOf, cmul, heroAuto, ff, pickEvent, fireEvent, fireCollide, fireTest, witness, relTier, pairV, hMood, evById, showResult, migrate, heroInter, doAction, endOfDay, stepMinute, startInter, answerRequest, showRequest, openChar, closeSheet, switchView, setSpeed, save, renderAll, startFF, stopFF, hMem, syncCustom, openCxForm, cxClean, catchUp, get vis(){ return VIS; }, visSpeed, snapVis, route, resumeOffline, get lastAway(){ return ui.lastAway; }, openHist, recHist, pruneHist, caught, leaveSeen, interFromDef, soloOk, endSolo, startAftercare, interTxt, quipFits, interSpot, resolveSpot, spotKey, crowdedPairSeat, setSeatPx: v => { SEAT_PX = v; for (const k in SEAT_CACHE) delete SEAT_CACHE[k]; }, findSeat, seatPair, reseatAll, rectsAt, roomOccupants, npcThink, heroThink, endInter, onArrive, kickHero, goHomeIfForeign, nearestRoom, get ffState(){ return ui.ff; }, get ffLast(){ return ui.ffLast; }, showStart, loadSaved, goReturn, goMoveIn, hasAnySave, peekSaves, peekMeta, restoreBackup, backupSave, fillNewForm, SAVE_KEY, SAVE_BAK_KEY };
+window.__imb = { get S(){ return S; }, socialThink, get form(){ return form; }, compatOf, cmul, heroAuto, ff, pickEvent, fireEvent, fireCollide, fireTest, witness, witnessThink, witActKey, witnessKindLive, relTier, pairV, hMood, evById, showResult, migrate, heroInter, doAction, endOfDay, stepMinute, startInter, answerRequest, showRequest, openChar, closeSheet, switchView, setSpeed, save, renderAll, startFF, stopFF, hMem, syncCustom, openCxForm, cxClean, catchUp, get vis(){ return VIS; }, visSpeed, snapVis, route, resumeOffline, get lastAway(){ return ui.lastAway; }, openHist, recHist, pruneHist, caught, leaveSeen, interFromDef, soloOk, endSolo, startAftercare, interTxt, quipFits, interSpot, resolveSpot, spotKey, crowdedPairSeat, setSeatPx: v => { SEAT_PX = v; for (const k in SEAT_CACHE) delete SEAT_CACHE[k]; }, findSeat, seatPair, reseatAll, rectsAt, roomOccupants, npcThink, heroThink, endInter, onArrive, kickHero, goHomeIfForeign, nearestRoom, get ffState(){ return ui.ff; }, get ffLast(){ return ui.ffLast; }, showStart, loadSaved, goReturn, goMoveIn, hasAnySave, peekSaves, peekMeta, restoreBackup, backupSave, fillNewForm, SAVE_KEY, SAVE_BAK_KEY };
 
 </script>
 <script>
