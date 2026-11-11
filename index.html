@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f7f1e8">
 <title>失衡・公寓觀察</title>
-<meta name="imb-build" content="2026-11-11 11:02 (台北)">
+<meta name="imb-build" content="2026-11-11 11:22 (台北)">
 <style>
 :root{
   --bg:#f7f1e8; --card:#fffaf3; --line:#e8dccb; --ink:#4a3f35; --muted:#9a8b7b; --accent:#c9876b; --accent2:#e7b9a3;
@@ -636,6 +636,16 @@ span.av,div.av{display:inline-block;border-radius:50%}
   .evfilters select{max-width:none}
 }
 
+/* 戀人標記 */
+.avbox{position:relative;display:inline-block;vertical-align:middle}
+.avbox .av,.avbox > svg,.avbox > img{display:block}
+.loveb{position:absolute;right:-5px;bottom:-3px;font-size:11px;line-height:1;filter:drop-shadow(0 0 1px #fff);pointer-events:none;z-index:2}
+.token .loveb{right:-7px;bottom:1px;font-size:12px;z-index:4}
+.pill.lover{background:#fde2e8;color:#c45a6c}
+.love-rel{margin:6px 0 8px}
+.love-rel .pill{margin:0 4px 4px 0}
+.acts3{flex-wrap:wrap}
+
 </style>
 </head>
 <body>
@@ -765,7 +775,7 @@ const WORDS = {
   hintSecAct:'你可以做什麼',
   hintAct:'點平面圖上的房間或自己的頭像，選要做的事：吃飯、洗澡、上班、休息都可以。選單裡有「＋ 自訂行動」，可以自己寫一件事（地點、時段、效果、日記和泡泡小故事）。也可以約「和誰一起」做一件事。想找某個室友時，點他、選互動；關係到了才能解鎖比較親近的選項。',
   hintSecRel:'室友與關係',
-  hintRel:'每位室友對你有好感和情慾，你對他也有（後者在關係頁比較隱密）。好感會把關係推向日常、曖昧、親近、心動；能做的事和解鎖的事件會跟著變。室友彼此還有交情和競爭。紀錄裡看到的數值變化，就是這一刻實際加減的分數。',
+  hintRel:'每位室友對你有好感和情慾，你對他也有（後者在關係頁比較隱密）。好感會把關係推向日常、曖昧、親近、心動；能做的事和解鎖的事件會跟著變。好感和情慾夠高時，你可以向他告白，他也有可能向你告白。答應後會成為戀人，頭像上會有 ❤。可以同時和不只一個人交往，但被另一位戀人發現時，當場會要你解釋、道歉、坦白或分手；信任會下降，也可能冷戰一陣子，通常不會立刻分手。之後可以多「好好談談」（傾聽、說明想法、給他安全感），降低他的獨佔欲、把話說開；獨佔欲夠低以後，他有可能接受多方發展。室友彼此還有交情和競爭。紀錄裡看到的數值變化，就是這一刻實際加減的分數。',
   hintSecEv:'事件',
   hintEv:'當你和室友在同一個空間，有時會跳出一段專屬事件，通常有三種回應。事件有自己的地點、時段和關係階段，看過的比較不會立刻再出現。',
   hintSecMark:'吻痕與獨佔欲',
@@ -839,6 +849,21 @@ const WORDS = {
   cutLineBlock:'{x} 擋在你們中間。「借過一下。」',
   cutIntimate:'……門外傳來敲門聲。{x}：「打擾了。」',
   cutLog:'⚡ {x} 打斷了你和 {p}。{line}',
+  loveStatus:'戀人', loveEx:'前任', loveKnown:'知情', loveTense:'需要好好談', loveOpened:'接受多方發展', loveCold:'冷戰中',
+  loveStart:'❤ 你和 {x} 開始交往了。',
+  loveMemStart:'我和 {x} 開始交往了。',
+  loveMemStartHim:'我和 {h} 開始交往了。',
+  loveBreak:'💔 你和 {x} 分手了。',
+  loveMemBreak:'我和 {x} 分手了。',
+  loveMemBreakHim:'我和 {h} 分手了。',
+  loveOpen:'❤ {x} 接受了多方發展。以後他不太會因為你和其他戀人在一起而大發醋意。',
+  loveMemOpen:'{x} 接受了多方發展。',
+  loveMemOpenHim:'我試著接受 {h} 也可以有其他戀人。',
+  loveColdOn:'接下來一段時間，他不太想和你說話。',
+  loveColdOff:'{x} 的冷戰結束了。你們可以再試試好好談。',
+  loveColdBlock:'你們正在冷戰，他現在不太想互動。可以等一等，或試著「好好談談」。',
+  loveGossip:'{w} 好像把看到的事，告訴了 {x}。',
+  loveTalkAsk:'{x} 還需要把話說開。這次你想怎麼談？',
 };
 const LEGACY_WORDS = [[/歡愛|做愛/g, WORDS.sex], [/自慰/g, WORDS.solo]];
 const W = s => typeof s === 'string' ? LEGACY_WORDS.reduce((a, [re, w]) => a.replace(re, w), s) : s;
@@ -3435,6 +3460,7 @@ function moodTick(){
   else if (S.sleepMin){ const sm = S.sleepMin; S.sleepMin = 0;
     if (sm >= 360){ m += 8; } else if (sm >= 60 && sm < 240){ m -= 4; log('你沒睡飽，起床時頭有點重。', ['h']); } }
   S.hero.mood = clamp(m, 0, 100);
+  if (typeof loveMoodTick === 'function') loveMoodTick();
 }
 function moodOf(e){ const n = e.needs; return clamp(Math.round(n.energy*0.25 + n.hunger*0.2 + n.hygiene*0.15 + n.fun*0.2 + n.social*0.2 + e.buff), 0, 100); }
 function moodLbl(m){ return m >= 75 ? '😊 開心' : m >= 55 ? '🙂 不錯' : m >= 35 ? '😐 普通' : m >= 20 ? '😞 低落' : '😣 很糟'; }
@@ -3507,6 +3533,7 @@ function migrateInner(s){
   s.npcMods = Array.isArray(s.npcMods) ? s.npcMods.map(x => typeof nmClean === 'function' ? nmClean(x) : x).filter(Boolean).slice(0, 100) : [];
   if (typeof sanitizeMark === 'function') sanitizeMark(s); else { s.mark = s.mark && typeof s.mark === 'object' ? s.mark : null; s.poss = s.poss && typeof s.poss === 'object' && !Array.isArray(s.poss) ? s.poss : {}; s.possCd = s.possCd && typeof s.possCd === 'object' ? s.possCd : {}; }
   s.witSeen = s.witSeen && typeof s.witSeen === 'object' && !Array.isArray(s.witSeen) ? s.witSeen : {};
+  if (typeof loveMigrate === 'function') loveMigrate(s);
 
   if (typeof evSanitize === 'function') evSanitize(s);
   else { s.evOv = s.evOv && typeof s.evOv === 'object' && !Array.isArray(s.evOv) ? s.evOv : {}; s.evWhen = s.evWhen && typeof s.evWhen === 'object' ? s.evWhen : {}; s.evDay = s.evDay && typeof s.evDay === 'object' ? s.evDay : {}; }
@@ -3580,9 +3607,10 @@ function stepMinute(){
   moodTick();
   socialThink();
   requestThink();
+  if (typeof loveThink === 'function') loveThink();
   heroWarnings();
   recHist();
-  if (S.pending && !S.autoPause && S.t - S.pending.at > 30){ const id = S.pending.who; const fxo = typeof fxBegin === 'function'; if (fxo) fxBegin(); releasePending(); addAff(id, 'h', -0.5); log(`${nm(id)} 等不到你的回應，自己走開了。`, [id]); if (fxo) fxEnd(); }
+  if (S.pending && !S.autoPause && S.t - S.pending.at > 30 && !S.pending.caught && !S.pending.talk){ const id = S.pending.who; const fxo = typeof fxBegin === 'function'; if (fxo) fxBegin(); releasePending(); addAff(id, 'h', -0.5); log(`${nm(id)} 等不到你的回應，自己走開了。`, [id]); if (fxo) fxEnd(); }
   if (S.t % 10 === 0) achThink();
   if (S.t - S.lastSave >= 60){ save(); }
 }
@@ -3948,7 +3976,7 @@ function witness(x, kind){
   for (const y of S.residents){
     if (y === x) continue; const ey = S.ents[y], C = CHAR[y];
     if (!home(ey) || ey.act === 'sleep' || (S.inter && S.inter.who === y)) continue;
-    if (typeof possOf === 'function' && possOf(y) > 0) continue;   // 獨佔欲的看見已在進行中當場計算，這裡不再算一次
+    if (typeof jealPoss === 'function' ? jealPoss(y) > 0 : (typeof possOf === 'function' && possOf(y) > 0)) continue;   // 獨佔欲／戀人下限的看見已在進行中當場計算
     if (S.witSeen[act + ':' + y]) continue;
     // 已在這個房間裡（只是挪位子）仍算看見；從別的房間走過來的要等走到
     if (walking(ey) && ey.room !== room) continue;
@@ -3965,6 +3993,8 @@ function witness(x, kind){
     bubble(y, kind === 'intimate' ? '😶' : '😤', 40);
     log(sameRoom ? fill(rnd(WITNESS[y]), {x:nm(x), room:R ? R.name : '走廊'}) : fill(WITNESS_FLOOR[y], {x:nm(x)}), [y, x], 'rival'); dayEv(y, 'jealous', nm(x));
     if (!S.firsts['jeal:' + y]){ S.firsts['jeal:' + y] = 1; addMem(y, `看到 ${S.hero.name} 和 ${nm(x)} 很親近。心裡不太舒服。`); }
+    S.loveSaw = S.loveSaw || {}; S.loveSaw[y] = {who:x, t:S.t};
+    if (typeof loveDiscover === 'function') loveDiscover(y, x, 'see', kind);
   }
 }
 
@@ -4043,7 +4073,7 @@ function requestThink(){
     if (o && home(o) && !o.busy && o.act !== 'sleep' && S.t - L.at < 90 && !walking(h)){ const r = REQUESTS[L.who].find(x => x.id === L.reqId);
       if (r){ S.lastReq[L.who] = S.t; S.lastAnyReq = S.t; S.pending = {who:L.who, reqId:r.id, at:S.t, again:true}; o.busy = true; bubble(L.who, '💭', 60); showRequest(); return; } } }
   if (S.t - S.lastAnyReq < 50) return;
-  const free = S.residents.filter(id => { const e = S.ents[id]; return !e.busy && home(e) && !walking(e) && e.act !== 'sleep' && !e.ov && (S.reqCd[id] || 0) <= S.t; });
+  const free = S.residents.filter(id => { const e = S.ents[id]; return !e.busy && home(e) && !walking(e) && e.act !== 'sleep' && !e.ov && (S.reqCd[id] || 0) <= S.t && !(typeof loveCold === 'function' && loveCold(id)); });
   if (groupInviteThink(free)) return;          // 偶爾有人約大家一起
   const here = walking(h) ? [] : free.filter(id => S.ents[id].room === h.room);
   // 撞車：兩個人同時來找你
@@ -4242,8 +4272,8 @@ function interFromDef(id, d, extra){
   const type = d.ik ? 'intimate' : d.T || 'flirt';
   startInter({who:id, place:d.place, spot:d.spot, dur:d.dur, label:d.lbl || d.label, type, kind:d.K || d.id, ik:d.ik, act:d.act, dk:d.dk, wk:d.wk, catchP:d.catchP, feed:d.feed, aff:d.aff, des:d.des, ...extra});
 }
-const interLocked = (id, def) => (def.tier || 0) > relTier(id) || cxLocked(id, def);
-const lineOf = (id, itype) => (H_LINES[id][itype] || (H_LINES_EXTRA[id] || {})[itype] || (PERSONA_LINES[id] || {})[itype] || (() => { const d = H_INTER.find(x => x.id === itype); return d && d.tier && STAGE_LINES[id][d.tier]; })() || ['', '']).map(l => fill(l, {n:S.hero.name}));
+const interLocked = (id, def) => (def.tier || 0) > relTier(id) || cxLocked(id, def) || (typeof loveLocked === 'function' && loveLocked(id, def));
+const lineOf = (id, itype) => (((typeof LOVE_LINES !== 'undefined' && LOVE_LINES[id] && LOVE_LINES[id][itype]) || H_LINES[id][itype] || (H_LINES_EXTRA[id] || {})[itype] || (PERSONA_LINES[id] || {})[itype] || (() => { const d = H_INTER.find(x => x.id === itype); return d && d.tier && STAGE_LINES[id][d.tier]; })() || ['', ''])).map(l => fill(l, {n:S.hero.name}));
 function resolveHeroInter(id, itype){
   const def = H_INTER.find(x => x.id === itype), o = S.ents[id], C = CHAR[id];
   const base = {chat:.88, care:.92, joke:.78, praise:.88, flirt:.5, cook:.55, movie:.55, walk:.5, terrace:.5, hug:.42, stay:.45, intimate:.3, sex:.28, book:.75, jog:.5, coop:.55, listen:.6, shoot:.75, sketch:.75, brew:.8, tease:.6, approach:.4}[itype] ?? def.p ?? .6;
@@ -4541,7 +4571,7 @@ function buildPlan(){
     $('#tokens').innerHTML = ''; $('#tokens').dataset.k = S.residents.join();
     ['h', ...S.residents].forEach(id => {
       const t = el('div', 'token' + (id === 'h' ? ' hero' : '')); t.id = 'tk-' + id;
-      t.innerHTML = `${avOf(id)}<span class="tn">${esc(nm(id))}</span><span class="ti"></span><span class="tb hidden"></span><span class="tag hidden"></span>`;
+      t.innerHTML = `${avOf(id)}<span class="tn">${esc(nm(id))}</span><span class="loveb hidden" title="戀人">❤</span><span class="ti"></span><span class="tb hidden"></span><span class="tag hidden"></span>`;
       t.onclick = ev => { ev.stopPropagation(); id === 'h' ? openHero() : openChar(id); };
       // 頭上的泡泡（活動圖示、狀態、對話泡泡）：點了看一小段故事
       t.querySelectorAll('.ti,.tag,.tb').forEach(b => { b.setAttribute('role', 'button'); b.title = '點一下看看在做什麼'; b.onclick = ev => { ev.stopPropagation(); openSnippet(id, b); }; });
@@ -4614,6 +4644,7 @@ function renderTokenDecor(){
     else if (e.act === 'solo'){ tag.textContent = '🔒 獨處（自我取悅中）'; tag.classList.remove('hidden'); }
     else tag.classList.add('hidden');
     if (!inI && e.bubble && e.bubble.until > S.t){ tb.textContent = e.bubble.text; tb.classList.remove('hidden'); } else tb.classList.add('hidden');
+    const lb = t.querySelector('.loveb'); if (lb) lb.classList.toggle('hidden', !(typeof isLover === 'function' && e.id !== 'h' && isLover(e.id)));
     t.classList.toggle('sel', ui.sel === e.id);
   }
   const pb = $('#planBanner'), I0 = S.inter, hs = S.ents.h.act === 'solo';
@@ -4690,9 +4721,9 @@ function renderView(v){
 function renderPeople(){
   const box = $('#v-people');
   box.innerHTML = `<h3 class="sec">住戶（點一下看詳細）</h3>` + S.residents.map(id => { const C = CHAR[id], e = S.ents[id];
-    return `<div class="card pcard" data-id="${id}"><div class="av">${avOf(id)}</div><div class="pm"><div class="pn">${C.name} <span class="muted small">${C.age}歲</span></div><div class="pj">${C.job}</div>
+    return `<div class="card pcard" data-id="${id}"><div class="av">${typeof avLove === 'function' ? avLove(id) : avOf(id)}</div><div class="pm"><div class="pn">${C.name}${typeof isLover === 'function' && isLover(id) ? ' <span class="pill lover">❤ 戀人</span>' : ''} <span class="muted small">${C.age}歲</span></div><div class="pj">${C.job}</div>
     <div style="margin-top:4px">${ACTS[e.act]?.icon || ''} ${esc(e.label)}<span class="muted small">・${roomName(e.room)}</span></div>
-    <div><span class="pill a">好感 ${Math.round(S.aff[id].h)}</span><span class="pill r">情慾 ${Math.round(S.des[id].h)}</span><span class="pill">${tierName(S.aff[id].h, S.des[id].h)}</span><span class="tierpill t${relTier(id)}">${REL_TIERS[relTier(id)].n}</span>${(S.jeal[id] || 0) >= 10 ? `<span class="pill j">吃醋 ${Math.round(S.jeal[id])}</span>` : ''}</div></div></div>`; }).join('');
+    <div><span class="pill a">好感 ${Math.round(S.aff[id].h)}</span><span class="pill r">情慾 ${Math.round(S.des[id].h)}</span><span class="pill${typeof isLover === 'function' && isLover(id) ? ' lover' : ''}">${typeof relLabel === 'function' ? relLabel(id) : tierName(S.aff[id].h, S.des[id].h)}</span><span class="tierpill t${relTier(id)}">${REL_TIERS[relTier(id)].n}</span>${(S.jeal[id] || 0) >= 10 ? `<span class="pill j">吃醋 ${Math.round(S.jeal[id])}</span>` : ''}</div></div></div>`; }).join('');
   box.querySelectorAll('.pcard').forEach(n => n.onclick = () => openChar(n.dataset.id));
 }
 function bar(v, cls, min = 0){ const w = min < 0 ? Math.abs(v) : v; return `<div class="bar ${cls} ${v < 0 ? 'neg' : ''}"><i style="width:${clamp(w, 0, 100)}%"></i></div>`; }
@@ -4828,7 +4859,8 @@ function openChar(id, tab){
     const note = [canAct ? '' : '他或你不在家，或你正在忙'].filter(Boolean).join('・');
     const act = `${note ? `<div class="small muted cnote">${note}</div>` : ''}
       ${Object.keys(H_INTER_GRP).filter(g => g === 'custom' || H_INTER.some(d => d.grp === g && personaOk(d) && (!d.only || d.only === id))).map(g => `<div class="igrp">${H_INTER_GRP[g]}</div><div class="agrid">${H_INTER.filter(d => d.grp === g && personaOk(d) && (!d.only || d.only === id)).map(d => { const lock = interLocked(id, d), cl = d.cx && cxLocked(id, d);
-        return `<button class="btn${d.cx ? ' cxbtn' : ''}" data-i="${esc(d.id)}" ${!canAct || lock ? 'disabled' : ''}><i>${lock ? '🔒' : esc(d.icon)}</i>${esc(d.label)}${cl ? `<small>${cxNeed(d)}</small>` : lock ? `<small>需要「${REL_TIERS[d.tier].n}」</small>` : d.id === 'flirt' && S.aff[id].h < 25 ? '<small>還不夠熟</small>' : d.cx ? `<small>${d.cx.dur} 分</small>` : ''}</button>`; }).join('')}</div>${g === 'custom' ? cxManageHTML(id) : ''}`).join('')}`;
+        const lh = typeof loveLockHint === 'function' ? loveLockHint(id, d) : '';
+        return `<button class="btn${d.cx ? ' cxbtn' : ''}" data-i="${esc(d.id)}" ${!canAct || lock ? 'disabled' : ''}><i>${lock ? '🔒' : esc(d.icon)}</i>${esc(d.label)}${cl ? `<small>${cxNeed(d)}</small>` : lock ? `<small>${lh || (d.tier ? '需要「' + REL_TIERS[d.tier].n + '」' : '還沒解鎖')}</small>` : d.id === 'flirt' && S.aff[id].h < 25 ? '<small>還不夠熟</small>' : d.cx ? `<small>${d.cx.dur} 分</small>` : ''}</button>`; }).join('')}</div>${g === 'custom' ? cxManageHTML(id) : ''}`).join('')}`;
     const info = `<div class="kv"><span class="k">年齡</span><span>${C.age} 歲・${C.nick}</span><span class="k">職業</span><span>${C.job}</span>
       <span class="k">房間</span><span>${myRoom ? roomName(myRoom) : '—'}</span>
       <span class="k">個性</span><span>${C.persona}</span>
@@ -4840,12 +4872,13 @@ function openChar(id, tab){
         <span class="lb">他對你的情慾</span><div>${bar(S.des[id].h, 'des')}</div><span class="lbv">${Math.round(S.des[id].h)}</span>
         <span class="lb">吃醋</span><div>${bar(S.jeal[id] || 0, 'jeal')}</div><span class="lbv">${Math.round(S.jeal[id] || 0)}</span></div>
         <div class="small muted" style="margin-top:4px">你對他：好感 ${Math.round(S.aff.h[id])}・情慾 ${Math.round(S.des.h[id])}${S.jealOf[id] && (S.jeal[id] || 0) >= 5 ? `・他在吃 ${nm(S.jealOf[id])} 的醋` : ''}</div></div>
-      <div class="kv"><span class="k">階段</span><span><span class="tierpill t${rt}">${REL_TIERS[rt].n}</span><span class="pill">${tierName(S.aff[id].h, S.des[id].h)}</span><br><span class="small muted">${rt < 3 ? `下一階段「${REL_TIERS[rt + 1].n}」：好感 ${REL_TIERS[rt + 1].aff}／情慾 ${REL_TIERS[rt + 1].des}` : '已到最高階段'}</span></span>
+      ${typeof loveRelExtra === 'function' ? loveRelExtra(id) : ''}
+      <div class="kv"><span class="k">階段</span><span><span class="tierpill t${rt}">${REL_TIERS[rt].n}</span><span class="pill${typeof isLover === 'function' && isLover(id) ? ' lover' : ''}">${typeof relLabel === 'function' ? relLabel(id) : tierName(S.aff[id].h, S.des[id].h)}</span><br><span class="small muted">${rt < 3 ? `下一階段「${REL_TIERS[rt + 1].n}」：好感 ${REL_TIERS[rt + 1].aff}／情慾 ${REL_TIERS[rt + 1].des}` : '已到最高階段'}</span></span>
       <span class="k">合拍度</span><span>${(() => { const v = compatOf(id), w = compatWhy(id); return `<span class="pill ${v < 0 ? 'neg' : 'a'}">${compatLbl(v)}（${v >= 0 ? '+' : ''}${v}）</span><span class="small muted">${w.length ? w.join(' ') : '你的個性與興趣跟他沒什麼交集'}・好感成長 ×${cmul(id).toFixed(2)}</span>`; })()}</span></div>
       <div class="field-title">最近和你的時光</div>${mems.map(x => `<div class="memo ${x.h ? 'hmem' : ''}"><span class="tm">${stamp(x.t)}${x.place ? `・${esc(x.place)}` : ''}</span>${esc(x.text)}${fxHtml(x, id)}</div>`).join('') || '<div class="muted small">還沒有。</div>'}
       <button class="btn wide histbtn" id="histBtn">📜 他的紀錄</button>`;
     const nowIcon = S.inter && S.inter.who === id && S.inter.cx ? (S.inter.cx.icon || '✨') : (ACTS[e.act]?.icon || '•');
-    $('#sheet').innerHTML = `<div class="grab"></div><div class="sh ccard-h"><div class="av">${avOf(id)}</div><div class="ccard-m"><h3>${C.name} <span class="muted small">${C.age}歲</span></h3><div class="small muted">${C.job}</div>
+    $('#sheet').innerHTML = `<div class="grab"></div><div class="sh ccard-h"><div class="av">${typeof avLove === 'function' ? avLove(id) : avOf(id)}</div><div class="ccard-m"><h3>${C.name}${typeof isLover === 'function' && isLover(id) ? ' <span class="pill lover">❤ 戀人</span>' : ''} <span class="muted small">${C.age}歲</span></h3><div class="small muted">${C.job}</div>
       <div class="ctags">${C.tags.map(t => `<span class="pill">${t}</span>`).join('')}</div></div><button class="iconbtn" id="histIcon" title="他的紀錄" aria-label="他的紀錄">📜</button></div>
       <div class="cnow" id="cNow"><span class="cn-i">${esc(nowIcon)}</span><span class="cn-t">${esc(e.label || ACTS[e.act]?.label || '')}</span><span class="cn-p">・${esc(where)}</span></div>
       <div class="seg ctabs">${CHAR_TABS.map(([k, n]) => `<button data-ct="${k}" class="${tab === k ? 'on' : ''}">${n}</button>`).join('')}</div>
@@ -4858,6 +4891,7 @@ function openChar(id, tab){
     const ca = $('#cxAdd'); if (ca) ca.onclick = () => openCxForm(id);
     const hb = $('#histBtn'); if (hb) hb.onclick = () => openHist(id);
     const hi = $('#histIcon'); if (hi) hi.onclick = () => openHist(id);
+    if (typeof loveBindRel === 'function') loveBindRel(id);
   });
 }
 function openHero(){
@@ -5058,7 +5092,7 @@ function initStart(){
 }
 // 測試用掛鉤
 function ff(mins, autoAnswer){ for (let i = 0; i < mins; i++){ stepMinute(); allEnts().forEach(e => moveEnt(e, 1)); if (S.pending && autoAnswer != null) answerRequest(autoAnswer); } snapVis(); drawTokens(); renderAll(true); }
-window.__imb = { get S(){ return S; }, socialThink, get form(){ return form; }, compatOf, cmul, heroAuto, ff, pickEvent, fireEvent, fireCollide, fireTest, witness, witnessThink, witActKey, witnessKindLive, relTier, pairV, hMood, evById, showResult, migrate, heroInter, doAction, endOfDay, stepMinute, startInter, answerRequest, showRequest, openChar, closeSheet, switchView, setSpeed, save, renderAll, startFF, stopFF, hMem, syncCustom, openCxForm, cxClean, catchUp, get vis(){ return VIS; }, visSpeed, snapVis, route, resumeOffline, get lastAway(){ return ui.lastAway; }, openHist, recHist, pruneHist, caught, leaveSeen, interFromDef, soloOk, endSolo, startAftercare, interTxt, quipFits, interSpot, resolveSpot, spotKey, crowdedPairSeat, setSeatPx: v => { SEAT_PX = v; for (const k in SEAT_CACHE) delete SEAT_CACHE[k]; }, findSeat, seatPair, reseatAll, rectsAt, roomOccupants, npcThink, heroThink, endInter, onArrive, kickHero, goHomeIfForeign, nearestRoom, get ffState(){ return ui.ff; }, get ffLast(){ return ui.ffLast; }, showStart, loadSaved, goReturn, goMoveIn, hasAnySave, peekSaves, peekMeta, restoreBackup, backupSave, fillNewForm, SAVE_KEY, SAVE_BAK_KEY };
+window.__imb = { get S(){ return S; }, socialThink, interLocked, lineOf, get form(){ return form; }, compatOf, cmul, heroAuto, ff, pickEvent, fireEvent, fireCollide, fireTest, witness, witnessThink, witActKey, witnessKindLive, relTier, pairV, hMood, evById, showResult, migrate, heroInter, doAction, endOfDay, stepMinute, startInter, answerRequest, showRequest, openChar, closeSheet, switchView, setSpeed, save, renderAll, startFF, stopFF, hMem, syncCustom, openCxForm, cxClean, catchUp, get vis(){ return VIS; }, visSpeed, snapVis, route, resumeOffline, get lastAway(){ return ui.lastAway; }, openHist, recHist, pruneHist, caught, leaveSeen, interFromDef, soloOk, endSolo, startAftercare, interTxt, quipFits, interSpot, resolveSpot, spotKey, crowdedPairSeat, setSeatPx: v => { SEAT_PX = v; for (const k in SEAT_CACHE) delete SEAT_CACHE[k]; }, findSeat, seatPair, reseatAll, rectsAt, roomOccupants, npcThink, heroThink, endInter, onArrive, kickHero, goHomeIfForeign, nearestRoom, get ffState(){ return ui.ff; }, get ffLast(){ return ui.ffLast; }, showStart, loadSaved, goReturn, goMoveIn, hasAnySave, peekSaves, peekMeta, restoreBackup, backupSave, fillNewForm, SAVE_KEY, SAVE_BAK_KEY };
 
 </script>
 <script>
@@ -5818,6 +5852,10 @@ function possOf(id){
   if (S && S.poss && typeof S.poss[id] === 'number' && isFinite(S.poss[id])) return clamp(Math.round(S.poss[id]), 0, 100);
   return clamp(Math.round((CHAR[id] && CHAR[id].possess) || 0), 0, 100);
 }
+function jealPoss(id){
+  const base = possOf(id);
+  return (typeof loveJealPoss === 'function') ? loveJealPoss(id, base) : base;
+}
 function setPoss(id, v){ if (!S || !CHAR[id]) return 0; S.poss = S.poss || {}; return S.poss[id] = clamp(Math.round(Number(v) || 0), 0, 100); }
 function cutInDef(id){ return id === 'theo' ? 100 : 20; }
 function cutInOf(id){
@@ -5837,7 +5875,7 @@ function shouldInterrupt(id, tier){
   return Math.random() < p;
 }
 function possScore(id, floorPoss){
-  const p = Math.max(floorPoss || 0, possOf(id)) / 100;
+  const p = Math.max(floorPoss || 0, jealPoss(id)) / 100;
   const a = clamp(S.aff[id] ? S.aff[id].h : 0, 0, 100) / 100;
   return p * (0.4 + 0.6 * a);
 }
@@ -5957,7 +5995,7 @@ function markNotice(id){
   const M = S && S.mark; if (!M || id === M.who || M.seen[id] || !CHAR[id]) return false;
   if (S.aff[id].h < MARK_AFF()) return false;
   if (!jealPresent(id)) return false;
-  const score = possScore(id, 18), tier = jealTierOf(score), hn = S.hero.name;
+  const score = possScore(id, (typeof loveOpen === 'function' && loveOpen(id)) ? 0 : 18), tier = jealTierOf(score), hn = S.hero.name;
   const raw = pickLine(MARK_JEAL, id, tier) || `${nm(id)} 看見你頸側的吻痕。`;
   const line = fill(raw, {x:nm(M.who), h:hn, room:markRoomName()});
   const text = fill(WORDS.markLog, {tier:jealTierName(tier), line:namedLine(id, line)});
@@ -5966,6 +6004,8 @@ function markNotice(id){
   const bub = pickLine(MARK_BUBBLE, id, tier); if (bub) bubble(id, fill(bub, {x:nm(M.who), h:hn}), 35);
   applyJealFX(id, M.who, score, tier);
   if (!S.firsts['markjeal:' + id]){ S.firsts['markjeal:' + id] = 1; addMem(id, `看到 ${hn} 頸側有 ${nm(M.who)} 留下的吻痕。`); }
+  S.loveSaw = S.loveSaw || {}; S.loveSaw[id] = {who:M.who, t:S.t};
+  if (typeof loveDiscover === 'function') loveDiscover(id, M.who, 'mark', 'mark');
   return true;
 }
 function markThink(){
@@ -5997,7 +6037,7 @@ function possActKey(watcher, target){
 }
 function possNotice(id, target){
   if (!S || !CHAR[id] || !CHAR[target] || id === target) return false;
-  if (possOf(id) <= 0) return false;
+  if (jealPoss(id) <= 0) return false;
   if (!jealPresent(id)) return false;
   const partners = possPartners(id); if (!partners.includes(target)) return false;
   const key = possActKey(id, target);
@@ -6014,20 +6054,22 @@ function possNotice(id, target){
   const bub = pickLine(POSS_BUBBLE, id, tier); if (bub) bubble(id, fill(bub, {x:nm(target), h:hn}), 30);
   applyJealFX(id, target, score, tier);
   if (!S.firsts['possjeal:' + id]){ S.firsts['possjeal:' + id] = 1; addMem(id, `看到 ${hn} 和別人在一起。心裡很不是滋味。`); }
+  S.loveSaw = S.loveSaw || {}; S.loveSaw[id] = {who:target, t:S.t};
+  if (typeof loveDiscover === 'function') loveDiscover(id, target, 'see', S.inter && (S.inter.wk || S.inter.ik || S.inter.type || S.inter.kind));
   return {ok:true, id, target, score, tier};
 }
 function possThink(){
   if (!S || S._jealCut) return;
   const hits = [];
   for (const id of S.residents){
-    if (possOf(id) <= 0 || !jealPresent(id)) continue;
+    if (jealPoss(id) <= 0 || !jealPresent(id)) continue;
     const ps = possPartners(id); if (!ps.length) continue;
     // 一次只對一個對象反應（挑競爭較高的），避免同一分鐘刷兩筆
     ps.sort((a, b) => (S.rival[pkey(id, b)] || 0) - (S.rival[pkey(id, a)] || 0) || (S.aff.h[b] || 0) - (S.aff.h[a] || 0));
     const r = possNotice(id, ps[0]); if (r && r.ok) hits.push(r);
   }
   if (!hits.length || jealAboutToEnd() || !jealActLive()) return;
-  const cuts = hits.filter(h => shouldInterrupt(h.id, h.tier)).sort((a, b) => b.score - a.score || (b.tier - a.tier));
+  const cuts = hits.filter(h => !(typeof loveSkipCut === 'function' && loveSkipCut(h.id, h.target)) && shouldInterrupt(h.id, h.tier)).sort((a, b) => b.score - a.score || (b.tier - a.tier));
   if (cuts[0]) jealCutIn(cuts[0].id, cuts[0].target);
 }
 function jealCutLine(wit, partner, intimate){
@@ -6091,7 +6133,7 @@ function markCheatBind(){
   if (left()) left().onchange = () => { if (!S.cheat || !S.mark) return; setMarkLeft(left().value); if (S.mark) left().value = markLeft(); renderAll(true); save(); };
 }
 
-Object.assign(window.__imb, { possOf, setPoss, cutInOf, setCutIn, cutInDef, interruptChance, shouldInterrupt, possScore, jealTierOf, jealTierName, markLeft, markClock, markChipText, markHTML, isMarkAct, applyMark, clearMark, setMarkLeft, sanitizeMark, markNotice, markThink, possPartners, possNotice, possThink, jealCutIn, jealPresent, MARK_MIN, MARK_AFF, markCheatHTML, markCheatBind });
+Object.assign(window.__imb, { possOf, jealPoss, setPoss, cutInOf, setCutIn, cutInDef, interruptChance, shouldInterrupt, possScore, jealTierOf, jealTierName, markLeft, markClock, markChipText, markHTML, isMarkAct, applyMark, clearMark, setMarkLeft, sanitizeMark, markNotice, markThink, possPartners, possNotice, possThink, jealCutIn, jealPresent, MARK_MIN, MARK_AFF, markCheatHTML, markCheatBind });
 
 </script>
 <script>
@@ -6976,6 +7018,945 @@ function txItemView(sh, it){
   $('#txISave').onclick = () => { if (!S.cheat) return; F.querySelectorAll('textarea').forEach(ta => txSetOv(ta.dataset.txk, ta.value)); save(); toast('已儲存文字修改'); txUi.item = null; ui.sheet.render(); };
 }
 Object.assign(window.__imb, { txBuild, applyTextOv, txSetOv, txResetWho, txExport, txImport, openTextEditor, get TX(){ return TX; }, txCur, schedLbl });
+
+</script>
+<script>
+/* ---------- 告白與交往 ----------
+   好感／情慾夠高時，你可以向他告白，他也有可能向你告白。
+   可以同時和不只一位室友交往，但預設是秘密的；被另一位戀人發現時會當面質問。
+   質問後通常不會立刻分手（除非你選分手，或信任極低又回應得很差），但會進入「需要好好談」，
+   可能冷戰一陣子，競爭也會升高。之後可重複「好好談談」降低獨佔欲、補回信任；
+   獨佔欲夠低且談過足夠次數後，他有可能接受多方發展。 */
+const LOVE_TALK_CD = 3 * 60;          // 好好談談冷卻：3 個遊戲小時
+const LOVE_CONF_CD = 12 * 60;         // 告白失敗冷卻
+const LOVE_DISC_CD = 12 * 60;         // 同一個人再次被發現的間隔
+const LOVE_OPEN_POSS = 30;            // 接受多方發展的獨佔欲門檻
+const LOVE_OPEN_TALKS = 3;
+const LOVE_AFF = 60;                  // 你可以告白的好感門檻
+const LOVE_DES = 25;
+const LOVE_NPC_AFF = 70;              // 他主動告白的好感門檻
+const LOVE_FLOOR = 55;                // 尚未接受多方發展的戀人，吃醋時的獨佔欲下限
+const LOVE_ST = ['none', 'lover', 'ex'];
+const LOVE_ST_N = {none:'未滿', lover:'戀人', ex:'前任'};
+const LOVE_PROG = ['抵觸', '動搖', '理解'];
+
+function loveBlank(){
+  return {st:'none', trust:50, known:false, talks:0, prog:0, talkAt:-99999, confAt:-99999,
+    open:false, tense:false, coldUntil:0, pending:false, discAt:-99999, since:0};
+}
+function loveMigrate(s){
+  if (!s) return s;
+  const src = s.love && typeof s.love === 'object' && !Array.isArray(s.love) ? s.love : {};
+  s.love = {};
+  for (const id of (s.residents || [])){
+    const o = src[id] && typeof src[id] === 'object' ? src[id] : {};
+    const L = loveBlank();
+    L.st = LOVE_ST.includes(o.st) ? o.st : 'none';
+    L.trust = clamp(Math.round(Number(o.trust) || 50), 0, 100);
+    L.known = !!o.known;
+    L.talks = clamp(Math.round(Number(o.talks) || 0), 0, 99);
+    L.prog = clamp(Math.round(Number(o.prog) || 0), 0, 2);
+    L.talkAt = Number.isFinite(o.talkAt) ? o.talkAt : -99999;
+    L.confAt = Number.isFinite(o.confAt) ? o.confAt : -99999;
+    L.open = !!o.open && L.st === 'lover';
+    L.tense = !!o.tense && L.st === 'lover';
+    L.coldUntil = Number.isFinite(o.coldUntil) ? o.coldUntil : 0;
+    L.pending = !!o.pending && L.st !== 'lover';
+    L.discAt = Number.isFinite(o.discAt) ? o.discAt : -99999;
+    L.since = Number.isFinite(o.since) ? o.since : 0;
+    if (L.st !== 'lover'){ L.open = false; L.tense = false; L.coldUntil = 0; }
+    s.love[id] = L;
+  }
+  s.loveQ = Array.isArray(s.loveQ) ? s.loveQ.filter(x => x && CHAR[x.who]).slice(0, 12) : [];
+  s.loveSaw = s.loveSaw && typeof s.loveSaw === 'object' && !Array.isArray(s.loveSaw) ? s.loveSaw : {};
+  return s;
+}
+function loveOf(id){
+  if (!S) return loveBlank();
+  S.love = S.love || {};
+  if (!S.love[id] || typeof S.love[id] !== 'object') S.love[id] = loveBlank();
+  return S.love[id];
+}
+const isLover = id => !!(S && CHAR[id] && loveOf(id).st === 'lover');
+const loveOpen = id => isLover(id) && !!loveOf(id).open;
+const loveTense = id => isLover(id) && !!loveOf(id).tense;
+const loveCold = id => isLover(id) && (loveOf(id).coldUntil || 0) > (S ? S.t : 0);
+const lovePending = id => !!(S && loveOf(id).pending && loveOf(id).st !== 'lover');
+const lovers = () => (S && S.residents || []).filter(isLover);
+function loveNeedTalk(id){ return isLover(id) && (loveOf(id).tense || loveOf(id).known) && !loveOf(id).open; }
+function loveCanConfess(id){
+  if (!S || !CHAR[id] || isLover(id) || loveOf(id).st === 'lover') return false;
+  if ((S.aff[id].h || 0) < LOVE_AFF || (S.des[id].h || 0) < LOVE_DES) return false;
+  if (S.t < (loveOf(id).confAt || -99999) + LOVE_CONF_CD) return false;
+  return true;
+}
+function loveConfessLeft(id){ return Math.max(0, (loveOf(id).confAt || -99999) + LOVE_CONF_CD - (S ? S.t : 0)); }
+function loveTalkLeft(id){ return Math.max(0, (loveOf(id).talkAt || -99999) + LOVE_TALK_CD - (S ? S.t : 0)); }
+
+function relLabel(id){
+  if (isLover(id)) return WORDS.loveStatus || '戀人';
+  if (loveOf(id).st === 'ex') return WORDS.loveEx || '前任';
+  return tierName(S.aff[id].h, S.des[id].h);
+}
+function loveBadgeHTML(id, cls){
+  if (!isLover(id)) return '';
+  return `<span class="loveb${cls ? ' ' + cls : ''}" title="${esc(WORDS.loveStatus || '戀人')}">❤</span>`;
+}
+function avLove(id){ return `<span class="avbox">${avOf(id)}${loveBadgeHTML(id)}</span>`; }
+
+function loveJealPoss(id, base){
+  if (!isLover(id)) return base;
+  if (loveOpen(id)) return Math.min(base, 8);
+  return Math.max(base, LOVE_FLOOR);
+}
+function loveSkipCut(id, target){ return loveOpen(id) && (!target || isLover(target) || target !== id); }
+function loveWitnessSkip(y, x){ return loveOpen(y) && isLover(x); }
+
+function loveAddTrust(id, v){ const L = loveOf(id); L.trust = clamp(Math.round((L.trust + v) * 10) / 10, 0, 100); return L.trust; }
+function loveAddPoss(id, v){
+  const cur = possOf(id);
+  setPoss(id, clamp(cur + v, 0, 100));
+  return possOf(id);
+}
+
+function loveRoll(p, forceKey){
+  if (S && S._loveForce){
+    if (S._loveForce === forceKey || S._loveForce === 'ok') return true;
+    if (S._loveForce === 'fail' || S._loveForce === 'nobreak') return false;
+    if (S._loveForce === 'break' && forceKey === 'break') return true;
+  }
+  return Math.random() < p;
+}
+
+function loveAch(key){
+  S.firsts = S.firsts || {};
+  if (key === 'confess' && !S.firsts.loveConfess) S.firsts.loveConfess = S.t;
+  if (key === 'lover' && !S.firsts.loveFirst) S.firsts.loveFirst = S.t;
+  if (key === 'caught' && !S.firsts.loveCaught) S.firsts.loveCaught = S.t;
+  if (key === 'talked' && !S.firsts.loveTalked) S.firsts.loveTalked = S.t;
+  if (key === 'open' && !S.firsts.loveOpen) S.firsts.loveOpen = S.t;
+  if (typeof achThink === 'function') achThink();
+}
+
+function becomeLover(id, how){
+  const L = loveOf(id);
+  const was = L.st;
+  L.st = 'lover';
+  if (was !== 'lover') L.trust = was === 'ex' ? clamp(L.trust, 30, 70) : (L.trust || 50);
+  if (!L.since) L.since = S.t;
+  L.pending = false;
+  L.open = !!L.open;
+  const line = fill(WORDS.loveStart || '❤ 你和 {x} 開始交往了。', {x:nm(id), h:S.hero.name});
+  log(line, ['h', id], 'heart');
+  toast(`❤ ${nm(id)}：戀人`);
+  addMem('h', fill(WORDS.loveMemStart || '我和 {x} 開始交往了。', {x:nm(id)}));
+  addMem(id, fill(WORDS.loveMemStartHim || '我和 {h} 開始交往了。', {h:S.hero.name}));
+  dayEv('h', 'love', id); dayEv(id, 'love');
+  if (how === 'confess' || how === 'npc') loveAch('confess');
+  loveAch('lover');
+  if (typeof renderAll === 'function') renderAll(true);
+  return L;
+}
+function breakUp(id, why){
+  const L = loveOf(id);
+  L.st = 'ex'; L.tense = false; L.open = false; L.coldUntil = 0; L.pending = false; L.known = false;
+  addAff(id, 'h', why === 'bad' ? -12 : -8);
+  addDes(id, 'h', -6);
+  addMood(why === 'pick' ? -6 : -10);
+  const line = fill(WORDS.loveBreak || '💔 你和 {x} 分手了。', {x:nm(id), h:S.hero.name});
+  log(line, ['h', id], 'big');
+  toast(`💔 ${nm(id)}：分手了`);
+  addMem('h', fill(WORDS.loveMemBreak || '我和 {x} 分手了。', {x:nm(id)}));
+  addMem(id, fill(WORDS.loveMemBreakHim || '我和 {h} 分手了。', {h:S.hero.name}));
+  dayEv('h', 'break', id); dayEv(id, 'break');
+  checkTier(id);
+  if (typeof renderAll === 'function') renderAll(true);
+  return L;
+}
+
+function setLoveStatus(id, st, opts){
+  if (!CHAR[id]) return false;
+  const L = loveOf(id);
+  if (st === 'lover' && L.st !== 'lover') becomeLover(id, 'cheat');
+  else if (st === 'ex' && L.st === 'lover') breakUp(id, 'cheat');
+  else if (st === 'none'){ L.st = 'none'; L.open = false; L.tense = false; L.coldUntil = 0; L.pending = false; }
+  else L.st = LOVE_ST.includes(st) ? st : L.st;
+  if (opts){
+    if (opts.trust != null) L.trust = clamp(Math.round(Number(opts.trust)), 0, 100);
+    if (opts.known != null) L.known = !!opts.known;
+    if (opts.open != null) L.open = !!opts.open && L.st === 'lover';
+    if (opts.tense != null) L.tense = !!opts.tense && L.st === 'lover';
+    if (opts.talks != null) L.talks = clamp(Math.round(Number(opts.talks)), 0, 99);
+    if (opts.prog != null) L.prog = clamp(Math.round(Number(opts.prog)), 0, 2);
+    if (opts.cold != null) L.coldUntil = S.t + Math.max(0, Math.round(Number(opts.cold) || 0));
+    if (opts.pending != null) L.pending = !!opts.pending && L.st !== 'lover';
+  }
+  return true;
+}
+
+/* ---- 互動選項 ---- */
+H_INTER.push(
+  {id:'confess', label:'告白', icon:'💌', dur:5, aff:0, des:0, place:'here', grp:'love', talk:true, need:'confess', p:1},
+  {id:'reply_cf', label:'回覆告白', icon:'✉️', dur:5, aff:0, des:0, place:'here', grp:'love', need:'pending', p:1},
+  {id:'talk_it', label:'好好談談', icon:'🕊️', dur:15, aff:0, des:0, place:'here', grp:'love', talk:true, need:'talk', wk:'none', p:1},
+  {id:'love_hug', label:'抱抱', icon:'🤗', dur:10, aff:5, des:3, place:'here', grp:'love', need:'lover', T:'flirt', K:'hug', wk:'hug', dk:'被他好好抱住', p:.88},
+  {id:'love_date', label:'約會出門', icon:'🎡', dur:120, aff:8, des:3, place:'out', grp:'love', need:'lover', T:'together', K:'date', wk:'flirt', lbl:'約會中', dk:'出去約會了', p:.8},
+  {id:'love_sleep', label:'一起睡', icon:'😴', dur:480, aff:6, des:2, place:'his', grp:'love', need:'lover', T:'together', K:'sleep', act:'sleep', wk:'hug', lbl:'一起睡', dk:'和他一起睡了一晚', hrs:[21, 26.5], p:.75}
+);
+H_INTER_GRP.love = '戀人';
+
+const LOVE_LINES = {
+  alexander:{
+    love_hand:['他看了你的手一秒，才慢慢握住，力道剛好。','他把手收回袖口。「不是現在。」'],
+    love_hug:['他沒有退開，手臂很穩地環過來，像在量一個他早就算好的距離。','他後退半步。「……等等。」'],
+    love_date:['他把外套搭在手臂上。「走吧。我知道一家很安靜的店。」','「今晚有圖要趕。下次。」'],
+    love_sleep:['他點頭，替你把被子掀開一邊。「睡吧。我在。」','「今晚我想一個人把圖收完。」']
+  },
+  jasper:{
+    love_hand:['他十指扣上來，還趁機晃了晃。「公開嗎？還是先偷偷的？」','他笑著抽手，「相機還在身上，等一下。」'],
+    love_hug:['他整個人靠過來，下巴擱在你肩上。「嗯，這個角度我要了。」','「等等，我頭髮亂了。」他笑著避開。'],
+    love_date:['「約會！我早想聽你親口說這兩個字。」他已經在找鏡頭以外的路。','「今晚要交片，欠你一次真正的約會。」'],
+    love_sleep:['他把相機面朝下放好。「今晚不拍了。睡。」','「我還有幾張要修……你先睡，我待會過來。」']
+  },
+  liam:{
+    love_hand:['他笑出酒窩，輕輕握住你的手，拇指在你指節上畫了一下。','「手上還有麵粉。」他不好意思地攤開掌心。'],
+    love_hug:['他把你圈進懷裡，身上有剛烤過的味道。「今天也辛苦了。」','他拍拍你的肩。「先讓我把火關掉。」'],
+    love_date:['「好啊。我想帶你去那家週末才開的小館。」','「今晚廚房走不開，明天我補你一頓好好的。」'],
+    love_sleep:['他替你倒了杯溫水，在床沿坐下。「想靠過來就靠過來。」','「我還有發酵要看。你先睡，好嗎？」']
+  },
+  marcus:{
+    love_hand:['他沒說話，只是把你的手牽進自己的外套口袋裡。','「待會。」他把耳機摘下一邊。'],
+    love_hug:['他讓你靠上來，手掌落在你後腦，很慢。','「別鬧。」語氣卻沒有推開你那麼堅決。'],
+    love_date:['「走。今晚我選地方。」他已經在拿皮夾克。','「今晚要收一首。改天，我請。」'],
+    love_sleep:['他拍拍床的另一側。「燈我關。」','「我還想再聽一遍。你先睡。」']
+  },
+  samuel:{
+    love_hand:['他的手心有一點汗，但還是小心地握住了。「……這樣可以嗎？」','「有、有人在看……對不起……」'],
+    love_hug:['他僵了兩秒，才小心翼翼地回抱，像怕用力過了。','他慌張地後退，「對、對不起，我還沒準備好……」'],
+    love_date:['「約、約會嗎？」他眼睛亮了一下，「我、我去查路……」','「外面人好多……可不可以改在家……？」'],
+    love_sleep:['他點頭，聲音小得幾乎聽不見：「我、我會盡量不佔位置……」','「我還在 debug……你先睡，我怕鍵盤會吵你。」']
+  },
+  theo:{
+    love_hand:['他立刻十指扣緊，晃著你的手走。「這是交往後第一次牽手耶！」','「等一下啦，手上還有筆記的墨水……」'],
+    love_hug:['他直接把你抱起來轉了半圈。「可以一直這樣嗎？」','「這裡有人啦……」他小聲說，臉卻紅了。'],
+    love_date:['「約會！！我知道附近有家甜點超好！」他已經在穿鞋了。','「明天小考……約會改周末，我請你吃兩份！」'],
+    love_sleep:['他眼睛亮得嚇人，「真的可以嗎？我會很乖，大概。」','「我還要背書……你先躺，我看完就過來！」']
+  }
+};
+
+/* ---- 室友主動告白（事件，不會被一般抽選抽到） ---- */
+const LOVE_CONFESS_EV = {
+  alexander:{text:'Alexander 把一杯黑咖啡放到你面前，卻沒有立刻放手。\n「我習慣把事情想清楚再開口。」他看著你，聲音比平時更低，「我想和你在一起。不是普通的室友。」\n他等你的答案，沒有催。',
+    a:['接受','他閉了一下眼，像終於把一條一直懸著的線放下。「……好。我會認真。」'],
+    r:['婉拒','他點頭，把手收回去。「我明白。」語氣平得幾乎聽不出來，只是那杯咖啡他沒再碰。'],
+    d:['先保留','「你需要時間。」他說，「我可以等。不要太久。」']},
+  jasper:{text:'Jasper 把相機放下，難得沒有笑。\n「我拍過很多人，」他說，「可是我想走進鏡頭外面，只看你。要不要和我在一起？」',
+    a:['接受','他終於笑出來，卻有一點發抖。「說好了。這次我不修圖，原封不動收下。」'],
+    r:['婉拒','他聳肩，笑意淡了一點。「好吧。這張，我先放到未公開。」'],
+    d:['先保留','「先欠著。」他眨眼，「我記帳。想好了再來找我。」']},
+  liam:{text:'Liam 搓了搓手指，像在廚房裡準備一道不允許失敗的菜。\n「我……想得很好，一看到你又不知道怎麼說。」他抬起頭，「可以和我在一起嗎？當戀人那種。」',
+    a:['接受','他笑出酒窩，眼睛卻紅了一點。「真的？我……我會對你很好。一直都想。」'],
+    r:['婉拒','他輕輕點頭，還是對你笑了一下。「沒關係。我還是會在廚房留一盞燈。」'],
+    d:['先保留','「好，你慢慢想。」他把一杯熱茶推過來，「不急。我在。」']},
+  marcus:{text:'Marcus 把音量關掉。房間忽然靜得只剩你和他。\n「我不愛說這種話。」他看著你，「想跟我在一起，就點頭。不想，也直接說。」',
+    a:['接受','他偏了偏頭，嘴角動了一下。「嗯。那就這樣。」手指卻在你袖口停了很久。'],
+    r:['婉拒','「知道了。」他把音樂重新打開，音量比剛才更低。'],
+    d:['先保留','「想清楚再來。」他說，「我不等很久，但會等。」']},
+  samuel:{text:'Samuel 站在門口很久，才把話說出口。\n「我、我練習了很多次……還是會抖。」他推了推眼鏡，「如果可以的話……你願意和我交往嗎？」',
+    a:['接受','他愣了整整三秒，然後倒抽一口氣，笑得有點想哭。「真、真的嗎。我不會讓你後悔……我會努力。」'],
+    r:['婉拒','「沒、沒關係……是我自己……對不起，打擾你了。」他低頭退開，撞到了門框。'],
+    d:['先保留','「可、可以等。」他連忙說，「你想好再告訴我。我不會一直問……大概。」']},
+  theo:{text:'Theo 深吸一口氣，臉已經紅到脖子。\n「我喜歡你！不是普通喜歡！」他握著你的袖口，「請和我交往。不是玩的，是認真的那種！」',
+    a:['接受','他一瞬間愣住，接著整個人撲上來。「真的嗎真的嗎？我要記一輩子！」'],
+    r:['婉拒','他的眼睛一下子紅了，還是努力笑了一下。「……喔。我知道了。我……還是會在的。」'],
+    d:['先保留','「好、好，你再想想！」他點頭點得很用力，「我等你。真的會等。」']}
+};
+
+(function loveInstallEvents(){
+  for (const id of Object.keys(LOVE_CONFESS_EV)){
+    const c = LOVE_CONFESS_EV[id];
+    E(id, 'cf_' + id, 3, ['living','kitchen','hall','roof'], '', c.text, c.a, c.r, c.d);
+    const ev = (EVENTS[id] || []).find(e => e.id === 'cf_' + id);
+    if (ev) ev.love = 'confess';
+  }
+  const dates = {
+    alexander:['a_lv','Alexander 把第二杯咖啡放到你手邊，杯口朝向你習慣的那一側。\n「戀人，」他說這個詞像在核對一張圖，「早上也可以這樣。」',
+      ['喝一口','咖啡剛好是你喜歡的濃度。他看著你喝完，才說：「明天也是這個時間。」'],
+      ['今天想自己靜一靜','他點頭，把杯子收回去一點。「好。」'],
+      ['「你也太早起了。」','「習慣。」他想了想，又說，「有你在的早上，會比較像習慣。」']],
+    jasper:['j_lv','Jasper 把一張沒修過的照片滑到你面前：是你側臉，光很好。\n「這張只給你看。」他說，「交往以後，有些畫面我不想給別人。」',
+      ['看著那張照片','你說很喜歡。他笑得很輕，「那就好。這張，存進只屬於我們的那一格。」'],
+      ['有點不好意思','他收回手機，「好啦，先欠著，等你想看再拿出來。」'],
+      ['「以後也可以拍我嗎？」','「可以。不過要先問你。」他少見地認真。']],
+    liam:['l_lv','Liam 從烤箱裡拿出兩份剛好的司康，一份推到你面前。\n「戀人的早餐。」他耳根紅了，「我可以每天這樣叫嗎？還是太肉麻？」',
+      ['說喜歡這個稱呼','他笑出酒窩，把果醬也推過來。「那就這樣叫。今天的份，多加了一點。」'],
+      ['先吃一口再說','你咬了一口，他才放心坐下來，像等一道菜被點頭。'],
+      ['「太肉麻，但可以偶爾。」','「偶爾就好。」他假裝嘆氣，眼睛卻很亮。']],
+    marcus:['m_lv','Marcus 把一副耳機分給你一邊，播放的不是他平常給別人聽的那首。\n「這首還沒發。」他說，「先給你。」',
+      ['戴上聽完','曲子結束時他沒問感想，只看了你一眼。那就夠了。'],
+      ['今晚想安靜','他把耳機收回來，「改天。」'],
+      ['「專屬的？」','「嗯。暫時是。」']],
+    samuel:['s_lv','Samuel 把一份列印得很整齊的行程表遞給你，邊緣還有點發抖。\n「這、這是周末可以一起做的事……不是要綁住你。只是我怕自己到時候說不出口。」',
+      ['收下那張紙','你說一起挑一兩件就好。他鬆了一口氣，耳朵卻更紅了。'],
+      ['先不用排這麼滿','「沒、沒關係，當沒看到就好……」他把紙對摺了兩次。'],
+      ['「你想去哪一件？」','他指了一個很安靜的項目，又立刻補充：「你想去別的也可以……」']],
+    theo:['t_lv','Theo 把兩張電影票在你面前晃了晃，幾乎要跳起來。\n「戀人約會！我搶到的！」他壓低聲音，「這次是正經約會，不是隨便出去玩。」',
+      ['答應一起去','他高興得轉了一圈，「我會準時！還會先查暴雷！」'],
+      ['這部我想改天','「好——那票我先收著，或我們換別的！」'],
+      ['「正經是什麼意思？」','「就是……會牽手，會認真聽你講話，還會請你吃爆米花！」他比了三個手指。']]
+  };
+  for (const id of Object.keys(dates)){
+    const [eid, text, a, r, d] = dates[id];
+    E(id, eid, 2, ['living','kitchen','hall','roof'], '', text, a, r, d);
+    const ev = (EVENTS[id] || []).find(e => e.id === eid);
+    if (ev) ev.love = 'date';
+  }
+})();
+
+/* ---- 被發現質問 ---- */
+const LOVE_CAUGHT = {
+  alexander:{
+    see:'Alexander 站在原地，看了你們很久。咖啡杯在他手指間轉了一圈。\n「解釋一下。」他說，聲音平得可怕，「你和我，還有他。」',
+    mark:'Alexander 的視線在你頸側停住了。那不是他留下的。\n「這是誰。」不是問句。',
+    gossip:'Alexander 走到你面前，把一句剛聽來的話重複了一遍，一個字都沒添。\n「是真的嗎。」'
+  },
+  jasper:{
+    see:'Jasper 的笑容第一次完全收掉。相機還掛在胸前，他卻沒有舉起。\n「所以我只是其中一幕？」他問，「還是我看錯了？」',
+    mark:'他盯著你頸側，吹了一聲很輕的口哨，一點也不開心。\n「這張，不是我拍的。要不要說實話？」',
+    gossip:'Jasper 靠在門框上，語氣輕，眼神不輕。\n「剛有人跟我說了一件事。我想親耳聽你講。」'
+  },
+  liam:{
+    see:'Liam 站在那，手上的杯子微微傾斜。\n「我不是要鬧。」他說得很慢，「可是我看見了。我們……可以談談嗎？」',
+    mark:'他看見你頸側的痕跡，先是一愣，然後把視線移開又移回來。\n「那不是我。」他輕輕說，「我需要聽你說。」',
+    gossip:'Liam 在廚房門口停下，聲音比平時低。\n「有人跟我說了。我希望是誤會。如果你願意，告訴我好不好？」'
+  },
+  marcus:{
+    see:'Marcus 把音樂關掉。安靜來得太突然。\n「看見了。」他說，「你要說實話，還是要我先走？」',
+    mark:'他的視線掃過你的頸側，停了兩秒。\n「不是我留的。說。」',
+    gossip:'有人把話傳到他耳朵裡。他現在站在你面前，雙手插在口袋。\n「我只問一次。是不是真的。」'
+  },
+  samuel:{
+    see:'Samuel 的臉一下子白了，推了推眼鏡，卻什麼也沒看清楚。\n「我、我不是故意看到的……可是你們……」他的聲音在抖，「可以告訴我嗎？」',
+    mark:'他看見那塊痕跡，耳朵紅了，隨即又慌起來。\n「那、那是……別人嗎？對不起，我不該問，可是我好難過……」',
+    gossip:'他幾乎是逃著來找你的，話卻還是說了出來。\n「有、有人跟我說……你和其他人……是真的嗎？我、我只是想聽你親口說。」'
+  },
+  theo:{
+    see:'Theo 整個人僵在門口，眼睛瞪得很大，隨即紅了。\n「你……你不是只喜歡我嗎？」他的聲音破了，「那剛剛是什麼？我要聽你說！」',
+    mark:'他湊近你的頸側，本來想撒嬌，卻忽然停住。\n「這不是我留下的。」他退了半步，「為什麼？告訴我啊。」',
+    gossip:'Theo 衝過來，話還沒站穩就倒出來。\n「有人說你和其他人在一起！不是吧？你跟我說不是，好不好？」'
+  }
+};
+const LOVE_CAUGHT_BTN = {
+  explain:['解釋','解釋'],
+  sorry:['道歉','道歉'],
+  both:['坦白想兩個都要','坦白：我想兩個都要'],
+  break:['分手','分手']
+};
+const LOVE_CAUGHT_RES = {
+  alexander:{
+    explain:'你試著把事情說清楚。他聽完，沉默了很久。「我聽到了。但不代表我接受。」',
+    sorry:'你道歉。他點頭，像收下一個尺寸不對的零件。「知道了。接下來怎麼辦，我們再談。」',
+    both:'你說你想兩個都要。他的眼神冷了一瞬，又很快收回去。「……這不是一個可以立刻回答的設計。我們需要好好談。」',
+    break:'你提出分手。他看了你一秒，「好。」他把杯子放下，走得很直。'
+  },
+  jasper:{
+    explain:'你解釋給他聽。他笑了一下，笑意沒到眼睛。「說法很好。我需要一點時間消化。」',
+    sorry:'你道歉。他往後退了半步，「收到。這次我不想用玩笑帶過。」',
+    both:'你說想兩個都要。他吹了聲口哨，很短。「大胆。我沒說不行，也沒說行。坐下談。」',
+    break:'你說要分手。他點點頭，「好。這張，撕掉。」'
+  },
+  liam:{
+    explain:'你把話慢慢說完。他聽得很認真，最後只說：「我懂你的意思。可是我心裡還是堵住。」',
+    sorry:'你道歉。他搖搖頭，「不是要你只會說對不起。我只是……需要一點時間。」',
+    both:'你坦白想兩個都要。他愣住，然後輕輕吸了一口氣。「這句話很重。但謝謝你沒騙我。我們好好談，好嗎？」',
+    break:'你說想分手。他點頭，眼睛紅了，還是替你把杯子放穩。「……好。你要是餓了，廚房還是會開著。」'
+  },
+  marcus:{
+    explain:'你解釋。他聽完，「話我聽到了。現在不想說話。」',
+    sorry:'你道歉。他嗯了一聲，「先這樣。之後再談。」',
+    both:'你說想兩個都要。他看了你很久。「誠實。比謊話好。但別以為我會立刻點頭。」',
+    break:'你提出分手。他戴上耳機，「走了。」'
+  },
+  samuel:{
+    explain:'你解釋給他聽。他拼命點頭，又搖頭。「我、我在聽……只是現在腦袋轉不過來……」',
+    sorry:'你道歉。他慌張地擺手，「不是要你道歉才……我只是好難過。可不可以晚點再跟我說？」',
+    both:'你說想兩個都要。他的眼睛睜大，聲音更小了。「……兩個。我、我沒想過。可是你願意告訴我，我……我會試著聽。」',
+    break:'你說要分手。他愣了很久，才擠出：「……好。對不起，是我自己……」他沒把後句說完。'
+  },
+  theo:{
+    explain:'你解釋。他聽著聽著就急了，最後還是咬著牙把話聽完。「我知道了……可是我還是好不甘心。」',
+    sorry:'你道歉。他吸了吸鼻子，「那你以後還會這樣嗎？……算了，我們再談。」',
+    both:'你說想兩個都要。他當機了好幾秒，「兩個？！我……我沒辦法現在說好。可是你老實說，我先記住。」',
+    break:'你說要分手。他的眼淚一下子掉下來，還是點了頭。「……我知道了。我不會一直纏著你。」'
+  }
+};
+
+const LOVE_TALK_ASK = '{x} 還需要把話說開。這次你想怎麼談？';
+const LOVE_TALK_RES = {
+  alexander:{listen:'你把位置讓出來，聽他把每一句不順的話講完。他最後說：「……我還在抵觸。但你願意聽，這點我記下了。」',
+    say:'你把想法說清楚，沒有修飾。他點頭，「結構我聽懂了。感覺，還要時間。」',
+    safe:'你告訴他你不會忽然消失。他看著你，「安全感不是一句話能給的。不過，開始了。」'},
+  jasper:{listen:'你讓他說。他先用玩笑開場，後來沒有。收尾時他說：「好吧，這次我把真實的那張給你看了。」',
+    say:'你說明自己的想法。他聽完，輕輕吹了聲口哨。「清楚。我喜歡清楚，即使我不喜歡內容。」',
+    safe:'你試著給他一點確定。他伸手碰了碰你的指節，「先記在帳上。我會來看你有沒有做到。」'},
+  liam:{listen:'你聽他把心裡的委屈慢慢倒出來。他說完，聲音輕了。「謝謝你願意聽。我還是會難過，可是比較沒那麼堵。」',
+    say:'你把想法攤開。他想了想，「我不一定立刻同意，但至少我知道你沒有隱瞞。」',
+    safe:'你給他一個可以抓住的保證。他點頭，握了握你的手。「我會試著相信。」'},
+  marcus:{listen:'你沒有搶話。他說得少，但每一句都落在地上。「……聽完了。比剛才好一點。」',
+    say:'你把話說直。他嗯了一聲，「清楚就好。其餘的，之後再算。」',
+    safe:'你說他不必猜。他看了你一眼，「那就別讓我猜。」'},
+  samuel:{listen:'你聽他斷斷續續地說，中間幫他倒了杯水。他最後小聲說：「被聽完的感覺……沒有我想像中那麼可怕。」',
+    say:'你慢慢說明。他努力跟上，偶爾重複你的句子確認。「我、我好像比較懂了。還是會怕，可是懂一點了。」',
+    safe:'你告訴他你還在。他眼睛紅了，「真的嗎。那……那我再試一次相信你。」'},
+  theo:{listen:'你讓他把所有不甘心一次說完，他說到後來聲音都啞了。「你都聽完了……那我再努力一下。」',
+    say:'你把想法講明白。他還是會插話，但最後點頭，「我不一定喜歡，可是我聽懂了。」',
+    safe:'你給他一個明確的保證。他抓住你的手，「真的要算數喔。我超需要這個。」'}
+};
+
+/* ---- 核心行為 ---- */
+function loveConfessP(id){
+  const aff = S.aff[id].h, des = S.des[id].h, m = hMood();
+  let p = 0.22 + aff / 200 + des / 280 + (m - 50) / 400 - (S.jeal[id] || 0) / 350;
+  if (aff >= 80 && des >= 50) p += 0.22;
+  else if (aff >= 70) p += 0.08;
+  p += compatOf(id) * 0.02;
+  return clamp(p, 0.12, 0.93);
+}
+function loveDoConfess(id){
+  const C = CHAR[id], p = loveConfessP(id), ok = loveRoll(p, 'ok');
+  const pack = (LOVE_CONFESS_EV[id] || LOVE_CONFESS_EV.liam);
+  if (ok){
+    const txt = pack.a[1];
+    log(`你向 ${C.name} 告白。${txt}`, ['h', id], 'heart');
+    gain(id, 6, 3); addMood(4);
+    becomeLover(id, 'confess');
+    return {ok:true, who:id, title:`${C.name} 接受了`, txt, da:6, dd:3};
+  }
+  const L = loveOf(id); L.confAt = S.t;
+  const txt = pack.r[1];
+  log(`你向 ${C.name} 告白，但他沒有答應。${txt}`, ['h', id]);
+  addAff(id, 'h', -2); addMood(-3);
+  toast(`${C.name}：這次沒有答應`);
+  return {ok:false, who:id, title:`${C.name} 沒有答應`, txt, da:-2, dd:0};
+}
+function loveResolveConfess(P, ch){
+  const id = P.who, ev = evById(id, P.ev), C = CHAR[id], pack = LOVE_CONFESS_EV[id] || {};
+  releasePending();
+  const txt = fill((ev && ev[ch] && ev[ch][1]) || '', {n:S.hero.name});
+  loveAch('confess');
+  if (ch === 'a'){
+    gain(id, 6, 3); addMood(4); S.rejN[id] = 0; S.reqCd[id] = S.t + 120;
+    becomeLover(id, 'npc');
+    log(`【${C.name} 向你告白】你選擇「接受」。${txt}`, ['h', id], 'heart');
+    return {who:id, title:`你接受了 ${C.name}`, txt, da:6, dd:3};
+  }
+  if (ch === 'd'){
+    loveOf(id).pending = true; loveOf(id).confAt = S.t; S.reqCd[id] = S.t + 180; addMood(0);
+    log(`【${C.name} 向你告白】你選擇「先保留」。${txt}`, ['h', id]);
+    toast('可以之後再回覆他的告白');
+    return {who:id, title:'先保留', txt, da:0, dd:0};
+  }
+  addAff(id, 'h', -4); addDes(id, 'h', -3); addMood(-2);
+  S.rejN[id] = (S.rejN[id] || 0) + 1; S.reqCd[id] = S.t + 8 * 60;
+  loveOf(id).pending = false; loveOf(id).confAt = S.t;
+  log(`【${C.name} 向你告白】你選擇「婉拒」。${txt}`, ['h', id]);
+  checkTier(id);
+  return {who:id, title:`你婉拒了 ${C.name}`, txt, da:-4, dd:-3};
+}
+function loveReplyPending(id, ch){
+  const ev = evById(id, 'cf_' + id) || {a:['接受',''], r:['婉拒',''], d:['先保留','']};
+  return loveResolveConfess({who:id, ev:'cf_' + id}, ch === 'a' ? 'a' : 'r');
+}
+
+function loveRomanticKind(kind, I){
+  const k = kind || (I && (I.wk || I.ik || I.type || I.kind)) || '';
+  if (!k || k === 'none' || k === 'chat' || k === 'care' || k === 'together') return false;
+  if (['flirt','hug','intimate','sex','kiss','hold','love_hand','love_hug','love_date','love_sleep'].includes(k)) return true;
+  if (I && (I.intimate || I.ik || I.type === 'intimate' || I.type === 'flirt' || (I.cx && I.cx.wit && I.cx.wit !== 'none'))){
+    const w = I.cx && I.cx.wit; if (w === 'chat' || w === 'none') return false;
+    if (I.type === 'together' && !I.wk && !I.ik && !(I.cx && I.cx.wit)) return false;
+    return !!(I.intimate || I.ik || I.type === 'flirt' || I.type === 'intimate' || (w && w !== 'none' && w !== 'chat'));
+  }
+  return false;
+}
+
+function loveDiscover(y, x, why, kind){
+  if (!S || !CHAR[y] || y === x || !isLover(y)) return false;
+  if (loveOpen(y) && (isLover(x) || why !== 'mark')) return false;
+  if (why !== 'mark' && why !== 'gossip' && !loveRomanticKind(kind, S.inter)) return false;
+  if (why === 'mark' && S.mark && S.mark.who === y) return false;
+  const L = loveOf(y);
+  if (S.t - (L.discAt || -99999) < LOVE_DISC_CD){
+    if (L.known){ loveAddTrust(y, -1.5); addJeal(y, 4); }
+    return false;
+  }
+  L.known = true; L.discAt = S.t;
+  const item = {who:y, other:x || (S.mark && S.mark.who) || '', why:why || 'see', kind:kind || '', at:S.t};
+  S.loveQ = S.loveQ || [];
+  if (!S.loveQ.some(q => q.who === y)) S.loveQ.push(item);
+  return true;
+}
+
+function loveFireCaught(item){
+  if (!S || S.pending || S.away) return false;
+  const id = item.who; if (!isLover(id)) return false;
+  if (S.inter){ endInter(true, 0.6); }
+  const e = S.ents[id]; if (e) e.busy = true;
+  S.pending = {who:id, caught:true, other:item.other, why:item.why || 'see', at:S.t};
+  S.lastAnyReq = S.t; bubble(id, '❗️', 60);
+  showRequest();
+  return true;
+}
+
+function loveCaughtText(id, why){
+  const pack = LOVE_CAUGHT[id] || LOVE_CAUGHT.liam;
+  return pack[why] || pack.see;
+}
+function loveResolveCaught(P, ch){
+  const id = P.who, o = P.other, C = CHAR[id], L = loveOf(id);
+  const key = ch === 'a' ? 'explain' : ch === 'r' ? 'sorry' : ch === 'd' ? 'both' : ch === 'b' ? 'break' : ch;
+  releasePending();
+  loveAch('caught');
+  if (key === 'break'){
+    const txt = (LOVE_CAUGHT_RES[id] || LOVE_CAUGHT_RES.liam).break;
+    log(`【被發現了・${C.name}】你選擇「分手」。${txt}`, ['h', id], 'big');
+    breakUp(id, 'pick');
+    return {who:id, title:`你和 ${C.name} 分手了`, txt, da:-8, dd:-6};
+  }
+  const drop = key === 'explain' ? 14 : key === 'sorry' ? 9 : 11;
+  const before = L.trust;
+  loveAddTrust(id, -drop);
+  addJeal(id, 12 + (possOf(id) / 8));
+  if (o && CHAR[o]){ const rk = pkey(id, o); S.rival[rk] = clamp((S.rival[rk] || 0) + 18 + possOf(id) / 6, 0, 100); S.jealOf[id] = o; }
+  addMood(-4);
+  L.tense = true; L.known = true;
+  const poss = possOf(id), trust = L.trust;
+  const coldP = (key === 'explain' ? 0.45 : key === 'sorry' ? 0.28 : 0.22) * (0.6 + poss / 150);
+  if (loveRoll(coldP, 'cold')){
+    const hrs = 4 + Math.round(poss / 25);
+    L.coldUntil = S.t + hrs * 60;
+  }
+  // 極少：信任很低又解釋得不好，才會走到分手
+  const bad = key === 'explain' && trust < 15 && before < 18;
+  const rare = bad && loveRoll(0.15, 'break');
+  const txt = (LOVE_CAUGHT_RES[id] || LOVE_CAUGHT_RES.liam)[key] || '';
+  if (rare){
+    log(`【被發現了・${C.name}】你選擇「解釋」。信任已經太低，這次沒有談下去。${txt}`, ['h', id], 'big');
+    breakUp(id, 'bad');
+    return {who:id, title:`你和 ${C.name} 分手了`, txt, da:-12, dd:-6};
+  }
+  const coldTxt = loveCold(id) ? fill(WORDS.loveColdOn || '接下來一段時間，他不太想和你說話。', {x:C.name}) : '';
+  log(`【被發現了・${C.name}】你選擇「${LOVE_CAUGHT_BTN[key][0]}」。${txt}${coldTxt ? ' ' + coldTxt : ''}（需要好好談）`, ['h', id], 'rival');
+  toast(`和 ${C.name} 需要好好談`);
+  addMem(id, `發現 ${S.hero.name} 和其他人走得很近。需要好好談。`);
+  addMem('h', `被 ${C.name} 發現了。我們還需要好好談。`);
+  return {who:id, title:`${C.name} 還需要好好談`, txt:txt + (coldTxt ? '\n' + coldTxt : ''), da:0, dd:0};
+}
+
+function loveTalkScale(id){
+  const aff = Math.max(0, S.aff[id].h), trust = loveOf(id).trust;
+  return (0.55 + aff / 220) * (0.55 + trust / 220);
+}
+function loveApplyTalk(id, ch){
+  const key = ch === 'a' ? 'listen' : ch === 'd' ? 'say' : 'safe';
+  const L = loveOf(id), sc = loveTalkScale(id);
+  const dt = key === 'listen' ? 8 : key === 'say' ? 5 : 6;
+  const dp = key === 'listen' ? -6 : key === 'say' ? -9 : -13;
+  const da = key === 'say' ? 0 : 1;
+  loveAddTrust(id, dt * sc);
+  loveAddPoss(id, dp * sc);
+  if (da) gain(id, da, 0);
+  L.talks = (L.talks || 0) + 1;
+  L.talkAt = S.t;
+  if (L.talks >= 4) L.prog = 2;
+  else if (L.talks >= 2) L.prog = Math.max(L.prog, 1);
+  else L.prog = Math.max(L.prog, 0);
+  if (loveCold(id)) L.coldUntil = Math.min(L.coldUntil, S.t + 30);
+  const pack = LOVE_TALK_RES[id] || LOVE_TALK_RES.liam;
+  const txt = pack[key] || '';
+  const pn = LOVE_PROG[L.prog] || '抵觸';
+  log(`你和 ${nm(id)} 好好談談（${key === 'listen' ? '傾聽他的感受' : key === 'say' ? '說明自己的想法' : '給他安全感'}）。${txt}（${pn}）`, ['h', id]);
+  if (L.prog === 2) loveAch('talked');
+  if (!L.open && possOf(id) < LOVE_OPEN_POSS && L.talks >= LOVE_OPEN_TALKS && L.prog >= 2){
+    L.open = true; L.tense = false; L.coldUntil = 0;
+    log(fill(WORDS.loveOpen || '❤ {x} 接受了多方發展。以後他不太會因為你和其他戀人在一起而大發醋意。', {x:nm(id)}), ['h', id], 'heart');
+    toast(`${nm(id)} 接受了多方發展`);
+    addMem('h', fill(WORDS.loveMemOpen || '{x} 接受了多方發展。', {x:nm(id)}));
+    addMem(id, fill(WORDS.loveMemOpenHim || '我試著接受 {h} 也可以有其他戀人。', {h:S.hero.name}));
+    loveAch('open');
+  } else if (L.tense && L.prog >= 2 && L.talks >= 2){
+    // 還沒接受多方，但已經比較能談了：緊張稍減
+  }
+  return {who:id, title:`和 ${nm(id)} 好好談談`, txt:`${txt}\n（目前：${pn}${L.open ? '・已接受多方發展' : ''}）`, da:da, dd:0};
+}
+function loveResolveTalk(P, ch){
+  const id = P.who;
+  releasePending();
+  return loveApplyTalk(id, ch);
+}
+
+function loveCanNpcConfess(id){
+  if (!S || isLover(id) || lovePending(id) || loveOf(id).st === 'lover') return false;
+  if ((S.aff[id].h || 0) < LOVE_NPC_AFF) return false;
+  if ((S.des[id].h || 0) < 30) return false;
+  if (S.t - (loveOf(id).confAt || -99999) < LOVE_CONF_CD) return false;
+  if (S.t - (S.lastReq[id] || -999) < 180) return false;
+  return true;
+}
+
+function loveThink(){
+  if (!S) return;
+  S.loveQ = S.loveQ || [];
+  // 緊張狀態：心情慢慢往下
+  if (!S.away){
+    const n = lovers().filter(loveTense).length;
+    if (n && typeof addMood === 'function'){ /* 每分鐘在 moodTick 另外扣，這裡不重複 */ }
+  }
+  // 接受多方後，對其他戀人的競爭慢慢下降
+  const Lvs = lovers().filter(loveOpen);
+  if (Lvs.length >= 2){
+    for (let i = 0; i < Lvs.length; i++) for (let j = i + 1; j < Lvs.length; j++){
+      const k = pkey(Lvs[i], Lvs[j]);
+      if ((S.rival[k] || 0) > 0) S.rival[k] = Math.max(0, (S.rival[k] || 0) - 0.03);
+    }
+  }
+  // 冷戰結束提示
+  for (const id of lovers()){
+    const L = loveOf(id);
+    if (L._coldOn && L.coldUntil <= S.t){
+      L._coldOn = false;
+      log(fill(WORDS.loveColdOff || '{x} 的冷戰結束了。你們可以再試試好好談。', {x:nm(id)}), ['h', id]);
+    }
+    if (loveCold(id)) L._coldOn = true;
+  }
+  if (S.away || S.pending || S.hPending) return;
+  // 被發現隊列：就算互動還在進行，也會先結束再質問
+  if (S.loveQ.length){
+    const item = S.loveQ.shift();
+    if (item && isLover(item.who)){ loveFireCaught(item); return; }
+  }
+  if (S.inter) return;
+  // 八卦：看過的人，之後可能告訴另一位還不知情的戀人
+  const h = S.ents.h;
+  if (h && home(h) && !walking(h)){
+    for (const w of (S.residents || [])){
+      const saw = S.loveSaw && S.loveSaw[w];
+      if (!saw || !saw.who || S.t - (saw.t || 0) > 1440) continue;
+      const ey = S.ents[w]; if (!ey || ey.room !== h.room || walking(ey) || ey.busy) continue;
+      for (const y of lovers()){
+        if (y === w || y === saw.who || loveOf(y).known || loveOpen(y)) continue;
+        const ev = S.ents[y]; if (!ev || ev.room !== h.room || ev.busy) continue;
+        if (Math.random() > 0.004) continue;
+        delete S.loveSaw[w];
+        log(fill(WORDS.loveGossip || '{w} 好像把看到的事，告訴了 {x}。', {w:nm(w), x:nm(y), p:nm(saw.who)}), [w, y, 'h'], 'rival');
+        loveDiscover(y, saw.who, 'gossip', 'flirt');
+        return;
+      }
+    }
+  }
+  // 他主動告白
+  if (h && home(h) && !walking(h) && h.act !== 'sleep' && h.act !== 'shower' && S.t - (S.lastAnyReq || 0) > 80){
+    const cand = (S.residents || []).filter(id => loveCanNpcConfess(id) && S.ents[id] && S.ents[id].room === h.room && !S.ents[id].busy && !walking(S.ents[id]));
+    if (cand.length && Math.random() < 0.008){
+      const id = rnd(cand), ev = evById(id, 'cf_' + id);
+      if (ev){ loveOf(id).confAt = S.t; fireEvent(id, ev, false); }
+    }
+  }
+}
+
+function loveMoodTick(){
+  if (!S || !S.hero) return;
+  const n = lovers().filter(loveTense).length;
+  if (n) S.hero.mood = clamp((S.hero.mood ?? 65) - 0.025 * n, 0, 100);
+}
+
+function loveFlushQueue(){
+  if (!S || S.away || S.pending) return;
+  if (S.loveQ && S.loveQ.length) loveFireCaught(S.loveQ.shift());
+}
+
+function loveHeroGate(id, itype, def){
+  if (loveCold(id) && !(def && (def.need === 'talk' || itype === 'talk_it'))){
+    toast(fill(WORDS.loveColdBlock || '你們正在冷戰，他現在不太想互動。可以等一等，或試著「好好談談」。', {x:nm(id)}));
+    return false;
+  }
+  if (itype === 'confess' && !loveCanConfess(id)){
+    const left = loveConfessLeft(id);
+    if (isLover(id)) toast('你們已經在交往了。');
+    else if (left > 0) toast(`告白才剛被婉拒，再過 ${Math.ceil(left / 60)} 小時再試試。`);
+    else toast('好感或情慾還不夠，現在告白恐怕太早。');
+    return false;
+  }
+  if (itype === 'talk_it'){
+    if (!isLover(id)) { toast('你們還不是戀人。'); return false; }
+    if (loveOpen(id) && !loveOf(id).tense){ toast('你們已經把話說開了。'); return false; }
+    if (!loveNeedTalk(id) && !loveOf(id).tense && !loveOf(id).known){ toast('現在還不需要特別談這件事。'); return false; }
+    if (loveTalkLeft(id) > 0){ toast(`才剛談過，再過 ${Math.ceil(loveTalkLeft(id) / 60)} 小時再繼續。`); return false; }
+  }
+  if (itype === 'reply_cf' && !lovePending(id)){ toast('他現在沒有在等你回覆告白。'); return false; }
+  return true;
+}
+
+function loveLocked(id, def){
+  if (!def || !def.need) return false;
+  if (def.need === 'lover') return !isLover(id);
+  if (def.need === 'confess') return !loveCanConfess(id);
+  if (def.need === 'talk') return !isLover(id) || loveTalkLeft(id) > 0 || (!loveNeedTalk(id) && !loveOf(id).tense && !loveOf(id).known);
+  if (def.need === 'pending') return !lovePending(id);
+  return false;
+}
+function loveLockHint(id, def){
+  if (!def || !def.need) return '';
+  if (def.need === 'lover') return isLover(id) ? '' : '需要先成為戀人';
+  if (def.need === 'confess'){
+    if (isLover(id)) return '已經是戀人';
+    if (loveConfessLeft(id) > 0) return '冷卻中';
+    if ((S.aff[id].h || 0) < LOVE_AFF || (S.des[id].h || 0) < LOVE_DES) return `需要好感 ${LOVE_AFF}／情慾 ${LOVE_DES}`;
+    return '';
+  }
+  if (def.need === 'talk'){
+    if (!isLover(id)) return '需要先成為戀人';
+    if (loveOpen(id) && !loveOf(id).tense) return '已經談開了';
+    if (loveTalkLeft(id) > 0) return `冷卻 ${Math.ceil(loveTalkLeft(id) / 60)} 小時`;
+    if (!loveNeedTalk(id)) return '現在還不用';
+    return '';
+  }
+  if (def.need === 'pending') return lovePending(id) ? '' : '沒有待回覆的告白';
+  return '';
+}
+
+function loveStartSpecial(id, itype){
+  if (itype === 'confess'){
+    const res = loveDoConfess(id);
+    if (res && res.txt) showResult(res);
+    renderAll(true);
+    return true;
+  }
+  if (itype === 'reply_cf'){
+    const ev = evById(id, 'cf_' + id);
+    if (!ev) return false;
+    S.pending = {who:id, ev:ev.id, at:S.t, reply:true}; S.ents[id].busy = true;
+    showRequest();
+    return true;
+  }
+  if (itype === 'talk_it'){
+    S.pending = {who:id, talk:true, at:S.t}; S.ents[id].busy = true;
+    showRequest();
+    return true;
+  }
+  return false;
+}
+
+function loveShowRequest(){
+  const P = S.pending; if (!P) return;
+  const id = P.who;
+  if (S.away) return;
+  stopFF('request');
+  if (S.autoPause){ if (S.speed !== 0) ui.prevSpeed = S.speed; setSpeed(0); }
+  closeSheet();
+  const m = $('#modal'); m.classList.remove('hidden');
+  const btns = (o) => `<div class="acts3">${o.map(([k, t, cls]) => `<button class="btn ${cls || ''}" data-c="${k}" id="${{a:'rqYes', r:'rqNo', d:'rqAlt', b:'rqB'}[k] || ('rq' + k)}">${esc(t)}</button>`).join('')}</div>`;
+  let html;
+  if (P.caught){
+    const why = P.why || 'see';
+    html = `<div class="avbox av">${avOf(id)}${loveBadgeHTML(id)}</div><div class="who">${esc(CHAR[id].name)}</div><div class="meta">${clockStr(S.t)}・<span class="pill lover">被發現了</span></div>
+      <div class="req prose">${loveCaughtText(id, why).split('\n').map(x => `<p>${esc(x)}</p>`).join('')}</div>` +
+      btns([['a', LOVE_CAUGHT_BTN.explain[1], 'primary'], ['r', LOVE_CAUGHT_BTN.sorry[1]], ['d', LOVE_CAUGHT_BTN.both[1]], ['b', LOVE_CAUGHT_BTN.break[1]]]);
+  } else if (P.talk){
+    html = `<div class="avbox av">${avOf(id)}${loveBadgeHTML(id)}</div><div class="who">${esc(CHAR[id].name)}</div><div class="meta">${clockStr(S.t)}・<span class="pill lover">好好談談</span>・獨佔欲 ${possOf(id)}・信任 ${Math.round(loveOf(id).trust)}</div>
+      <div class="req prose"><p>${esc(fill(WORDS.loveTalkAsk || LOVE_TALK_ASK, {x:nm(id)}))}</p></div>` +
+      btns([['a', '傾聽他的感受', 'primary'], ['d', '說明自己的想法'], ['r', '給他安全感']]);
+  } else return;
+  m.innerHTML = `<div class="box">${html}</div>`;
+  m.querySelectorAll('[data-c]').forEach(bt => bt.onclick = () => answerRequest(bt.dataset.c, true));
+}
+
+/* ---- 把既有函式接上（在本檔載入時） ---- */
+(function loveHook(){
+  if (typeof evEligible === 'function'){
+    const _el = evEligible;
+    evEligible = function(e, id, room, force){
+      if (e && e.love === 'confess') return false;
+      if (e && e.love === 'date') return isLover(id) && _el(e, id, room, force);
+      return _el(e, id, room, force);
+    };
+  }
+  if (typeof resolveEvent === 'function'){
+    const _re = resolveEvent;
+    resolveEvent = function(P, ch){
+      const ev = evById(P.who, P.ev);
+      if (ev && ev.love === 'confess') return loveResolveConfess(P, ch);
+      return _re(P, ch);
+    };
+  }
+  if (typeof answerRequest === 'function'){
+    const _ar = answerRequest;
+    answerRequest = function(choice, fromUi){
+      const P = S.pending; if (!P) return;
+      const ch = choice === true ? 'a' : choice === false ? 'r' : choice === 'alt' ? 'd' : choice;
+      if (P.caught){
+        const res = loveResolveCaught(P, ch);
+        if (fromUi && res && res.txt) showResult(res);
+        renderAll(true); return;
+      }
+      if (P.talk){
+        const res = loveResolveTalk(P, ch);
+        if (fromUi && res && res.txt) showResult(res);
+        renderAll(true); return;
+      }
+      return _ar(choice, fromUi);
+    };
+  }
+  if (typeof showRequest === 'function'){
+    const _sr = showRequest;
+    showRequest = function(){
+      const P = S.pending;
+      if (P && (P.caught || P.talk)){ loveShowRequest(); return; }
+      _sr();
+    };
+  }
+  if (typeof awayAnswer === 'function'){
+    const _aa = awayAnswer;
+    awayAnswer = function(){
+      const P = S.pending; if (!P) return;
+      if (P.caught){
+        S.loveQ = S.loveQ || [];
+        S.loveQ.unshift({who:P.who, other:P.other, why:P.why, at:S.t});
+        releasePending();
+        return;
+      }
+      _aa();
+    };
+  }
+  if (typeof heroInter === 'function'){
+    const _hi = heroInter;
+    heroInter = function(id, itype, auto){
+      const def = H_INTER.find(x => x.id === itype);
+      if (def && def.need && !loveHeroGate(id, itype, def)) return;
+      if (loveCold(id) && !(def && (def.need === 'talk' || itype === 'talk_it'))){
+        toast(fill(WORDS.loveColdBlock || '你們正在冷戰，他現在不太想互動。', {x:nm(id)}));
+        return;
+      }
+      return _hi(id, itype, auto);
+    };
+  }
+  if (typeof resolveHeroInter === 'function'){
+    const _rh = resolveHeroInter;
+    resolveHeroInter = function(id, itype){
+      if (loveStartSpecial(id, itype)) return;
+      return _rh(id, itype);
+    };
+  }
+  if (typeof finishAway === 'function'){
+    const _fa = finishAway;
+    finishAway = function(){ _fa(); setTimeout(loveFlushQueue, 0); };
+  }
+
+  if (typeof window !== 'undefined' && window.__imb){ Object.assign(window.__imb, { answerRequest, showRequest, heroInter, resolveHeroInter, evEligible, resolveEvent, awayAnswer, finishAway }); }
+  if (typeof ACH !== 'undefined' && Array.isArray(ACH) && !ACH.some(a => a.id === 'love_confess')){
+    ACH.push(
+      {id:'love_confess', icon:'💌', n:'第一次告白', d:'第一次告白（你向他，或他向你）。', ok:() => !!S.firsts.loveConfess},
+      {id:'love_first', icon:'❤', n:'第一位戀人', d:'和一位室友開始交往。', ok:() => lovers().length >= 1 || !!S.firsts.loveFirst},
+      {id:'love_caught', icon:'👁️', n:'被發現了', d:'被另一位戀人發現你和其他人走得很近。', ok:() => !!S.firsts.loveCaught},
+      {id:'love_talk', icon:'🕊️', n:'好好談開', d:'經過幾次好好談談，他開始理解你。', ok:() => !!S.firsts.loveTalked || (S.residents || []).some(id => loveOf(id).prog >= 2)},
+      {id:'love_open', icon:'🌈', n:'多方發展', d:'一位戀人接受了多方發展。', ok:() => !!S.firsts.loveOpen || (S.residents || []).some(loveOpen)}
+    );
+  }
+  if (typeof cheatFields === 'function'){
+    const _cf = cheatFields;
+    cheatFields = function(who){
+      const f = _cf(who);
+      if (who && typeof CHAR !== 'undefined' && CHAR[who] && S && (S.residents || []).includes(who) && typeof loveOf === 'function'){
+        const labT = `${nm(who)} 的信任`, labK = `${nm(who)} 知情`;
+        if (!f.some(x => x[1] === labT)){
+          const i = f.findIndex(x => String(x[1]).includes('的醋意'));
+          const rows = [
+            [who, labT, () => loveOf(who).trust, v => { loveOf(who).trust = clamp(v, 0, 100); }, 0, 100, 1, '和你的關係'],
+            [who, labK, () => loveOf(who).known ? 1 : 0, v => { loveOf(who).known = v >= 1; }, 0, 1, 1, '和你的關係']
+          ];
+          f.splice(i >= 0 ? i + 1 : f.length, 0, ...rows);
+        }
+      }
+      return f;
+    };
+    if (window.__imb) window.__imb.cheatFields = cheatFields;
+  }
+  if (typeof renderCheatVals === 'function'){
+    const _rcv = renderCheatVals;
+    renderCheatVals = function(){
+      _rcv();
+      const who = typeof ckUi !== 'undefined' ? ckUi.who : null;
+      if (who && who !== 'h' && who !== 'all' && typeof loveCheatHTML === 'function' && $('#sheet') && !$('#ckLoveSec')){
+        const panel = document.querySelector('#sheet .cheatpanel');
+        if (panel){ panel.insertAdjacentHTML('beforeend', loveCheatHTML(who)); loveCheatBind(who); }
+      }
+    };
+  }
+  if (typeof TX_TABLES === 'object'){
+    Object.assign(TX_TABLES, {LOVE_LINES, LOVE_CONFESS_EV, LOVE_CAUGHT, LOVE_CAUGHT_RES, LOVE_TALK_RES});
+    if (typeof TX_CAT === 'object'){
+      Object.assign(TX_CAT, {LOVE_LINES:'戀人互動的回應', LOVE_CONFESS_EV:'告白', LOVE_CAUGHT:'被發現了', LOVE_CAUGHT_RES:'被發現了', LOVE_TALK_RES:'好好談談'});
+    }
+  }
+})();
+
+function loveRelExtra(id){
+  const L = loveOf(id);
+  const pills = [];
+  if (isLover(id)) pills.push(`<span class="pill lover">❤ ${esc(WORDS.loveStatus || '戀人')}</span>`);
+  else if (L.st === 'ex') pills.push(`<span class="pill">${esc(WORDS.loveEx || '前任')}</span>`);
+  if (L.pending) pills.push(`<span class="pill">待回覆告白</span>`);
+  if (isLover(id) && L.known) pills.push(`<span class="pill">${esc(WORDS.loveKnown || '知情')}</span>`);
+  if (loveTense(id)) pills.push(`<span class="pill j">${esc(WORDS.loveTense || '需要好好談')}</span>`);
+  if (loveOpen(id)) pills.push(`<span class="pill lover">${esc(WORDS.loveOpened || '接受多方發展')}</span>`);
+  if (loveCold(id)) pills.push(`<span class="pill j">${esc(WORDS.loveCold || '冷戰中')}</span>`);
+  const trust = isLover(id) || L.st === 'ex' ? `<div class="relrow" style="margin-top:6px"><span class="lb">信任</span><div>${bar(L.trust, 'aff')}</div><span class="lbv">${Math.round(L.trust)}</span></div>` : '';
+  const brk = isLover(id) ? `<button type="button" class="btn wide" id="loveBreakBtn">分手</button>` : '';
+  if (!pills.length && !trust && !brk) return '';
+  return `<div class="love-rel">${pills.join(' ')}${trust}${brk}</div>`;
+}
+function loveBindRel(id){
+  const b = $('#loveBreakBtn'); if (!b) return;
+  b.onclick = () => {
+    const m = $('#modal'); m.classList.remove('hidden');
+    m.innerHTML = `<div class="box"><div class="who">要和 ${esc(nm(id))} 分手嗎？</div><div class="req prose"><p>確定後就不能當戀人了。之後仍可以再告白。</p></div>
+      <div class="acts3"><button class="btn" id="lbNo">取消</button><button class="btn primary" id="lbYes">確定分手</button></div></div>`;
+    $('#lbNo').onclick = () => { closeModal(); };
+    $('#lbYes').onclick = () => { closeModal(); breakUp(id, 'pick'); closeSheet(); renderAll(true); };
+  };
+}
+function loveCheatHTML(who){
+  if (!who || who === 'h' || who === 'all' || !CHAR[who]) return '';
+  const L = loveOf(who);
+  const st = L.st, on = k => st === k ? ' primary' : '';
+  return `<div class="cksec" id="ckLoveSec">交往</div>
+    <div class="ckmark" id="ckLoveBox">
+      <div class="ckcd">
+        <button type="button" class="btn sm${on('none')}" data-lovest="none">未滿</button>
+        <button type="button" class="btn sm${on('lover')}" data-lovest="lover">戀人</button>
+        <button type="button" class="btn sm${on('ex')}" data-lovest="ex">分手</button>
+      </div>
+      <div class="small muted">目前：${esc(LOVE_ST_N[st] || st)}${L.known ? '・知情' : ''}${L.tense ? '・需要好好談' : ''}${L.open ? '・接受多方發展' : ''}${loveCold(who) ? '・冷戰中' : ''}${L.pending ? '・待回覆告白' : ''}</div>
+    </div>`;
+}
+function loveCheatBind(who){
+  $('#sheet') && $('#sheet').querySelectorAll('[data-lovest]').forEach(b => b.onclick = () => {
+    if (!S.cheat) return;
+    setLoveStatus(who, b.dataset.lovest);
+    toast(`${nm(who)}：${LOVE_ST_N[b.dataset.lovest] || b.dataset.lovest}`);
+    if (ui.sheet && ui.sheet.render) ui.sheet.render();
+    renderAll(true); save();
+  });
+}
+
+if (typeof window !== 'undefined') Object.assign(window.__imb || (window.__imb = {}), {
+  loveOf, isLover, loveOpen, loveTense, loveCold, lovePending, lovers, loveNeedTalk, loveCanConfess,
+  loveConfessP, loveDoConfess, becomeLover, breakUp, setLoveStatus, loveDiscover, loveThink,
+  loveFireCaught, loveResolveCaught, loveApplyTalk, loveJealPoss, loveSkipCut, loveWitnessSkip,
+  loveMigrate, relLabel, avLove, loveBadgeHTML, loveLocked, loveLockHint, loveHeroGate,
+  loveCanNpcConfess, LOVE_TALK_CD, LOVE_CONF_CD, LOVE_OPEN_POSS, LOVE_AFF, LOVE_DES, LOVE_FLOOR,
+  loveCheatHTML, loveCheatBind, loveFlushQueue, loveRelExtra, loveBindRel, loveMoodTick, loveStartSpecial
+});
 
 </script>
 <script>
