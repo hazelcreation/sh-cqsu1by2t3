@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f7f1e8">
 <title>失衡・公寓觀察</title>
-<meta name="imb-build" content="2026-11-11 11:22 (台北)">
+<meta name="imb-build" content="2026-11-11 11:59 (台北)">
 <style>
 :root{
   --bg:#f7f1e8; --card:#fffaf3; --line:#e8dccb; --ink:#4a3f35; --muted:#9a8b7b; --accent:#c9876b; --accent2:#e7b9a3;
@@ -775,7 +775,7 @@ const WORDS = {
   hintSecAct:'你可以做什麼',
   hintAct:'點平面圖上的房間或自己的頭像，選要做的事：吃飯、洗澡、上班、休息都可以。選單裡有「＋ 自訂行動」，可以自己寫一件事（地點、時段、效果、日記和泡泡小故事）。也可以約「和誰一起」做一件事。想找某個室友時，點他、選互動；關係到了才能解鎖比較親近的選項。',
   hintSecRel:'室友與關係',
-  hintRel:'每位室友對你有好感和情慾，你對他也有（後者在關係頁比較隱密）。好感會把關係推向日常、曖昧、親近、心動；能做的事和解鎖的事件會跟著變。好感和情慾夠高時，你可以向他告白，他也有可能向你告白。答應後會成為戀人，頭像上會有 ❤。可以同時和不只一個人交往，但被另一位戀人發現時，當場會要你解釋、道歉、坦白或分手；信任會下降，也可能冷戰一陣子，通常不會立刻分手。之後可以多「好好談談」（傾聽、說明想法、給他安全感），降低他的獨佔欲、把話說開；獨佔欲夠低以後，他有可能接受多方發展。室友彼此還有交情和競爭。紀錄裡看到的數值變化，就是這一刻實際加減的分數。',
+  hintRel:'每位室友對你有好感和情慾，你對他也有（後者在關係頁比較隱密）。他對你的好感會把關係推向日常、曖昧、親近、心動；能做的事和解鎖的事件會跟著變。他對你的好感到 60、情慾到 25 時，你可以向他告白；他對你的好感更高時，也可能主動向你告白。答應後會成為戀人，頭像上會有 ❤。可以同時和不只一個人交往，但被另一位戀人發現時，當場會要你解釋、道歉、坦白或分手；信任會下降，也可能冷戰一陣子，通常不會立刻分手。之後可以多「好好談談」（傾聽、說明想法、給他安全感），降低他的獨佔欲、把話說開；獨佔欲夠低以後，他有可能接受多方發展。室友彼此還有交情和競爭。紀錄裡看到的數值變化，就是這一刻實際加減的分數。',
   hintSecEv:'事件',
   hintEv:'當你和室友在同一個空間，有時會跳出一段專屬事件，通常有三種回應。事件有自己的地點、時段和關係階段，看過的比較不會立刻再出現。',
   hintSecMark:'吻痕與獨佔欲',
@@ -864,6 +864,8 @@ const WORDS = {
   loveColdBlock:'你們正在冷戰，他現在不太想互動。可以等一等，或試著「好好談談」。',
   loveGossip:'{w} 好像把看到的事，告訴了 {x}。',
   loveTalkAsk:'{x} 還需要把話說開。這次你想怎麼談？',
+  loveNeedHis:'需要他對你的好感 {a}／情慾 {d}',
+  loveConfessLow:'他對你的好感或情慾還不夠，現在告白恐怕太早。',
 };
 const LEGACY_WORDS = [[/歡愛|做愛/g, WORDS.sex], [/自慰/g, WORDS.solo]];
 const W = s => typeof s === 'string' ? LEGACY_WORDS.reduce((a, [re, w]) => a.replace(re, w), s) : s;
@@ -7022,7 +7024,7 @@ Object.assign(window.__imb, { txBuild, applyTextOv, txSetOv, txResetWho, txExpor
 </script>
 <script>
 /* ---------- 告白與交往 ----------
-   好感／情慾夠高時，你可以向他告白，他也有可能向你告白。
+   他對你的好感／情慾夠高時，你可以向他告白，他也有可能向你告白（看的是畫面上他對你的數值，不是你對他較隱密的那組）。
    可以同時和不只一位室友交往，但預設是秘密的；被另一位戀人發現時會當面質問。
    質問後通常不會立刻分手（除非你選分手，或信任極低又回應得很差），但會進入「需要好好談」，
    可能冷戰一陣子，競爭也會升高。之後可重複「好好談談」降低獨佔欲、補回信任；
@@ -7032,9 +7034,9 @@ const LOVE_CONF_CD = 12 * 60;         // 告白失敗冷卻
 const LOVE_DISC_CD = 12 * 60;         // 同一個人再次被發現的間隔
 const LOVE_OPEN_POSS = 30;            // 接受多方發展的獨佔欲門檻
 const LOVE_OPEN_TALKS = 3;
-const LOVE_AFF = 60;                  // 你可以告白的好感門檻
+const LOVE_AFF = 60;                  // 你可以告白：他對你的好感門檻（畫面上看得見的）
 const LOVE_DES = 25;
-const LOVE_NPC_AFF = 70;              // 他主動告白的好感門檻
+const LOVE_NPC_AFF = 70;              // 他主動告白：他對你的好感門檻
 const LOVE_FLOOR = 55;                // 尚未接受多方發展的戀人，吃醋時的獨佔欲下限
 const LOVE_ST = ['none', 'lover', 'ex'];
 const LOVE_ST_N = {none:'未滿', lover:'戀人', ex:'前任'};
@@ -7684,7 +7686,7 @@ function loveHeroGate(id, itype, def){
     const left = loveConfessLeft(id);
     if (isLover(id)) toast('你們已經在交往了。');
     else if (left > 0) toast(`告白才剛被婉拒，再過 ${Math.ceil(left / 60)} 小時再試試。`);
-    else toast('好感或情慾還不夠，現在告白恐怕太早。');
+    else toast(WORDS.loveConfessLow || '他對你的好感或情慾還不夠，現在告白恐怕太早。');
     return false;
   }
   if (itype === 'talk_it'){
@@ -7711,7 +7713,7 @@ function loveLockHint(id, def){
   if (def.need === 'confess'){
     if (isLover(id)) return '已經是戀人';
     if (loveConfessLeft(id) > 0) return '冷卻中';
-    if ((S.aff[id].h || 0) < LOVE_AFF || (S.des[id].h || 0) < LOVE_DES) return `需要好感 ${LOVE_AFF}／情慾 ${LOVE_DES}`;
+    if ((S.aff[id].h || 0) < LOVE_AFF || (S.des[id].h || 0) < LOVE_DES) return fill(WORDS.loveNeedHis || '需要他對你的好感 {a}／情慾 {d}', {a:LOVE_AFF, d:LOVE_DES});
     return '';
   }
   if (def.need === 'talk'){
@@ -7780,6 +7782,18 @@ function loveShowRequest(){
       if (e && e.love === 'date') return isLover(id) && _el(e, id, room, force);
       return _el(e, id, room, force);
     };
+  }
+  if (typeof evDef === 'function'){
+    const _evDef = evDef;
+    evDef = function(e){
+      const d = _evDef(e);
+      if (e && e.love === 'confess'){
+        if (d.minAff == null) d.minAff = LOVE_NPC_AFF;
+        if (d.minDes == null) d.minDes = 30;
+      }
+      return d;
+    };
+    if (typeof window !== 'undefined' && window.__imb) window.__imb.evDef = evDef;
   }
   if (typeof resolveEvent === 'function'){
     const _re = resolveEvent;
@@ -7951,7 +7965,7 @@ function loveCheatBind(who){
 
 if (typeof window !== 'undefined') Object.assign(window.__imb || (window.__imb = {}), {
   loveOf, isLover, loveOpen, loveTense, loveCold, lovePending, lovers, loveNeedTalk, loveCanConfess,
-  loveConfessP, loveDoConfess, becomeLover, breakUp, setLoveStatus, loveDiscover, loveThink,
+  loveConfessP, loveTalkScale, loveDoConfess, becomeLover, breakUp, setLoveStatus, loveDiscover, loveThink,
   loveFireCaught, loveResolveCaught, loveApplyTalk, loveJealPoss, loveSkipCut, loveWitnessSkip,
   loveMigrate, relLabel, avLove, loveBadgeHTML, loveLocked, loveLockHint, loveHeroGate,
   loveCanNpcConfess, LOVE_TALK_CD, LOVE_CONF_CD, LOVE_OPEN_POSS, LOVE_AFF, LOVE_DES, LOVE_FLOOR,
