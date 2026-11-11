@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f7f1e8">
 <title>失衡・公寓觀察</title>
-<meta name="imb-build" content="2026-11-11 13:54 (台北)">
+<meta name="imb-build" content="2026-11-11 16:17 (台北)">
 <style>
 :root{
   --bg:#f7f1e8; --card:#fffaf3; --line:#e8dccb; --ink:#4a3f35; --muted:#9a8b7b; --accent:#c9876b; --accent2:#e7b9a3;
@@ -784,7 +784,7 @@ const WORDS = {
   hintSecEv:'事件',
   hintEv:'當你和室友在同一個空間，有時會跳出一段專屬事件，通常有三種回應。事件有自己的地點、時段和關係階段，看過的比較不會立刻再出現。',
   hintSecMark:'吻痕與獨佔欲',
-  hintMark:'如果有人在你頸側留下吻痕，狀態會持續 12 個遊戲小時（會跟速度和離線補時走），並顯示在你的狀態上。在意你的人一看到就會吃醋，不必等到事情結束。看見你和別人曖昧、親近或親密，也會當場寫進紀錄（時間是第一次看見的那一刻），不會拖到互動結束才出現。獨佔欲較高的人（Theo 預設就很高）只要看見你跟別人互動，不論好感高低、不論是聊天、一起做事、曖昧還是纏綿，當下就會算；就算那個人後來離開了，也已經算過了。吃得兇不兇，看他對你的好感和獨佔欲，分成悶悶不樂、明顯吃醋、大吃飛醋。大吃飛醋時可能會直接打斷你們（Theo 預設一定會；明顯吃醋時也有一點機會）。打斷的機會看每個人的「打斷傾向」，可在作弊模式裡改。如果是在關著門的臥室，只有進到同一間房的人才算看見。纏綿被打斷時，只會寫到門外的敲門聲，不會寫更進一步的內容。',
+  hintMark:'如果有人在你頸側留下吻痕，狀態會持續 12 個遊戲小時（會跟速度和離線補時走），並顯示在你的狀態上。在意你的人一看到就會吃醋，不必等到事情結束。看見你和別人曖昧、親近或親密，也會當場寫進紀錄（時間是第一次看見的那一刻），不會拖到互動結束才出現。獨佔欲較高的人（Theo 預設就很高）只要看見你跟別人互動，不論好感高低、不論是聊天、一起做事、曖昧還是纏綿，當下就會算；就算那個人後來離開了，也已經算過了。吃得兇不兇，看他對你的好感和獨佔欲，分成悶悶不樂、明顯吃醋、大吃飛醋。大吃飛醋時可能會直接打斷你們（Theo 預設一定會；明顯吃醋時也有一點機會）。打斷的機會看每個人的「打斷傾向」，可在作弊模式裡改。如果是在關著門的臥室，只有進到同一間房、或確實經過那扇房門的人才算看見。纏綿被打斷時，只會寫到門外的敲門聲，不會寫更進一步的內容。',
   hintSecAch:'成就',
   hintAch:'底下分頁有「🏆 成就」。達成條件後會解鎖，也可以自己新增條件。用過作弊的存檔，之後達成的成就會標 🛠️。',
   hintSecCheat:'作弊模式',
@@ -3974,7 +3974,28 @@ function leaveSeen(x){
     log('👀 ' + rnd(LEAVE_LINES).replace('{y}', nm(y)).replace('{x}', nm(x)), [y, x], 'rival'); addJeal(y, 8 * CHAR[y].jealousy); dayEv(y, 'jealous', nm(x)); S.lastLeaveSeen = {y, x, t:S.t}; }
 }
 const fmtD = v => (v >= 0 ? '+' : '') + (Math.round(v * 10) / 10);
-// 修羅場：別的室友看見（同一個空間）或察覺（同一層樓）你和某人親近
+const DOOR_SEE = 14; // 在房門外這一段走廊上，才算「經過門口」
+function closedBed(room){
+  const r = room && G && G.rooms && G.rooms[room];
+  return !!(r && r.owner && r.type === 'bed');
+}
+function nearDoor(e, roomId){
+  const r = G && G.rooms && G.rooms[roomId];
+  if (!e || !r || !r.door || e.hidden || e.room === 'out') return false;
+  if ((e.f || 0) !== (r.f || 0)) return false;
+  if (e.room === roomId && !walking(e)) return false;
+  const d = Math.hypot((e.x || 0) - r.door[0], (e.y || 0) - r.door[1]);
+  if (d > DOOR_SEE) return false;
+  const er = e.room && G.rooms[e.room];
+  if (er && er.owner && e.room !== roomId && !walking(e)) return false; // 待在別間臥室裡不算經過
+  return true;
+}
+function witDoorLine(y, partner, room){
+  let s = (typeof WITNESS_FLOOR !== 'undefined' && WITNESS_FLOOR[y]) || `${nm(y)} 經過走廊時，好像聽見了什麼。`;
+  if (room === 'r_h') s = s.replace('{x} 的房門', '你的房門').replace('隔壁的關門聲', '你房門的關門聲');
+  return fill(s, {x:nm(partner)});
+}
+// 修羅場：同一個空間看見；關著門的臥室只有進到同一間，或確實經過那扇房門的人才算
 function witActKey(partner){
   const I = S.inter;
   if (I && I.who === partner) return 'i:' + partner + ':' + (I.created || I.start || 0);
@@ -4002,10 +4023,12 @@ function witnessThink(){
   if (!I || !kind) return;
   witness(I.who, kind);
 }
-// 修羅場：別的室友看見（同一個空間）或察覺（同一層樓）你和某人親近。
+// 修羅場：別的室友看見（同一個空間），或確實經過關著門的臥室門口時察覺。同一層但不在門口、也不在房裡的人不算。
 // 進行中每一分鐘都會檢查；每人每段互動只算一次，紀錄時間是第一次看見的那一分。結束時再呼叫也會跳過已算過的人。
 function witness(x, kind){
-  const h = S.ents.h, room = h.room, R = room && G.rooms[room], pub = R && !R.owner;
+  const h = S.ents.h, I = S.inter;
+  const room = (I && I.who === x && I.room) ? I.room : h.room;
+  const R = room && G.rooms[room], pub = R && !R.owner, bed = closedBed(room);
   const k0 = kind === 'intimate' ? 8 : kind === 'hug' ? 5 : 4;
   const act = witActKey(x);
   S.witSeen = S.witSeen && typeof S.witSeen === 'object' ? S.witSeen : {};
@@ -4014,20 +4037,22 @@ function witness(x, kind){
     if (!home(ey) || ey.act === 'sleep' || (S.inter && S.inter.who === y)) continue;
     if (typeof jealPoss === 'function' ? jealPoss(y) > 0 : (typeof possOf === 'function' && possOf(y) > 0)) continue;   // 獨佔欲／戀人下限的看見已在進行中當場計算
     if (S.witSeen[act + ':' + y]) continue;
-    // 已在這個房間裡（只是挪位子）仍算看見；從別的房間走過來的要等走到
-    if (walking(ey) && ey.room !== room) continue;
-    const sameRoom = ey.room && ey.room === room && (pub || kind === 'intimate');
-    const sameFloor = !sameRoom && (ey.f || 0) === (h.f || 0) && (kind === 'intimate' || pub && !ey.room);
-    if (!sameRoom && !sameFloor) continue;
+    const passing = nearDoor(ey, room);
+    // 已在這個房間裡（只是挪位子）仍算看見；從別的房間走過來的要等走到，但經過那扇門的人當場算
+    if (walking(ey) && ey.room !== room && !passing) continue;
+    const sameRoom = !!(ey.room && ey.room === room && !passing);
+    // 關著門的臥室：只有進到同一間，或確實經過房門。不再用「同一層」當成經過門口。
+    if (!sameRoom && !passing) continue;
     if (S.aff[y].h < 20) continue;                      // 還沒對她動心的人，不會在意
     S.witSeen[act + ':' + y] = S.t;
     const lv = sameRoom ? 1 : 0.5, k = k0 * lv;
-    if (C.jealousy < 0.2){ addDes(y, 'h', 1); addPair(x, y, 0.5); log(fill(rnd(WITNESS[y]), {x:nm(x), room:R ? R.name : '走廊'}), [y, x], 'rival'); bubble(y, '😏', 30); continue; }
+    const line = sameRoom ? fill(rnd(WITNESS[y]), {x:nm(x), room:R ? R.name : '走廊'}) : witDoorLine(y, x, room);
+    if (C.jealousy < 0.2){ addDes(y, 'h', 1); addPair(x, y, 0.5); log(line, [y, x], 'rival'); bubble(y, '😏', 30); continue; }
     addJeal(y, k * C.jealousy * 3 * (0.5 + Math.max(0, S.aff[y].h) / 100)); S.jealOf[y] = x;
     addPair(x, y, -k * C.jealousy * 0.6); const rk = pkey(x, y); S.rival[rk] = clamp((S.rival[rk] || 0) + k * C.jealousy * 2, 0, 100);
     addAff(y, 'h', -0.3 * k * C.jealousy); ey.buff -= 5 * C.jealousy;
     bubble(y, kind === 'intimate' ? '😶' : '😤', 40);
-    log(sameRoom ? fill(rnd(WITNESS[y]), {x:nm(x), room:R ? R.name : '走廊'}) : fill(WITNESS_FLOOR[y], {x:nm(x)}), [y, x], 'rival'); dayEv(y, 'jealous', nm(x));
+    log(line, [y, x], 'rival'); dayEv(y, 'jealous', nm(x));
     if (!S.firsts['jeal:' + y]){ S.firsts['jeal:' + y] = 1; addMem(y, `看到 ${S.hero.name} 和 ${nm(x)} 很親近。心裡不太舒服。`); }
     S.loveSaw = S.loveSaw || {}; S.loveSaw[y] = {who:x, t:S.t};
     if (typeof loveDiscover === 'function') loveDiscover(y, x, 'see', kind);
@@ -5146,7 +5171,7 @@ function initStart(){
 }
 // 測試用掛鉤
 function ff(mins, autoAnswer){ for (let i = 0; i < mins; i++){ stepMinute(); allEnts().forEach(e => moveEnt(e, 1)); if (S.pending && autoAnswer != null) answerRequest(autoAnswer); } snapVis(); drawTokens(); renderAll(true); }
-window.__imb = { get S(){ return S; }, socialThink, interLocked, lineOf, get form(){ return form; }, compatOf, cmul, heroAuto, ff, pickEvent, fireEvent, fireCollide, fireTest, witness, witnessThink, witActKey, witnessKindLive, relTier, pairV, hMood, evById, showResult, migrate, heroInter, doAction, endOfDay, stepMinute, startInter, answerRequest, showRequest, openChar, closeSheet, switchView, setSpeed, save, renderAll, startFF, stopFF, hMem, syncCustom, openCxForm, cxClean, catchUp, get vis(){ return VIS; }, visSpeed, snapVis, route, resumeOffline, get lastAway(){ return ui.lastAway; }, openHist, recHist, pruneHist, caught, leaveSeen, interFromDef, soloOk, endSolo, startAftercare, interTxt, quipFits, interSpot, resolveSpot, spotKey, crowdedPairSeat, setSeatPx: v => { SEAT_PX = v; for (const k in SEAT_CACHE) delete SEAT_CACHE[k]; }, findSeat, seatPair, reseatAll, rectsAt, roomOccupants, npcThink, heroThink, endInter, onArrive, kickHero, goHomeIfForeign, nearestRoom, get ffState(){ return ui.ff; }, get ffLast(){ return ui.ffLast; }, showStart, loadSaved, goReturn, goMoveIn, hasAnySave, peekSaves, peekMeta, restoreBackup, backupSave, fillNewForm, SAVE_KEY, SAVE_BAK_KEY };
+window.__imb = { get S(){ return S; }, socialThink, interLocked, lineOf, nearDoor, closedBed, witDoorLine, DOOR_SEE, get form(){ return form; }, compatOf, cmul, heroAuto, ff, pickEvent, fireEvent, fireCollide, fireTest, witness, witnessThink, witActKey, witnessKindLive, relTier, pairV, hMood, evById, showResult, migrate, heroInter, doAction, endOfDay, stepMinute, startInter, answerRequest, showRequest, openChar, closeSheet, switchView, setSpeed, save, renderAll, startFF, stopFF, hMem, syncCustom, openCxForm, cxClean, catchUp, get vis(){ return VIS; }, visSpeed, snapVis, route, resumeOffline, get lastAway(){ return ui.lastAway; }, openHist, recHist, pruneHist, caught, leaveSeen, interFromDef, soloOk, endSolo, startAftercare, interTxt, quipFits, interSpot, resolveSpot, spotKey, crowdedPairSeat, setSeatPx: v => { SEAT_PX = v; for (const k in SEAT_CACHE) delete SEAT_CACHE[k]; }, findSeat, seatPair, reseatAll, rectsAt, roomOccupants, npcThink, heroThink, endInter, onArrive, kickHero, goHomeIfForeign, nearestRoom, get ffState(){ return ui.ff; }, get ffLast(){ return ui.ffLast; }, showStart, loadSaved, goReturn, goMoveIn, hasAnySave, peekSaves, peekMeta, restoreBackup, backupSave, fillNewForm, SAVE_KEY, SAVE_BAK_KEY };
 
 </script>
 <script>
@@ -8646,13 +8671,28 @@ function fxDiff(s0, s1){
   const dm = fxR((s1.m ?? 0) - (s0.m ?? 0)); if (Math.abs(dm) >= 0.1) out.push(['m', 'h', '', dm]);
   return out;
 }
+// 一筆紀錄只顯示跟這句話有關的人的變化，避免把目擊吃醋掛到「你約了他」那幾行，看起來像連算三次
+function fxRelevant(item, who){
+  const W = who || [];
+  const hits = id => W.includes(id);
+  const [t, a, b] = item;
+  if (t === 'm') return hits('h') || !W.length;
+  if (t === 'j') return hits(a);
+  if (t === 'p' || t === 'r') return W.length === 1 ? (hits(a) || hits(b)) : (hits(a) && hits(b));
+  if (t === 'a' || t === 'd'){
+    if (a === 'h') return hits(b) || hits('h');
+    if (b === 'h') return hits(a);
+    return W.length === 1 ? (hits(a) || hits(b)) : (hits(a) && hits(b));
+  }
+  return true;
+}
 function fxEnd(){
   if (!S || FX.d === 0) return; if (--FX.d > 0) return;
   const ents = FX.ents; FX.ents = []; if (!ents.length) return;
   const out = fxDiff(FX.snap, fxSnap()); if (!out.length) return; const n = S.fxN = (S.fxN || 0) + 1;
   for (const [o, who] of ents){
     const W = (who || []).filter(id => id !== 'h');
-    const f = FX.filt ? out.filter(x => x[0] === 'p' || x[0] === 'r' ? W.includes(x[1]) && W.includes(x[2]) : x[0] !== 'm' && W.includes(x[1])) : out;
+    const f = FX.filt ? out.filter(x => x[0] === 'p' || x[0] === 'r' ? W.includes(x[1]) && W.includes(x[2]) : x[0] !== 'm' && W.includes(x[1])) : out.filter(x => fxRelevant(x, who || []));
     if (f.length){ o.fx = f.map(x => [...x]); o.fxi = n; }
   }
 }
