@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f7f1e8">
 <title>失衡・公寓觀察</title>
-<meta name="imb-build" content="2026-11-11 12:09 (台北)">
+<meta name="imb-build" content="2026-11-11 13:54 (台北)">
 <style>
 :root{
   --bg:#f7f1e8; --card:#fffaf3; --line:#e8dccb; --ink:#4a3f35; --muted:#9a8b7b; --accent:#c9876b; --accent2:#e7b9a3;
@@ -646,6 +646,11 @@ span.av,div.av{display:inline-block;border-radius:50%}
 .love-rel .pill{margin:0 4px 4px 0}
 .acts3{flex-wrap:wrap}
 
+
+/* 約他一起去 */
+#gotoLeave,#gotoWho{margin-top:4px}
+#gotoBack{margin-top:12px}
+
 </style>
 </head>
 <body>
@@ -773,7 +778,7 @@ const WORDS = {
   hintSecTime:'時間與快轉',
   hintTime:'畫面上方可以切換速度：1x 是真實時間（遊戲裡過 1 分鐘，現實也過 1 分鐘）；10x、60x、300x 會越來越快。⏩ 是快轉，會一分鐘一分鐘地模擬，遇到要你回應的事會自動停下來。關掉分頁或離開一陣子再回來，大家會把你不在的時間過完（最多補 7 天），並告訴你發生了什麼。',
   hintSecAct:'你可以做什麼',
-  hintAct:'點平面圖上的房間或自己的頭像，選要做的事：吃飯、洗澡、上班、休息都可以。選單裡有「＋ 自訂行動」，可以自己寫一件事（地點、時段、效果、日記和泡泡小故事）。也可以約「和誰一起」做一件事。想找某個室友時，點他、選互動；關係到了才能解鎖比較親近的選項。',
+  hintAct:'點平面圖上的房間或自己的頭像，選要做的事：吃飯、洗澡、上班、休息都可以。選單裡有「＋ 自訂行動」，可以自己寫一件事（地點、時段、效果、日記和泡泡小故事）。也可以約「和誰一起」做一件事。想跟誰去哪個地方，可以在他的互動選單選「約他一起去…」，或從你的行動選單選「和誰前往哪裡」：兩人會一起走過去，到了就待在那裡，再選要做什麼；也可以按「各自散開」。想找某個室友時，點他、選互動；關係到了才能解鎖比較親近的選項。',
   hintSecRel:'室友與關係',
   hintRel:'每位室友對你有好感和情慾，你對他也有（後者在關係頁比較隱密）。他對你的好感會把關係推向日常、曖昧、親近、心動；能做的事和解鎖的事件會跟著變。他對你的好感到 60、情慾到 25 時，你可以向他告白；他對你的好感更高時，也可能主動向你告白。答應後會成為戀人，頭像上會有 ❤。可以同時和不只一個人交往，但被另一位戀人發現時，當場會要你解釋、道歉、坦白或分手；信任會下降，也可能冷戰一陣子，通常不會立刻分手。之後可以多「好好談談」（傾聽、說明想法、給他安全感），降低他的獨佔欲、把話說開；獨佔欲夠低以後，他有可能接受多方發展。室友彼此還有交情和競爭。紀錄裡看到的數值變化，就是這一刻實際加減的分數。',
   hintSecEv:'事件',
@@ -866,7 +871,25 @@ const WORDS = {
   loveTalkAsk:'{x} 還需要把話說開。這次你想怎麼談？',
   loveNeedHis:'需要他對你的好感 {a}／情慾 {d}',
   loveConfessLow:'他對你的好感或情慾還不夠，現在告白恐怕太早。',
+  gotoTitle:'約他一起去…',
+  gotoWhoTitle:'和誰前往哪裡',
+  gotoPickHint:'選一個地方，兩人會一起走過去。到了就待在那裡，可以再選要做什麼。',
+  gotoWhoHint:'先選一位在家、現在方便的室友，再選要去的地方。',
+  gotoStay:'和 {x} 待在{p}',
+  gotoWalk:'正和 {x} 前往{p}',
+  gotoArrive:'你和 {x} 到了{p}，就待在這裡。可以接著選要做什麼，或各自散開。',
+  gotoLeave:'你們在{p}各自散開。',
+  gotoDuty:'{x} {y}，你們各自散開。',
+  gotoMax:'你們在{p}待了一陣子，各自散開。',
+  gotoAsk:'你約 {x} 一起去{p}。',
+  gotoBtn:'各自散開',
+  gotoPub:'公共空間',
+  gotoRooms:'房間',
+  gotoOut:'出門（外面）',
+  gotoHangNote:'你們正待在一起。可以接著選要做什麼，或各自散開。',
+  gotoSame:'你們已經在這裡了。',
 };
+
 const LEGACY_WORDS = [[/歡愛|做愛/g, WORDS.sex], [/自慰/g, WORDS.solo]];
 const W = s => typeof s === 'string' ? LEGACY_WORDS.reduce((a, [re, w]) => a.replace(re, w), s) : s;
 function deepW(o, seen = new Set()){
@@ -1052,6 +1075,7 @@ const H_INTER = [   // grp：選單分組；tier：需要的關係階段（REL_T
   {id:'movie',label:'邀他看電影',icon:'🎬',dur:120,aff:5,des:2,place:'living',lbl:'一起看電影',grp:'invite'},
   {id:'walk',label:'邀他出門散步',icon:'🌳',dur:60,aff:5,des:1,place:'out',lbl:'一起散步',grp:'invite'},
   {id:'terrace',label:'約他上露臺吹風',icon:'🌙',dur:30,aff:3,des:3,place:'balcony',lbl:'在露臺吹風',grp:'invite',tier:1},
+  {id:'goto',label:'約他一起去…',icon:'👣',dur:180,aff:2,des:0,place:'pick',lbl:'待在一起',grp:'invite',p:.55},
   {id:'hug',label:'擁抱',icon:'🫂',dur:5,aff:4,des:3,place:'here',grp:'close',tier:1},
   {id:'stay',label:'靠在他身邊',icon:'🛋️',dur:30,aff:4,des:4,place:'here',lbl:'靠在一起',grp:'close',tier:2},
   {id:'intimate',label:'邀請共度',icon:'💗',dur:90,aff:8,des:4,place:'his',lbl:'共度中',grp:'close',tier:3},
@@ -1069,6 +1093,7 @@ const H_LINES = {
   cook:['「可以。刀給我，你負責擺盤。」','「我吃過了。」'],
   movie:['他挑了一部建築紀錄片。你沒有抗議。','「今晚有圖要趕。」'],
   walk:['他拿起外套。「走吧，帶你看看這區的老建築。」','「改天。」'],
+  goto:['他看了你一眼，點點頭。「走吧。」','「現在不方便。」'],
   hug:['他僵了一瞬，然後手掌很輕地落在你背上。','他後退半步。「……不是現在。」'],
   intimate:['他沉默地看著你，然後讓開門口。「進來。」','「還不是時候。」他的聲音平穩，指節卻收緊了。'],
  },
@@ -1080,6 +1105,7 @@ const H_LINES = {
   cook:['「我負責拍，你負責煮？好啦好啦，我切菜。」','「Liam 在的話我不敢碰廚房。」'],
   movie:['「老片之夜！我選片，你不准睡著。」','「今晚要修圖，明天補你兩部。」'],
   walk:['他把相機掛上脖子。「走，今天的光很好。」','「剛拍完一整天，腿要斷了。」'],
+  goto:['「帶路啊。」他把相機往肩上一掛。','「這時候？我手上還有東西。」'],
   hug:['他順勢把你抱住，下巴擱在你頭頂。「嗯，這個角度不錯。」','「突然這樣，我會以為你要哭了。」他笑著避開。'],
   intimate:['他放下相機，難得沒有笑。「好。今晚不拍了。」','「別急，」他用指尖點了點你的額頭，「慢慢來比較好玩。」'],
  },
@@ -1091,6 +1117,7 @@ const H_LINES = {
   cook:['「好啊！我教你切洋蔥不流淚的方法。」','「今天累壞了，明天我煮給你吃好不好？」'],
   movie:['他端出一盤剛炸好的薯條。「看電影怎麼能沒有零食。」','「我可能會看到睡著……改天吧。」'],
   walk:['「好，順便去看看附近的市集。」','「今天腳有點痠，下次一定。」'],
+  goto:['「好啊，我陪你。」他擦了擦手。','「現在有點忙，晚點好嗎？」'],
   hug:['他把你整個圈進懷裡，身上有香草的味道。「今天辛苦了。」','他輕輕拍拍你的肩。「怎麼了？先坐下來。」'],
   intimate:['「……你確定嗎？」他問得很輕，等你點頭，才牽起你的手。','「我想等你更確定一點。」他吻了吻你的額頭。'],
  },
@@ -1102,6 +1129,7 @@ const H_LINES = {
   cook:['「我只會煎牛排。你要的話。」','「不餓。」'],
   movie:['「我挑。不准滑手機。」','「今晚要聽 demo。」'],
   walk:['他拿起皮夾克。「走。別離我太遠。」','「外面太吵。」'],
+  goto:['「嗯。」他已經站起來了。','「待會。」'],
   hug:['他沒動，但也沒推開你。過了一會，一隻手落在你後腦。','「不要隨便靠過來。」'],
   intimate:['他看著你很久。「想清楚了？……進來。」','「你還沒想清楚。」他替你把門關上。'],
  },
@@ -1113,6 +1141,7 @@ const H_LINES = {
   cook:['「我……我只會微波。但我可以學。」','「我、我吃過了……」'],
   movie:['他抱著抱枕坐在沙發最邊邊，卻一直偷看你。','「我……我會緊張，下次好嗎……」'],
   walk:['他戴上帽T的帽子，安靜地跟在你旁邊。','「外面人好多……」'],
+  goto:['「好、好啊……我跟你去。」','「我、我現在……下次可以嗎……」'],
   hug:['他整個人僵住，過了好幾秒才小心翼翼地回抱，像怕弄痛你。','他慌張地後退，撞到了門框。「對、對不起！」'],
   intimate:['「你……真的嗎？」他的聲音在抖，「我……我會努力不讓你後悔。」','「我、我還沒準備好……對不起……」'],
  },
@@ -1124,6 +1153,7 @@ const H_LINES = {
   cook:['「好耶！我負責吃……開玩笑，我幫你洗菜！」','「我等下要念書……你煮好叫我！」'],
   movie:['他搶先佔好沙發，拍拍旁邊。「恐怖片！你怕的話可以抓我。」','「明天考試，我會被當……」'],
   walk:['「走走走！」他已經在門口穿鞋了。','「腿剛練完，走不動了啦……」'],
+  goto:['「要跟我一起走嗎？走呀走呀！」','「欸現在不行啦——等我一下下嘛。」'],
   hug:['他直接把你整個抱起來轉了一圈。「你主動抱我耶！」','「欸、這裡有人啦……」他小聲說，臉紅了。'],
   intimate:['他握住你的手，握得很緊。「我等這句話等好久了。」','「我……我想要，可是……再等等，好不好？」'],
  },
@@ -3836,9 +3866,10 @@ function interThink(){
   if (I.start == null){
     [h, c].forEach(e => { if (walking(e)){ e.act = 'walk'; } });
     if (arrived(h) && arrived(c)){ I.start = S.t; }
-    else if (S.t - I.created > 90){ log(`你和 ${nm(I.who)} 的約定不了了之。`, ['h', I.who]); endInter(false, 0); return; }
+    else if (S.t - I.created > 90){ log(`你和 ${nm(I.who)} 的約定不了了之。`, ['h', I.who]); if (I.hang && typeof hangClear === 'function'){ hangClear(); const h=S.ents.h,c=S.ents[I.who]; if(h){h.act='idle';h.label='閒著';goHomeIfForeign(h);} if(c&&!S.away) npcThink(c); } else endInter(false, 0); return; }
   }
   if (I.start != null){
+    if (I.hang && typeof hangTick === 'function'){ hangTick(I); return; }
     const act = I.intimate ? 'intimate' : (I.type === 'chat' || I.type === 'care' ? 'chat' : 'together');
     const lb = I.ik ? `${IK[I.ik].n}中（${I.room === 'r_' + I.who ? '他房間' : ikPlace(I)}）` : I.after ? '事後照顧（aftercare）' : I.label;
     if (I.ik === 'night' && S.t === I.start){ const m = S.t % 1440; I.dur = m < 7 * 60 ? 7 * 60 - m : 1440 - m + 7 * 60; }
@@ -3853,6 +3884,9 @@ function interThink(){
   }
 }
 function endInter(ok, frac, opt){
+  if (S.inter && S.inter.hang && typeof endHang === 'function' && !(opt && opt.cut) && !S._jealCut){
+    endHang(ok && frac >= 1 ? 'max' : 'leave'); return;
+  }
   if (!S._jealCut && typeof possThink === 'function') possThink();
   if (typeof witnessThink === 'function') witnessThink();
   const I = S.inter; if (!I) return;
@@ -4257,14 +4291,19 @@ function resolveRequest(P, ch){
 /* ---------- 主角主動互動 ---------- */
 function heroInter(id, itype, auto){
   const o = S.ents[id], def = H_INTER.find(x => x.id === itype), h = S.ents.h;
-  if (!home(o)){ toast(`${nm(id)} 不在家。`); return; }
-  if (!home(h)){ toast('你不在家。'); return; }
-  if (S.inter){ toast('你正在和別人相處。'); return; }
-  if (o.busy){ toast(`${nm(id)} 現在在忙別的事。`); return; }
+  const hangWith = typeof isHangWith === 'function' && isHangWith(id);
+  const hangReady = typeof hangCanAct === 'function' && hangCanAct(id);
+  if (!hangWith){
+    if (!home(o)){ toast(`${nm(id)} 不在家。`); return; }
+    if (!home(h)){ toast('你不在家。'); return; }
+    if (S.inter){ toast('你正在和別人相處。'); return; }
+    if (o.busy){ toast(`${nm(id)} 現在在忙別的事。`); return; }
+  } else if (!hangReady && itype !== 'goto'){ toast('等到了再選要做什麼。'); return; }
   if (def.only && def.only !== id){ toast('這是別人的專屬互動。'); return; }
   if (def.hrs && !inHrs(def.hrs)){ toast(`「${def.label}」要在 ${String(Math.floor(def.hrs[0] % 24)).padStart(2, '0')}:00 之後的時段才行。`); return; }
   if (interLocked(id, def)){ toast(def.cx && cxLocked(id, def) ? `「${def.label}」還沒解鎖（${cxNeed(def)}）。` : `你們的關係還沒到這一步（需要「${REL_TIERS[def.tier].n}」）。`); return; }
   S.hAction = null; if (!auto) closeSheet();
+  if (itype === 'goto' && typeof openGotoPicker === 'function'){ openGotoPicker(id); return; }
   if (h.room && h.room === o.room && !walking(o)) resolveHeroInter(id, itype);
   else { S.hPending = {who:id, itype, auto:!!auto}; log(`你${auto ? '想找人說說話，' : ''}去找 ${nm(id)}。`, ['h']); if (!auto) kickHero(); }
 }
@@ -4278,7 +4317,7 @@ const interLocked = (id, def) => (def.tier || 0) > relTier(id) || cxLocked(id, d
 const lineOf = (id, itype) => ((H_LINES[id][itype] || (H_LINES_EXTRA[id] || {})[itype] || (PERSONA_LINES[id] || {})[itype] || (() => { const d = H_INTER.find(x => x.id === itype); return d && d.tier && STAGE_LINES[id][d.tier]; })() || ['', ''])).map(l => fill(l, {n:S.hero.name}));
 function resolveHeroInter(id, itype){
   const def = H_INTER.find(x => x.id === itype), o = S.ents[id], C = CHAR[id];
-  const base = {chat:.88, care:.92, joke:.78, praise:.88, flirt:.5, cook:.55, movie:.55, walk:.5, terrace:.5, hug:.42, stay:.45, intimate:.3, sex:.28, book:.75, jog:.5, coop:.55, listen:.6, shoot:.75, sketch:.75, brew:.8, tease:.6, approach:.4}[itype] ?? def.p ?? .6;
+  const base = {chat:.88, care:.92, joke:.78, praise:.88, flirt:.5, cook:.55, movie:.55, walk:.5, terrace:.5, goto:.55, hug:.42, stay:.45, intimate:.3, sex:.28, book:.75, jog:.5, coop:.55, listen:.6, shoot:.75, sketch:.75, brew:.8, tease:.6, approach:.4}[itype] ?? def.p ?? .6;
   const aff = S.aff[id].h, des = S.des[id].h, m = moodOf(o), T = TALK[id];
   let p = base + aff / 200 + (['flirt','hug','stay','intimate','sex'].includes(itype) || (def.tier || 0) >= 1 || (def.cx && def.cx.wit !== 'none') ? des / 160 : 0) + (m - 50) / 300 + (hMood() - 50) / 400 - (S.jeal[id] || 0) / 400;
   if (['work','music','draw','code','photo'].includes(o.act) && !['chat','praise'].includes(itype)) p -= 0.2;
@@ -4309,6 +4348,7 @@ function resolveHeroInter(id, itype){
       log('✨ Alexander 真的笑了。很短，但所有人都會記得這一天。', ['h','alexander'], 'big'); toast('✨ 你逗笑了 Alexander！');
       addAff('alexander', 'h', 6); dayEv('alexander', 'laugh'); dayEv('h', 'laugh');
     }
+    if (typeof hangClear === 'function' && typeof isHangWith === 'function' && isHangWith(id)) hangClear();
     if (def.cx) cxStart(id, def);
     else if (STAGED.some(x => x.id === itype)) interFromDef(id, def, {src:'h'});
     else startInter({who:id, place:def.place, dur:def.dur, label:def.lbl || def.label, ik:def.ik, dk:def.dk, type:itype === 'intimate' || def.ik ? 'intimate' : itype === 'care' ? 'care' : (['chat','joke','praise','book','tease'].includes(itype) ? 'chat' : ['flirt','hug','stay','approach','listen'].includes(itype) ? 'flirt' : 'together'), kind:itype === 'stay' ? 'hug' : itype === 'tease' ? 'joke' : itype === 'approach' ? 'flirt' : itype, aff:def.aff, des:def.des, src:'h', cheer:itype === 'care' && hMood() < 40});
@@ -4676,13 +4716,17 @@ function needsHTML(e){ return `<div class="needs">${Object.keys(NEED_LBL).map(k 
 function renderHero(){
   const e = S.ents.h, I = S.inter;
   let actTxt = `${ACTS[e.act]?.icon || ''} ${e.label || ACTS[e.act]?.label || ''}`;
-  if (I){ actTxt = I.start == null ? `👣 正和 ${nm(I.who)} 前往${I.room === 'out' ? '外面' : G.rooms[I.room].name}` : (I.ik || I.after || I.cx ? interTxt(I) : `${I.intimate ? '💗' : '💞'} 和 ${nm(I.who)}「${I.label}」`) + `・剩 ${Math.max(0, I.start + I.dur - S.t)} 分`; }
+  if (I){
+    const pn = (typeof hangPlaceName === 'function') ? hangPlaceName(I.room, I.who) : (I.room === 'out' ? '外面' : (G.rooms[I.room] ? G.rooms[I.room].name : ''));
+    if (I.hang){ actTxt = I.start == null ? `👣 ${fill(WORDS.gotoWalk || '正和 {x} 前往{p}', {x:nm(I.who), p:pn})}` : `💞 ${fill(WORDS.gotoStay || '和 {x} 待在{p}', {x:nm(I.who), p:pn})}`; }
+    else actTxt = I.start == null ? `👣 正和 ${nm(I.who)} 前往${I.room === 'out' ? '外面' : G.rooms[I.room].name}` : (I.ik || I.after || I.cx ? interTxt(I) : `${I.intimate ? '💗' : '💞'} 和 ${nm(I.who)}「${I.label}」`) + `・剩 ${Math.max(0, I.start + I.dur - S.t)} 分`;
+  }
   else if (S.hAction && S.hAction.until) actTxt += `・剩 ${Math.max(0, S.hAction.until - S.t)} 分`;
   const autoOn = S.heroAuto !== false; const byAuto = (S.hAction && S.hAction.auto) || (S.hPending && S.hPending.auto);
   const where = e.room === 'out' ? '外面' : roomName(e.room);
   $('#heroPanel').innerHTML = `<div class="av">${avOf('h')}</div><div class="hp-main"><div><b>${esc(S.hero.name)}</b> <span class="muted small">在${where}</span></div><div class="hp-act">${esc(actTxt)}${byAuto ? ' <span class="pill">自動</span>' : ''}</div>${typeof markHTML === 'function' ? markHTML() : ''}${moodHTML()}${needsHTML(e)}
    <label class="autotog"><input type="checkbox" id="autoChk" ${autoOn ? 'checked' : ''}><span class="sw"></span>女主角自動生活</label></div>
-   <div class="hp-btns"><button class="btn sm primary" id="btnAct">行動</button>${I || S.hAction || S.hPending ? `<button class="btn sm" id="btnStop">${I ? '結束' : '取消'}</button>` : ''}</div>`;
+   <div class="hp-btns"><button class="btn sm primary" id="btnAct">行動</button>${I || S.hAction || S.hPending ? `<button class="btn sm" id="btnStop">${I && I.hang ? esc(WORDS.gotoBtn || '各自散開') : (I ? '結束' : '取消')}</button>` : ''}</div>`;
   $('#btnAct').onclick = openActions;
   $('#autoChk').onchange = ev => { S.heroAuto = ev.target.checked; if (!S.heroAuto && S.hAction && S.hAction.auto && S.hAction.until == null) S.hAction = null; toast(S.heroAuto ? '女主角會照自己的作息生活' : '女主角只照你的指令行動'); renderAll(true); };
   const bs = $('#btnStop'); if (bs) bs.onclick = stopHero;
@@ -4690,6 +4734,7 @@ function renderHero(){
 // 玩家下指令後馬上出發（不等下一個遊戲分鐘）
 function kickHero(){ if (S && !S.away && !S.ents.h.busy) heroThink(); }
 function stopHero(){
+  if (S.inter && S.inter.hang && typeof endHang === 'function'){ endHang('leave'); renderAll(true); return; }
   if (S.inter){ const I = S.inter; const frac = I.start == null ? 0 : clamp((S.t - I.start) / I.dur, 0, 1);
     log(`你提早結束了和 ${nm(I.who)} 的「${I.label}」。`, ['h', I.who]);
     if (frac < 0.3){ addAff(I.who, 'h', -1); }
@@ -4856,10 +4901,11 @@ function openChar(id, tab){
     const sched = SCHEDULES[id](dowOf(S.t)).map(b => `${pad(Math.floor(b[0]))}:${pad(Math.round((b[0]%1)*60))} ${schedLbl(id, b[4] || ACTS[b[2]].label)}`).join('・');
     const myRoom = Object.keys(G.rooms).find(k => G.rooms[k].owner === id), m = moodOf(e);
     const moments = [...S.mem[id]].filter(x => x.h).reverse().slice(0, 5), mems = moments.length ? moments : [...S.mem[id]].reverse().slice(0, 4);
-    const canAct = home(e) && home(S.ents.h) && !S.inter; const rt = relTier(id), tab = ui.charTab;
+    const hangReady = typeof hangCanAct === 'function' && hangCanAct(id);
+    const canAct = hangReady || (home(e) && home(S.ents.h) && !S.inter); const rt = relTier(id), tab = ui.charTab;
     const pane = (k, html) => `<div class="cpane ${tab === k ? '' : 'hidden'}" data-p="${k}">${html}</div>`;
-    const note = [canAct ? '' : '他或你不在家，或你正在忙'].filter(Boolean).join('・');
-    const act = `${note ? `<div class="small muted cnote">${note}</div>` : ''}
+    const note = hangReady ? (WORDS.gotoHangNote || '你們正待在一起。可以接著選要做什麼，或各自散開。') : [canAct ? '' : '他或你不在家，或你正在忙'].filter(Boolean).join('・');
+    const act = `${note ? `<div class="small muted cnote">${note}</div>` : ''}${hangReady ? `<button type="button" class="btn wide" id="gotoLeave" style="margin-bottom:8px">${esc(WORDS.gotoBtn || '各自散開')}</button>` : ''}
       ${Object.keys(H_INTER_GRP).filter(g => g === 'custom' || H_INTER.some(d => d.grp === g && personaOk(d) && (!d.only || d.only === id))).map(g => `<div class="igrp">${H_INTER_GRP[g]}</div><div class="agrid">${H_INTER.filter(d => d.grp === g && personaOk(d) && (!d.only || d.only === id)).map(d => { const lock = interLocked(id, d), cl = d.cx && cxLocked(id, d);
         const lh = typeof loveLockHint === 'function' ? loveLockHint(id, d) : '';
         return `<button class="btn${d.cx ? ' cxbtn' : ''}" data-i="${esc(d.id)}" ${!canAct || lock ? 'disabled' : ''}><i>${lock ? '🔒' : esc(d.icon)}</i>${esc(d.label)}${cl ? `<small>${cxNeed(d)}</small>` : lock ? `<small>${lh || (d.tier ? '需要「' + REL_TIERS[d.tier].n + '」' : '還沒解鎖')}</small>` : d.id === 'flirt' && S.aff[id].h < 25 ? '<small>還不夠熟</small>' : d.cx ? `<small>${d.cx.dur} 分</small>` : ''}</button>`; }).join('')}</div>${g === 'custom' ? cxManageHTML(id) : ''}`).join('')}`;
@@ -4891,6 +4937,7 @@ function openChar(id, tab){
     $('#sheet').querySelectorAll('[data-i]').forEach(b => b.onclick = () => heroInter(id, b.dataset.i));
     $('#sheet').querySelectorAll('[data-cxe]').forEach(b => b.onclick = () => openCxForm(id, b.dataset.cxe));
     const ca = $('#cxAdd'); if (ca) ca.onclick = () => openCxForm(id);
+    const gl = $('#gotoLeave'); if (gl) gl.onclick = () => { closeSheet(); if (typeof endHang === 'function') endHang('leave'); };
     const hb = $('#histBtn'); if (hb) hb.onclick = () => openHist(id);
     const hi = $('#histIcon'); if (hi) hi.onclick = () => openHist(id);
     if (typeof loveBindRel === 'function') loveBindRel(id);
@@ -4907,11 +4954,13 @@ function openHero(){
 function openActions(){
   ui.sel = 'h';
   openSheet(() => {
-    const e = S.ents.h, busy = !!S.inter;
-    $('#sheet').innerHTML = `<div class="grab"></div><h3>你要做什麼？</h3><div class="small muted">${busy ? '你正在和室友相處，先結束才能做別的事。' : '你會走過去，到了才開始。時間會照常流動。'}</div>
+    const e = S.ents.h, hanging = !!(S.inter && S.inter.hang), busy = !!S.inter && !hanging;
+    const hangNote = hanging ? (WORDS.gotoHangNote || '你們正待在一起。可以接著選要做什麼，或各自散開。') : '';
+    $('#sheet').innerHTML = `<div class="grab"></div><h3>你要做什麼？</h3><div class="small muted">${busy ? '你正在和室友相處，先結束才能做別的事。' : (hangNote || '你會走過去，到了才開始。時間會照常流動。')}</div>
+      ${hanging ? `<button type="button" class="btn wide" id="gotoLeave" style="margin:8px 0">${esc(WORDS.gotoBtn || '各自散開')}</button>` : ''}
       <div class="agrid">${H_ACTIONS.filter(a => !a.hobby || hasH(a.hobby)).map(a => { const off = a.ha && !haInWin(a.ha); const dt = a.dur === 'work' ? '到 18:00' : a.dur >= 60 ? (Math.round(a.dur / 6) / 10) + ' 小時' : a.dur + ' 分';
         return `<button class="btn${a.ha ? ' hatile' : ''}" data-a="${esc(a.id)}" ${busy || off ? 'disabled' : ''}><i>${esc(a.icon)}</i>${esc(a.label)}<small>${off ? '只在 ' + haWinTxt(a.ha) : dt}</small>${a.ha ? `<span class="haed" role="button" tabindex="0" data-hed="${esc(a.id)}" title="編輯" aria-label="編輯「${esc(a.label)}」">✏️</span>` : ''}</button>`; }).join('')}<button class="btn haadd" id="haAdd"><i>＋</i>自訂行動<small>自己做一件事</small></button></div>
-      <div class="field-title">去找室友</div><div class="agrid">${S.residents.map(id => { const o = S.ents[id]; return `<button class="btn" data-f="${id}" ${!home(o) || busy ? 'disabled' : ''}><span class="av" style="width:30px;height:30px">${avOf(id)}</span>${CHAR[id].name}<small>${home(o) ? esc(o.label) : '不在家'}</small></button>`; }).join('')}</div>
+      <div class="field-title">去找室友</div><div class="agrid"><button class="btn" id="gotoWho" ${busy ? 'disabled' : ''}><i>👣</i>${esc(WORDS.gotoWhoTitle || '和誰前往哪裡')}<small>一起走過去，到了再決定</small></button>${S.residents.map(id => { const o = S.ents[id]; const ok = (typeof hangCanAct === 'function' && hangCanAct(id)) || (home(o) && !busy); return `<button class="btn" data-f="${id}" ${ok ? '' : 'disabled'}><span class="av" style="width:30px;height:30px">${avOf(id)}</span>${CHAR[id].name}<small>${(typeof hangCanAct === 'function' && hangCanAct(id)) ? '正待在一起' : home(o) ? esc(o.label) : '不在家'}</small></button>`; }).join('')}</div>
       <div class="small muted" style="margin-top:8px">也可以直接點平面圖上的房間走過去，或點室友的頭像跟他互動。</div>`;
     $('#sheet').querySelectorAll('[data-a]').forEach(b => { b.onclick = ev => { if (b.dataset.lp){ delete b.dataset.lp; return; } const ed = ev.target.closest('[data-hed]'); if (ed){ ev.stopPropagation(); return openHaForm(ed.dataset.hed); } grpOk(b.dataset.a) ? openGroupPicker(b.dataset.a) : doAction(b.dataset.a); };
       if (b.classList.contains('hatile')){ let tm = null; const clr = () => { clearTimeout(tm); tm = null; };
@@ -4919,11 +4968,14 @@ function openActions(){
         b.addEventListener('contextmenu', ev => { ev.preventDefault(); clr(); openHaForm(b.dataset.a); }); } });
     $('#sheet').querySelectorAll('.haed').forEach(s => s.onkeydown = ev => { if (ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); ev.stopPropagation(); openHaForm(s.dataset.hed); } });
     $('#haAdd').onclick = () => openHaForm();
+    const gw = $('#gotoWho'); if (gw) gw.onclick = () => { if (typeof openGotoWho === 'function') openGotoWho(); };
+    const gl = $('#gotoLeave'); if (gl) gl.onclick = () => { closeSheet(); if (typeof endHang === 'function') endHang('leave'); };
     $('#sheet').querySelectorAll('[data-f]').forEach(b => b.onclick = () => openChar(b.dataset.f));
   }, false);
 }
 function doAction(aid, withIds){
   const a = H_ACTIONS.find(x => x.id === aid); const room = actRoom(a);
+  if (S.inter && S.inter.hang && typeof endHang === 'function') endHang('leave');
   if (withIds && withIds.length && typeof grpOk === 'function' && grpOk(aid) && !S.inter){ startGroup(aid, withIds); closeSheet(); kickHero(); renderAll(true); return; }
   if (!a) return; if (a.ha && !haInWin(a.ha)){ toast(`「${a.label}」只能在 ${haWinTxt(a.ha)} 做。`); return; }
   if (a.act === 'solo' && allEnts().some(o => o.id !== 'h' && o.room === room && !o.hidden)){ toast('房間裡有人，不方便獨處。'); return; }
@@ -4938,11 +4990,11 @@ function openRoom(rid){
     const title = r.owner === 'h' ? '你的房間' : r.owner && !S.residents.includes(r.owner) ? '空房' : r.name;
     $('#sheet').innerHTML = `<div class="grab"></div><h3>${ROOM_ICON[r.type]} ${title}</h3>
       <div class="field-title">現在在這裡</div><div class="chips">${here.length ? here.map(e => `<span class="chip" data-id="${e.id}"><span class="av" style="width:20px;height:20px">${avOf(e.id)}</span>${esc(nm(e.id))}・${esc(e.label)}</span>`).join('') : '<span class="muted small">沒有人</span>'}</div>
-      <div class="agrid">${r.owner && r.owner !== 'h' ? '' : `<button class="btn" id="goRoom" ${S.inter ? 'disabled' : ''}><i>👣</i>走過去待著</button>`}
-      ${acts.map(a => `<button class="btn" data-a="${a.id}" ${S.inter ? 'disabled' : ''}><i>${a.icon}</i>${a.label}</button>`).join('')}</div>
+      <div class="agrid">${r.owner && r.owner !== 'h' ? '' : `<button class="btn" id="goRoom" ${S.inter && !S.inter.hang ? 'disabled' : ''}><i>👣</i>走過去待著</button>`}
+      ${acts.map(a => `<button class="btn" data-a="${a.id}" ${S.inter && !S.inter.hang ? 'disabled' : ''}><i>${a.icon}</i>${a.label}</button>`).join('')}</div>
       ${r.owner && r.owner !== 'h' && S.residents.includes(r.owner) ? (S.ents[r.owner].room === rid && S.ents[r.owner].act !== 'sleep' ? `<button class="btn wide" id="knock">🚪 敲門找 ${CHAR[r.owner].name}</button>` : `<div class="small muted" style="margin-top:8px">這是 ${CHAR[r.owner].name} 的房間。${S.ents[r.owner].room === rid ? '他已經睡了。' : '他不在房間。'}</div>`) : ''}`;
     const kn = $('#knock'); if (kn) kn.onclick = () => { log(`你敲了敲 ${CHAR[r.owner].name} 的門。他${S.ents[r.owner].label}。`, ['h', r.owner]); openChar(r.owner); };
-    const g = $('#goRoom'); if (g) g.onclick = () => { S.hPending = null; S.hAction = {id:'stay', label:'待著', icon:'👣', room:rid, act:'idle', dur:30, lbl:'待著'}; closeSheet(); kickHero(); renderAll(true); };
+    const g = $('#goRoom'); if (g) g.onclick = () => { if (S.inter && S.inter.hang && typeof endHang === 'function') endHang('leave'); S.hPending = null; S.hAction = {id:'stay', label:'待著', icon:'👣', room:rid, act:'idle', dur:30, lbl:'待著'}; closeSheet(); kickHero(); renderAll(true); };
     $('#sheet').querySelectorAll('[data-a]').forEach(b => b.onclick = () => grpOk(b.dataset.a) ? openGroupPicker(b.dataset.a) : doAction(b.dataset.a));
     $('#sheet').querySelectorAll('.chip[data-id]').forEach(c => c.onclick = () => c.dataset.id === 'h' ? openHero() : openChar(c.dataset.id));
   });
@@ -6898,7 +6950,11 @@ const TX_CAT = {EVENTS:'事件', TEST_EV:'吃醋試探', COLLIDE_OPEN:'兩人同
 const TX_HERO = new Set(['SNIP_H', 'H_DIARY', 'TRAIT_VOICE', 'WORDS']);
 const TX_FIELD = {text:'內容', a:'接受', r:'拒絕', d:'第三種回應', 0:'①', 1:'②', 2:'③', 3:'④', lbl:'名稱', label:'名稱', txt:'冷卻時的反應', look:'外貌', persona:'個性', open:'開頭', close:'結尾', ev:'事件句',
   hintTitle:'提示標題', hintClose:'關閉按鈕',
-  hintSecIntro:'段落・這是什麼', hintIntro:'這是什麼', hintSecTime:'段落・時間', hintTime:'時間與快轉', hintSecAct:'段落・行動', hintAct:'你可以做什麼', hintSecRel:'段落・關係', hintRel:'室友與關係', hintSecEv:'段落・事件', hintEv:'事件', hintSecMark:'段落・吻痕', hintMark:'吻痕與獨佔欲', hintSecAch:'段落・成就', hintAch:'成就', hintSecCheat:'段落・作弊', hintCheat:'作弊模式', hintSecSave:'段落・存檔', hintSave:'存檔'};
+  hintSecIntro:'段落・這是什麼', hintIntro:'這是什麼', hintSecTime:'段落・時間', hintTime:'時間與快轉', hintSecAct:'段落・行動', hintAct:'你可以做什麼', hintSecRel:'段落・關係', hintRel:'室友與關係', hintSecEv:'段落・事件', hintEv:'事件', hintSecMark:'段落・吻痕', hintMark:'吻痕與獨佔欲', hintSecAch:'段落・成就', hintAch:'成就', hintSecCheat:'段落・作弊', hintCheat:'作弊模式', hintSecSave:'段落・存檔', hintSave:'存檔',
+  gotoTitle:'約他一起去（標題）', gotoWhoTitle:'和誰前往哪裡（標題）', gotoPickHint:'選地點說明', gotoWhoHint:'選人說明',
+  gotoStay:'待在一起的狀態', gotoWalk:'一起走過去的狀態', gotoArrive:'到達時的紀錄', gotoLeave:'各自散開',
+  gotoDuty:'他有事要離開', gotoMax:'待太久後散開', gotoAsk:'邀請紀錄', gotoBtn:'各自散開按鈕',
+  gotoPub:'公共空間', gotoRooms:'房間', gotoOut:'出門（外面）', gotoHangNote:'待在一起時的提示', gotoSame:'已經在這裡'};
 const hasCJK = s => typeof s === 'string' && /[\u3400-\u9fff\uff00-\uffef「」……]/.test(s);
 const TX = {items:[], orig:new Map(), ready:false};
 const txKey = p => p.join('|');
@@ -7954,6 +8010,246 @@ if (typeof window !== 'undefined') Object.assign(window.__imb || (window.__imb =
 
 </script>
 <script>
+/* 自由前往：約室友一起去某個地方，兩人即時走過去，到了就待在那裡，再選互動。 */
+'use strict';
+const GOTO_MAX = 180;
+const GOTO_SKIP = {bath:1, wc:1};
+
+function hangPlaceName(room, who){
+  if (room === 'out') return '外面';
+  if (room === 'h_room' || room === 'r_h') return '你的房間';
+  if (who && (room === 'his' || room === 'r_' + who)) return (typeof nm === 'function' ? nm(who) : who) + '的房間';
+  const r = (typeof G !== 'undefined' && G && G.rooms) ? G.rooms[room] : null;
+  if (!r) return room === 'out' ? '外面' : '那裡';
+  if (r.owner === 'h') return '你的房間';
+  return r.name;
+}
+const isHang = (I = (typeof S !== 'undefined' && S && S.inter)) => !!(I && I.hang);
+const isHangWith = id => isHang() && S.inter.who === id;
+const hangArrived = (I = (S && S.inter)) => isHang(I) && I.start != null;
+const hangCanAct = id => hangArrived() && S.inter.who === id;
+
+function gotoNormPlace(place, who){
+  if (place === 'here') return (S.ents.h && S.ents.h.room) || 'living';
+  if (place === 'his') return 'r_' + who;
+  if (place === 'h_room') return 'r_h';
+  return place;
+}
+function gotoAvailable(id){
+  if (!S || !S.ents) return false;
+  const o = S.ents[id], h = S.ents.h;
+  if (!o || !h) return false;
+  if (typeof loveCold === 'function' && loveCold(id) && !isHangWith(id)) return false;
+  if (S.inter && !isHangWith(id)) return false;
+  if (o.busy && !isHangWith(id)) return false;
+  if (isHangWith(id)) return true;
+  return typeof home === 'function' && home(o) && home(h);
+}
+function gotoPlaces(who){
+  const pub = [];
+  if (!G || !G.rooms) return {pub, rooms:[], out:null};
+  for (const id of Object.keys(G.rooms)){
+    const r = G.rooms[id];
+    if (!r || r.owner) continue;
+    if (GOTO_SKIP[r.type]) continue;
+    const f = r.f || 0;
+    const floor = (G.floors && G.floors[f]) ? G.floors[f].split('・')[0] : '';
+    pub.push({id, name:r.name, icon:ROOM_ICON[r.type] || '📍', f, group: floor ? `${floor}・${WORDS.gotoPub || '公共空間'}` : (WORDS.gotoPub || '公共空間')});
+  }
+  pub.sort((a, b) => (a.f - b.f) || String(a.name).localeCompare(String(b.name), 'zh-Hant'));
+  const rooms = [
+    {id:'r_' + who, name: `${nm(who)}的房間`, icon:'🛏️', group: WORDS.gotoRooms || '房間'},
+    {id:'r_h', name:'你的房間', icon:'🛏️', group: WORDS.gotoRooms || '房間'},
+  ];
+  const out = {id:'out', name: WORDS.gotoOut || '出門（外面）', icon:'🚶', group:'出門'};
+  return {pub, rooms, out};
+}
+function dutyKey(id){
+  if (typeof curBlock !== 'function') return '';
+  const b = curBlock(id);
+  return `${b[2]}|${b[4]}|${b[0]}`;
+}
+function hangDuty(id, I = (S && S.inter)){
+  if (typeof curBlock !== 'function') return null;
+  const b = curBlock(id);
+  const act = b[2], target = b[4];
+  const key = dutyKey(id);
+  if (I && I._duty0 && key === I._duty0) return null;  // 答應時的那一段作息還沒收，不立刻拆開
+  if (act === 'sleep' || act === 'nap') return 'sleep';
+  if (act === 'work' || act === 'class') return act;
+  if (target === 'out') return 'out';
+  return null;
+}
+function hangClear(){
+  const I = S.inter; if (!I || !I.hang) return;
+  const h = S.ents.h, c = S.ents[I.who];
+  if (h){ h.busy = false; h.feed = false; }
+  if (c){ c.busy = false; c.feed = false; }
+  S.inter = null;
+}
+function endHang(reason, duty){
+  if (!S._jealCut && typeof possThink === 'function') possThink();
+  if (typeof witnessThink === 'function') witnessThink();
+  const I = S.inter; if (!I || !I.hang) return;
+  const h = S.ents.h, c = S.ents[I.who];
+  const stayed = I.start != null ? S.t - I.start : 0;
+  const place = hangPlaceName(I.room, I.who);
+  if (h){ h.busy = false; h.feed = false; }
+  if (c){ c.busy = false; c.feed = false; }
+  S._witActKey = (typeof witActKey === 'function') ? witActKey(I.who) : null;
+  S.inter = null;
+  let line = '';
+  if (reason === 'duty'){
+    const why = duty === 'sleep' ? '該去休息了' : duty === 'work' ? '該去上班了' : duty === 'class' ? '該去上課了' : '有事要出門了';
+    line = fill(WORDS.gotoDuty || '{x} {y}，你們各自散開。', {x:nm(I.who), y:why});
+  } else if (reason === 'max'){
+    line = fill(WORDS.gotoMax || '你們在{p}待了一陣子，各自散開。', {p:place});
+  } else if (reason === 'cut'){
+    line = '';
+  } else {
+    line = fill(WORDS.gotoLeave || '你們在{p}各自散開。', {x:nm(I.who), p:place});
+  }
+  if (line) log(line, ['h', I.who]);
+  if (stayed >= 10 && reason !== 'cut'){
+    addAff(I.who, 'h', 1.5); addAff('h', I.who, 1);
+    addMood(2);
+    dayEv(I.who, 'together', '待在' + place);
+    dayEv('h', 'together', I.who + '|待在' + place);
+    if (stayed >= 20) hMem(I.who, 'together', '待在' + place, I.room);
+  }
+  S._witActKey = null;
+  if (I.room === 'out') route(h, 'living');
+  else if (h){ h.act = 'idle'; h.label = '閒著'; goHomeIfForeign(h); }
+  if (!S.away && c) npcThink(c);
+  if (typeof renderAll === 'function') renderAll(true);
+}
+function hangTick(I){
+  if (!I || !I.hang) return false;
+  const h = S.ents.h, c = S.ents[I.who];
+  const place = hangPlaceName(I.room, I.who);
+  const lb = fill(WORDS.gotoStay || '和 {x} 待在{p}', {x:nm(I.who), p:place});
+  [h, c].forEach(e => { if (e){ e.act = 'together'; e.label = lb; e.feed = false; } });
+  if (S.t === I.start && !I._hangLog){
+    I._hangLog = true;
+    log(fill(WORDS.gotoArrive || '你和 {x} 到了{p}，就待在這裡。可以接著選要做什麼，或各自散開。', {x:nm(I.who), p:place}), ['h', I.who]);
+  }
+  const duty = hangDuty(I.who, I);
+  if (duty){ endHang('duty', duty); return true; }
+  if (S.t >= I.start + (I.dur || GOTO_MAX)){ endHang('max'); return true; }
+  return true;
+}
+function startGoto(id, place, already){
+  const room = gotoNormPlace(place, id);
+  const name = hangPlaceName(room, id);
+  startInter({who:id, place:room, dur:GOTO_MAX, label:`待在${name}`, type:'together', kind:'goto', hang:true, aff:2, des:0, src:'h', quiet:true, reqId:'goto'});
+  if (S.inter) S.inter._duty0 = dutyKey(id);
+  if (!already) log(fill(WORDS.gotoAsk || '你約 {x} 一起去{p}。', {x:nm(id), p:name}), ['h', id]);
+  if (typeof interThink === 'function') interThink();
+  if (typeof renderAll === 'function') renderAll(true);
+}
+function tryGoto(id, place, auto){
+  if (!S || !S.ents[id]) return false;
+  if (typeof loveCold === 'function' && loveCold(id) && !isHangWith(id)){
+    toast(fill(WORDS.loveColdBlock || '你們正在冷戰，他現在不太想互動。', {x:nm(id)}));
+    return false;
+  }
+  const room = gotoNormPlace(place, id);
+  if (isHangWith(id) && hangArrived() && S.inter.room === room){
+    toast(WORDS.gotoSame || '你們已經在這裡了。');
+    return false;
+  }
+  const C = CHAR[id], o = S.ents[id];
+  if (isHangWith(id)){
+    hangClear();
+    const aLine = (lineOf(id, 'goto') || ['走吧。', ''])[0];
+    log(`你對 ${C.name}「約他一起去…」。${aLine}`, ['h', id]);
+    toast(`${C.name}：${aLine}`);
+    startGoto(id, room, true);
+    closeSheet();
+    return true;
+  }
+  if (!gotoAvailable(id)){ toast(`${nm(id)} 現在不方便。`); return false; }
+  const def = H_INTER.find(x => x.id === 'goto') || {p:.55};
+  const base = 0.55;
+  const aff = S.aff[id].h, m = moodOf(o);
+  let p = base + aff / 200 + (m - 50) / 300 + (hMood() - 50) / 400 - (S.jeal[id] || 0) / 400;
+  if (['work','music','draw','code','photo'].includes(o.act)) p -= 0.2;
+  p += (typeof compatOf === 'function' ? compatOf(id) : 0) * 0.03;
+  const asleep = o.act === 'sleep';
+  if (asleep) p = 0.12;
+  p = clamp(p, 0.03, 0.97);
+  const ok = Math.random() < p;
+  let [aLine, rLine] = lineOf(id, 'goto');
+  const name = hangPlaceName(room, id);
+  S.hAction = null; S.hPending = null;
+  if (ok){
+    if (asleep) log(`${C.name} 被你叫醒了，揉著眼睛坐起來。`, [id]);
+    log(`你對 ${C.name}「約他一起去…」。${aLine}`, ['h', id]);
+    toast(`${C.name}：${aLine}`);
+    startGoto(id, room, false);
+    closeSheet();
+    return true;
+  }
+  const line = asleep ? '他翻了個身，含糊地說：「……現在幾點……」' : rLine;
+  hMem(id, 'declined', '約他一起去…');
+  log(`你對 ${C.name}「約他一起去…」。${line}`, ['h', id]);
+  toast(`${C.name}：${line}`);
+  if (asleep){ addAff(id, 'h', id === 'liam' ? -0.5 : -3); o.buff -= 5; bubble(id, '😪', 20); }
+  else addAff(id, 'h', -0.5);
+  addMood(typeof hasT === 'function' && hasT('bold') ? -1 : -3);
+  dayEv(id, 'refused'); dayEv('h', 'refused', id);
+  S.ents.h.act = 'idle'; S.ents.h.label = '有點尷尬';
+  if (typeof checkTier === 'function') checkTier(id);
+  if (typeof renderAll === 'function') renderAll(true);
+  return false;
+}
+function renderGotoPlaces(id, back){
+  const {pub, rooms, out} = gotoPlaces(id);
+  const groups = [];
+  const push = (label, items) => { if (items && items.length) groups.push({label, items}); };
+  let cur = null, buf = [];
+  pub.forEach(it => {
+    if (cur != null && it.group !== cur){ push(cur, buf); buf = []; }
+    cur = it.group; buf.push(it);
+  });
+  if (buf.length) push(cur, buf);
+  push(WORDS.gotoRooms || '房間', rooms);
+  push('出門', [out]);
+  const hint = fill(WORDS.gotoPickHint || '選一個地方，兩人會一起走過去。到了就待在那裡，可以再選要做什麼。', {x:nm(id)});
+  return `<div class="grab"></div><h3>👣 ${esc(WORDS.gotoTitle || '約他一起去…')}</h3>
+    <div class="small muted">和 ${esc(nm(id))} 一起。${esc(hint)}</div>
+    ${groups.map(g => `<div class="igrp">${esc(g.label)}</div><div class="agrid">${g.items.map(it => `<button class="btn" data-gp="${esc(it.id)}"><i>${esc(it.icon)}</i>${esc(it.name)}</button>`).join('')}</div>`).join('')}
+    ${back ? `<button type="button" class="btn wide" id="gotoBack" style="margin-top:12px">返回</button>` : ''}`;
+}
+function openGotoPicker(id, fromWho){
+  ui.sel = id;
+  openSheet(() => {
+    $('#sheet').innerHTML = renderGotoPlaces(id, !!fromWho);
+    $('#sheet').querySelectorAll('[data-gp]').forEach(b => b.onclick = () => tryGoto(id, b.dataset.gp));
+    const bk = $('#gotoBack'); if (bk) bk.onclick = () => openGotoWho();
+  }, false);
+}
+function openGotoWho(){
+  ui.sel = 'h';
+  openSheet(() => {
+    const hangId = isHang() ? S.inter.who : null;
+    $('#sheet').innerHTML = `<div class="grab"></div><h3>👣 ${esc(WORDS.gotoWhoTitle || '和誰前往哪裡')}</h3>
+      <div class="small muted">${esc(WORDS.gotoWhoHint || '先選一位在家、現在方便的室友，再選要去的地方。')}</div>
+      <div class="agrid">${S.residents.map(id => {
+        const o = S.ents[id], ok = gotoAvailable(id);
+        const sub = !ok ? (typeof home === 'function' && !home(o) ? '不在家' : '現在不方便') : (isHangWith(id) ? '正待在一起' : esc(o.label || ''));
+        return `<button class="btn" data-gw="${id}" ${ok ? '' : 'disabled'}><span class="av" style="width:30px;height:30px">${avOf(id)}</span>${esc(CHAR[id].name)}<small>${sub}</small></button>`;
+      }).join('')}</div>`;
+    $('#sheet').querySelectorAll('[data-gw]').forEach(b => b.onclick = () => openGotoPicker(b.dataset.gw, true));
+  }, false);
+}
+
+if (typeof window !== 'undefined') Object.assign(window.__imb || (window.__imb = {}), {
+  GOTO_MAX, hangPlaceName, isHang, isHangWith, hangArrived, hangCanAct, dutyKey, hangDuty, hangClear, hangTick, endHang, startGoto, tryGoto, openGotoPicker, openGotoWho, gotoPlaces, gotoAvailable, gotoNormPlace
+});
+
+</script>
+<script>
 /* ---------- 作弊模式：自己加室友的自主行為 ----------
    三種：① 他一個人做的事（自己的活動）② 室友和室友之間的活動（只限日常，沒有任何親密或戀愛的選項）
    ③ 他主動來找你的事件（和內建事件同一套：關係階段、地點、時間、三個選項）。
@@ -8391,7 +8687,7 @@ function fxWrap(name, filt){
   const w = function(...a){ fxBegin(filt); try { return f.apply(this, a); } finally { fxEnd(); } }; w.__fx = true; window[name] = w;
   if (window.__imb && name in window.__imb) window.__imb[name] = w;
 }
-['answerRequest', 'endInter', 'heroInter', 'witness', 'caught', 'leaveSeen', 'endSolo', 'cookShare', 'startGroup', 'endGroup', 'resolveGrpInvite', 'startAftercare', 'fireCollide', 'fireTest', 'resolveHeroInter', 'stopHero', 'resolveEvent', 'heroSoloDone', 'haDone', 'markNotice', 'possNotice', 'jealCutIn'].forEach(n => fxWrap(n));
+['answerRequest', 'endInter', 'heroInter', 'witness', 'caught', 'leaveSeen', 'endSolo', 'cookShare', 'startGroup', 'endGroup', 'resolveGrpInvite', 'startAftercare', 'fireCollide', 'fireTest', 'resolveHeroInter', 'stopHero', 'resolveEvent', 'heroSoloDone', 'haDone', 'markNotice', 'possNotice', 'jealCutIn', 'endHang', 'tryGoto'].forEach(n => fxWrap(n));
 ['socialThink', 'nmThink'].forEach(n => fxWrap(n, true));
 Object.assign(window.__imb, { fxHtml, fxSeg, fxBegin, fxEnd, fxDiff, get FX(){ return FX; } });
 
