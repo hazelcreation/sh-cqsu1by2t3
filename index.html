@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f7f1e8">
 <title>失衡・公寓觀察</title>
-<meta name="imb-build" content="2026-11-11 11:59 (台北)">
+<meta name="imb-build" content="2026-11-11 12:09 (台北)">
 <style>
 :root{
   --bg:#f7f1e8; --card:#fffaf3; --line:#e8dccb; --ink:#4a3f35; --muted:#9a8b7b; --accent:#c9876b; --accent2:#e7b9a3;
@@ -4275,7 +4275,7 @@ function interFromDef(id, d, extra){
   startInter({who:id, place:d.place, spot:d.spot, dur:d.dur, label:d.lbl || d.label, type, kind:d.K || d.id, ik:d.ik, act:d.act, dk:d.dk, wk:d.wk, catchP:d.catchP, feed:d.feed, aff:d.aff, des:d.des, ...extra});
 }
 const interLocked = (id, def) => (def.tier || 0) > relTier(id) || cxLocked(id, def) || (typeof loveLocked === 'function' && loveLocked(id, def));
-const lineOf = (id, itype) => (((typeof LOVE_LINES !== 'undefined' && LOVE_LINES[id] && LOVE_LINES[id][itype]) || H_LINES[id][itype] || (H_LINES_EXTRA[id] || {})[itype] || (PERSONA_LINES[id] || {})[itype] || (() => { const d = H_INTER.find(x => x.id === itype); return d && d.tier && STAGE_LINES[id][d.tier]; })() || ['', ''])).map(l => fill(l, {n:S.hero.name}));
+const lineOf = (id, itype) => ((H_LINES[id][itype] || (H_LINES_EXTRA[id] || {})[itype] || (PERSONA_LINES[id] || {})[itype] || (() => { const d = H_INTER.find(x => x.id === itype); return d && d.tier && STAGE_LINES[id][d.tier]; })() || ['', ''])).map(l => fill(l, {n:S.hero.name}));
 function resolveHeroInter(id, itype){
   const def = H_INTER.find(x => x.id === itype), o = S.ents[id], C = CHAR[id];
   const base = {chat:.88, care:.92, joke:.78, praise:.88, flirt:.5, cook:.55, movie:.55, walk:.5, terrace:.5, hug:.42, stay:.45, intimate:.3, sex:.28, book:.75, jog:.5, coop:.55, listen:.6, shoot:.75, sketch:.75, brew:.8, tease:.6, approach:.4}[itype] ?? def.p ?? .6;
@@ -7071,6 +7071,26 @@ function loveMigrate(s){
   }
   s.loveQ = Array.isArray(s.loveQ) ? s.loveQ.filter(x => x && CHAR[x.who]).slice(0, 12) : [];
   s.loveSaw = s.loveSaw && typeof s.loveSaw === 'object' && !Array.isArray(s.loveSaw) ? s.loveSaw : {};
+  // 已拿掉的重複戀人互動（抱抱／約會出門／一起睡，以及先前拿掉的牽手）：進行中的直接收尾；紀錄與回憶文字保留
+  const GONE_LOVE = ['love_hug','love_date','love_sleep','love_hand'];
+  if (s.hPending && GONE_LOVE.includes(s.hPending.itype)){
+    const id = s.hPending.who;
+    if (s.ents && s.ents[id] && !(s.inter && s.inter.who === id)) s.ents[id].busy = false;
+    s.hPending = null;
+  }
+  if (s.inter && (GONE_LOVE.includes(s.inter.kind) || GONE_LOVE.includes(s.inter.itype) || GONE_LOVE.includes(s.inter.id) || ['抱抱','約會出門','約會中','一起睡'].includes(s.inter.label))){
+    const who = s.inter.who;
+    ['h', who].forEach(id => {
+      const e = s.ents && s.ents[id];
+      if (!e) return;
+      e.busy = false;
+      e.path = [];
+      e.dest = null;
+      e.act = 'idle';
+      e.label = id === 'h' ? '閒著' : '放鬆';
+    });
+    s.inter = null;
+  }
   return s;
 }
 function loveOf(id){
@@ -7200,51 +7220,10 @@ function setLoveStatus(id, st, opts){
 H_INTER.push(
   {id:'confess', label:'告白', icon:'💌', dur:5, aff:0, des:0, place:'here', grp:'love', talk:true, need:'confess', p:1},
   {id:'reply_cf', label:'回覆告白', icon:'✉️', dur:5, aff:0, des:0, place:'here', grp:'love', need:'pending', p:1},
-  {id:'talk_it', label:'好好談談', icon:'🕊️', dur:15, aff:0, des:0, place:'here', grp:'love', talk:true, need:'talk', wk:'none', p:1},
-  {id:'love_hug', label:'抱抱', icon:'🤗', dur:10, aff:5, des:3, place:'here', grp:'love', need:'lover', T:'flirt', K:'hug', wk:'hug', dk:'被他好好抱住', p:.88},
-  {id:'love_date', label:'約會出門', icon:'🎡', dur:120, aff:8, des:3, place:'out', grp:'love', need:'lover', T:'together', K:'date', wk:'flirt', lbl:'約會中', dk:'出去約會了', p:.8},
-  {id:'love_sleep', label:'一起睡', icon:'😴', dur:480, aff:6, des:2, place:'his', grp:'love', need:'lover', T:'together', K:'sleep', act:'sleep', wk:'hug', lbl:'一起睡', dk:'和他一起睡了一晚', hrs:[21, 26.5], p:.75}
+  {id:'talk_it', label:'好好談談', icon:'🕊️', dur:15, aff:0, des:0, place:'here', grp:'love', talk:true, need:'talk', wk:'none', p:1}
 );
 H_INTER_GRP.love = '戀人';
 
-const LOVE_LINES = {
-  alexander:{
-    love_hand:['他看了你的手一秒，才慢慢握住，力道剛好。','他把手收回袖口。「不是現在。」'],
-    love_hug:['他沒有退開，手臂很穩地環過來，像在量一個他早就算好的距離。','他後退半步。「……等等。」'],
-    love_date:['他把外套搭在手臂上。「走吧。我知道一家很安靜的店。」','「今晚有圖要趕。下次。」'],
-    love_sleep:['他點頭，替你把被子掀開一邊。「睡吧。我在。」','「今晚我想一個人把圖收完。」']
-  },
-  jasper:{
-    love_hand:['他十指扣上來，還趁機晃了晃。「公開嗎？還是先偷偷的？」','他笑著抽手，「相機還在身上，等一下。」'],
-    love_hug:['他整個人靠過來，下巴擱在你肩上。「嗯，這個角度我要了。」','「等等，我頭髮亂了。」他笑著避開。'],
-    love_date:['「約會！我早想聽你親口說這兩個字。」他已經在找鏡頭以外的路。','「今晚要交片，欠你一次真正的約會。」'],
-    love_sleep:['他把相機面朝下放好。「今晚不拍了。睡。」','「我還有幾張要修……你先睡，我待會過來。」']
-  },
-  liam:{
-    love_hand:['他笑出酒窩，輕輕握住你的手，拇指在你指節上畫了一下。','「手上還有麵粉。」他不好意思地攤開掌心。'],
-    love_hug:['他把你圈進懷裡，身上有剛烤過的味道。「今天也辛苦了。」','他拍拍你的肩。「先讓我把火關掉。」'],
-    love_date:['「好啊。我想帶你去那家週末才開的小館。」','「今晚廚房走不開，明天我補你一頓好好的。」'],
-    love_sleep:['他替你倒了杯溫水，在床沿坐下。「想靠過來就靠過來。」','「我還有發酵要看。你先睡，好嗎？」']
-  },
-  marcus:{
-    love_hand:['他沒說話，只是把你的手牽進自己的外套口袋裡。','「待會。」他把耳機摘下一邊。'],
-    love_hug:['他讓你靠上來，手掌落在你後腦，很慢。','「別鬧。」語氣卻沒有推開你那麼堅決。'],
-    love_date:['「走。今晚我選地方。」他已經在拿皮夾克。','「今晚要收一首。改天，我請。」'],
-    love_sleep:['他拍拍床的另一側。「燈我關。」','「我還想再聽一遍。你先睡。」']
-  },
-  samuel:{
-    love_hand:['他的手心有一點汗，但還是小心地握住了。「……這樣可以嗎？」','「有、有人在看……對不起……」'],
-    love_hug:['他僵了兩秒，才小心翼翼地回抱，像怕用力過了。','他慌張地後退，「對、對不起，我還沒準備好……」'],
-    love_date:['「約、約會嗎？」他眼睛亮了一下，「我、我去查路……」','「外面人好多……可不可以改在家……？」'],
-    love_sleep:['他點頭，聲音小得幾乎聽不見：「我、我會盡量不佔位置……」','「我還在 debug……你先睡，我怕鍵盤會吵你。」']
-  },
-  theo:{
-    love_hand:['他立刻十指扣緊，晃著你的手走。「這是交往後第一次牽手耶！」','「等一下啦，手上還有筆記的墨水……」'],
-    love_hug:['他直接把你抱起來轉了半圈。「可以一直這樣嗎？」','「這裡有人啦……」他小聲說，臉卻紅了。'],
-    love_date:['「約會！！我知道附近有家甜點超好！」他已經在穿鞋了。','「明天小考……約會改周末，我請你吃兩份！」'],
-    love_sleep:['他眼睛亮得嚇人，「真的可以嗎？我會很乖，大概。」','「我還要背書……你先躺，我看完就過來！」']
-  }
-};
 
 /* ---- 室友主動告白（事件，不會被一般抽選抽到） ---- */
 const LOVE_CONFESS_EV = {
@@ -7845,6 +7824,7 @@ function loveShowRequest(){
   if (typeof heroInter === 'function'){
     const _hi = heroInter;
     heroInter = function(id, itype, auto){
+      if (['love_hug','love_date','love_sleep','love_hand'].includes(itype)) return;
       const def = H_INTER.find(x => x.id === itype);
       if (def && def.need && !loveHeroGate(id, itype, def)) return;
       if (loveCold(id) && !(def && (def.need === 'talk' || itype === 'talk_it'))){
@@ -7907,9 +7887,9 @@ function loveShowRequest(){
     };
   }
   if (typeof TX_TABLES === 'object'){
-    Object.assign(TX_TABLES, {LOVE_LINES, LOVE_CONFESS_EV, LOVE_CAUGHT, LOVE_CAUGHT_RES, LOVE_TALK_RES});
+    Object.assign(TX_TABLES, {LOVE_CONFESS_EV, LOVE_CAUGHT, LOVE_CAUGHT_RES, LOVE_TALK_RES});
     if (typeof TX_CAT === 'object'){
-      Object.assign(TX_CAT, {LOVE_LINES:'戀人互動的回應', LOVE_CONFESS_EV:'告白', LOVE_CAUGHT:'被發現了', LOVE_CAUGHT_RES:'被發現了', LOVE_TALK_RES:'好好談談'});
+      Object.assign(TX_CAT, {LOVE_CONFESS_EV:'告白', LOVE_CAUGHT:'被發現了', LOVE_CAUGHT_RES:'被發現了', LOVE_TALK_RES:'好好談談'});
     }
   }
 })();
